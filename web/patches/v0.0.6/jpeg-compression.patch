@@ -1,0 +1,159 @@
+diff -ur parti-orig/xpra/client.py parti/xpra/client.py
+--- parti-orig/xpra/client.py	2009-08-05 19:27:26.000000000 -0700
++++ parti/xpra/client.py	2009-08-05 20:03:24.000000000 -0700
+@@ -156,12 +156,19 @@
+         cr.set_source_rgb(1, 1, 1)
+         cr.fill()
+ 
+-    def draw(self, x, y, width, height, rgb_data):
+-        assert len(rgb_data) == width * height * 3
+-        (my_width, my_height) = self.window.get_size()
++    def draw(self, x, y, width, height, coding, img_data):
+         gc = self._backing.new_gc()
+-        self._backing.draw_rgb_image(gc, x, y, width, height,
+-                                     gtk.gdk.RGB_DITHER_NONE, rgb_data)
++        if coding != "rgb24":
++            loader = gtk.gdk.PixbufLoader(coding)
++            loader.write(img_data, len(img_data))
++            pixbuf = loader.get_pixbuf()
++            loader.close()
++            self._backing.draw_pixbuf(gc, pixbuf, 0, 0, x, y, width, height)
++        else:
++            assert len(img_data) == width * height * 3
++            self._backing.draw_rgb_image(gc, x, y, width, height,
++                                         gtk.gdk.RGB_DITHER_NONE, img_data)
++
+         self.window.invalidate_rect(gtk.gdk.Rectangle(x, y, width, height),
+                                     False)
+ 
+@@ -271,7 +278,7 @@
+ gobject.type_register(ClientWindow)
+ 
+ class XpraClient(gobject.GObject):
+-    def __init__(self, sock, compression_level):
++    def __init__(self, sock, compression_level, jpegquality):
+         gobject.GObject.__init__(self)
+         self._window_to_id = {}
+         self._id_to_window = {}
+@@ -281,6 +288,8 @@
+         capabilities_request = dict(default_capabilities)
+         if compression_level:
+             capabilities_request["deflate"] = compression_level
++        if jpegquality:
++            capabilities_request["jpeg"] = jpegquality
+         root_w, root_h = gtk.gdk.get_default_root_window().get_size()
+         capabilities_request["desktop_size"] = [root_w, root_h]
+         self.send(["hello", capabilities_request])
+@@ -390,8 +399,7 @@
+     def _process_draw(self, packet):
+         (_, id, x, y, width, height, coding, data) = packet
+         window = self._id_to_window[id]
+-        assert coding == "rgb24"
+-        window.draw(x, y, width, height, data)
++        window.draw(x, y, width, height, coding, data)
+ 
+     def _process_window_metadata(self, packet):
+         (_, id, metadata) = packet
+Only in parti/xpra: __init__.pyc
+diff -ur parti-orig/xpra/protocol.py parti/xpra/protocol.py
+--- parti-orig/xpra/protocol.py	2009-08-05 19:27:26.000000000 -0700
++++ parti/xpra/protocol.py	2009-08-05 19:32:12.000000000 -0700
+@@ -38,6 +38,7 @@
+         self._write_buf = ""
+         self._compressor = None
+         self._decompressor = None
++        self.jpegquality = 0
+         self._watch_tag = None
+         self._update_watch(force=True)
+ 
+diff -ur parti-orig/xpra/scripts/main.py parti/xpra/scripts/main.py
+--- parti-orig/xpra/scripts/main.py	2009-08-05 19:27:26.000000000 -0700
++++ parti/xpra/scripts/main.py	2009-08-05 19:31:05.000000000 -0700
+@@ -59,6 +59,10 @@
+                       help="How hard to work on compressing data."
+                       + " 0 to disable compression,"
+                       + "9 for maximal (slowest) compression. Default: 3.")
++    parser.add_option("--jpeg-quality", action="store",
++                      metavar="LEVEL",
++                      dest="jpegquality", type="int", default="0",
++                      help="Use jpeg compression with given quality (1-100), 0 disables jpeg compression. Default: disabled.")
+     parser.add_option("--ssh", action="store",
+                       dest="ssh", default=None, metavar="CMD",
+                       help="How to run 'xpra' on the remote host")
+@@ -194,7 +198,9 @@
+     sock = connect(pick_display(parser, opts, extra_args))
+     if opts.compression_level < 0 or opts.compression_level > 9:
+         parser.error("Compression level must be between 0 and 9 inclusive.")
+-    app = XpraClient(sock, opts.compression_level)
++    if opts.jpegquality < 0 or opts.jpegquality > 100:
++        parser.error("Jpeg quality must be between 0 and 100 inclusive.")
++    app = XpraClient(sock, opts.compression_level, opts.jpegquality)
+     sys.stdout.write("Attached (press Control-C to detach)\n")
+     app.run()
+ 
+diff -ur parti-orig/xpra/server.py parti/xpra/server.py
+--- parti-orig/xpra/server.py	2009-08-05 19:27:26.000000000 -0700
++++ parti/xpra/server.py	2009-08-05 19:46:20.000000000 -0700
+@@ -16,6 +16,8 @@
+ import os.path
+ import sys
+ import subprocess
++import Image
++import StringIO
+ 
+ from wimpiggy.wm import Wm
+ from wimpiggy.util import (LameStruct,
+@@ -167,11 +169,11 @@
+                 log.error("wtf, pixmap is None?")
+                 packet = None
+             else:
+-                (x2, y2, w2, h2, data) = self._get_rgb_data(pixmap, x, y, w, h)
++                (x2, y2, w2, h2, coding, data) = self._get_rgb_data(pixmap, x, y, w, h)
+                 if not w2 or not h2:
+                     packet = None
+                 else:
+-                    packet = ["draw", id, x2, y2, w2, h2, "rgb24", data]
++                    packet = ["draw", id, x2, y2, w2, h2, coding, data]
+         else:
+             packet = None
+         return packet, self._have_more()
+@@ -203,7 +205,20 @@
+             for i in xrange(height):
+                 rows.append(raw_data[i*rowstride : i*rowstride+rowwidth])
+             data = "".join(rows)
+-        return (x, y, width, height, data)
++        coding = "rgb24"
++
++        # should probably have some other conditions for
++        # enabling jpeg compression (for example len(data) > N and/or
++        # width*height > M)
++        if self._protocol.jpegquality > 0:
++            im = Image.fromstring("RGB", (width,height), data)
++            buf=StringIO.StringIO()
++            im.save(buf,"JPEG", quality=self._protocol.jpegquality)
++            data=buf.getvalue()
++            buf.close()
++            coding = "jpeg"
++
++        return (x, y, width, height, coding, data)
+ 
+ class XpraServer(gobject.GObject):
+     __gsignals__ = {
+@@ -489,7 +504,7 @@
+ 
+     def _calculate_capabilities(self, client_capabilities):
+         capabilities = {}
+-        for cap in ("deflate", "__prerelease_version"):
++        for cap in ("deflate", "__prerelease_version", "jpeg"):
+             if cap in client_capabilities:
+                 capabilities[cap] = client_capabilities[cap]
+         if "desktop_size" in client_capabilities:
+@@ -517,6 +532,8 @@
+         self._send(["hello", capabilities])
+         if "deflate" in capabilities:
+             self._protocol.enable_deflate(capabilities["deflate"])
++        if "jpeg" in capabilities:
++            self._protocol.jpegquality = capabilities["jpeg"]
+         # We send the new-window packets sorted by id because this sorts them
+         # from oldest to newest -- and preserving window creation order means
+         # that the earliest override-redirect windows will be on the bottom,

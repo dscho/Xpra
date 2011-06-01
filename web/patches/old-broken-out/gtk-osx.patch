@@ -1,0 +1,61 @@
+--- a/setup.py	(revision 213)
++++ b/setup.py	(working copy)
+@@ -52,7 +52,7 @@
+   xpra:
+     %s""" % (wimpiggy_desc, parti_desc, xpra_desc)
+ 
+-if not sys.platform.startswith("win"):
++if not sys.platform.startswith("win") and not sys.platform.startswith("darwin"):
+     from Pyrex.Compiler.Version import version as pyrex_version_string
+     pyrex_version = [int(part) for part in pyrex_version_string.split(".")]
+     # This was when the 'for 0 < i < 10:' syntax as added, bump upwards as
+--- a/wimpiggy/keys.py	(revision 213)
++++ b/wimpiggy/keys.py	(working copy)
+@@ -3,6 +3,7 @@
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+ 
++import sys
+ import gobject
+ import gtk
+ from wimpiggy.util import one_arg_signal
+@@ -27,7 +28,7 @@
+         gobject.GObject.__init__(self)
+         self.window = window
+         self.hotkeys = {}
+-        if not sys.platform.startswith("win"):
++        if not sys.platform.startswith("win") and not sys.platform.startswith("darwin"):
+                 global get_modifier_map
+                 global grab_key
+                 global ungrab_all_keys
+--- a/wimpiggy/lowlevel/__init__.py	(revision 213)
++++ b/wimpiggy/lowlevel/__init__.py	(working copy)
+@@ -12,7 +12,7 @@
+     pass
+ 
+ _sendClientMessage=noop
+-if not sys.platform.startswith("win"):
++if not sys.platform.startswith("win") and not sys.platform.startswith("darwin"):
+     from wimpiggy.lowlevel.bindings import *
+     _sendClientMessage = sendClientMessage
+ 
+--- a/xpra/client.py	(revision 222)
++++ b/xpra/client.py	(working copy)
+@@ -293,7 +293,7 @@
+         self._xsettings_watcher = None
+         self._root_props_watcher = None
+ 
+-        if not sys.platform.startswith("win"):
++        if not sys.platform.startswith("win") and not sys.platform.startswith("darwin"):
+             from xpra.clipboard import ClipboardProtocolHelper
+             self._clipboard_helper = ClipboardProtocolHelper(self.send)
+         else:
+@@ -395,7 +395,7 @@
+             self._clipboard_helper.send_all_tokens()
+         self._xsettings_watcher = None
+         self._root_props_watcher = None
+-        if not sys.platform.startswith("win"):
++        if not sys.platform.startswith("win") and not sys.platform.startswith("darwin"):
+             from xpra.xsettings import XSettingsWatcher
+             from xpra.root_props import RootPropWatcher
+             self._xsettings_watcher = XSettingsWatcher()

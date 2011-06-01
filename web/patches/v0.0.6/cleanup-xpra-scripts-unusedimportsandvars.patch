@@ -1,0 +1,57 @@
+### Eclipse Workspace Patch 1.0
+#P xpra
+Index: trunk/dev/xpra/scripts/server.py
+===================================================================
+--- trunk/dev/xpra/scripts/server.py	(revision 129)
++++ trunk/dev/xpra/scripts/server.py	(working copy)
+@@ -8,11 +8,9 @@
+ import gobject
+ import subprocess
+ import sys
+-import os
+ import os.path
+ import atexit
+ import signal
+-import time
+ import socket
+ 
+ from xpra.wait_for_x_server import wait_for_x_server
+@@ -62,7 +60,7 @@
+     def __call__(self, signum, frame):
+         while 1:
+             try:
+-                pid, status = os.waitpid(-1, os.WNOHANG)
++                pid, _ = os.waitpid(-1, os.WNOHANG)
+             except OSError:
+                 break
+             if pid == 0:
+Index: trunk/dev/xpra/scripts/main.py
+===================================================================
+--- trunk/dev/xpra/scripts/main.py	(revision 140)
++++ trunk/dev/xpra/scripts/main.py	(working copy)
+@@ -3,7 +3,6 @@
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+ 
+-import gobject
+ import sys
+ import os
+ import socket
+@@ -146,7 +145,7 @@
+         else:
+             remote_xpra = ["$HOME/.xpra/run-xpra"]
+         
+-        p = subprocess.Popen(["ssh", host, "-e", "none"]
++        subprocess.Popen(["ssh", host, "-e", "none"]
+                              + remote_xpra + ["_proxy"] + display_args,
+                              stdin=b.fileno(), stdout=b.fileno(),
+                              bufsize=0)
+@@ -196,7 +195,7 @@
+         pass
+     if local:
+         sockdir = DotXpra()
+-        for i in xrange(6):
++        for _ in xrange(6):
+             final_state = sockdir.server_state(display_name)
+             if final_state is DotXpra.LIVE:
+                 time.sleep(0.5)

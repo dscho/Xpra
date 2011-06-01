@@ -1,0 +1,15 @@
+### Eclipse Workspace Patch 1.0
+#P xpra
+Index: trunk/dev/parti/parti_main.py
+===================================================================
+--- trunk/dev/parti/parti_main.py	(revision 124)
++++ trunk/dev/parti/parti_main.py	(working copy)
+@@ -14,7 +14,7 @@
+ from parti.world_organizer import WorldOrganizer
+ 
+ from parti.tray import TraySet
+-from parti.trays.simpletab import SimpleTabTray
++#from parti.trays.simpletab import SimpleTabTray
+ 
+ from parti.addons.ipython_embed import spawn_repl_window
+ 

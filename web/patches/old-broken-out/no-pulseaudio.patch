@@ -1,0 +1,119 @@
+### Eclipse Workspace Patch 1.0
+#P xpra
+Index: trunk/dev/xpra/client.py
+===================================================================
+--- trunk/dev/xpra/client.py	(revision 246)
++++ trunk/dev/xpra/client.py	(working copy)
+@@ -273,7 +273,7 @@
+ gobject.type_register(ClientWindow)
+ 
+ class XpraClient(gobject.GObject):
+-    def __init__(self, sock, compression_level, jpegquality, title_suffix, password_file):
++    def __init__(self, sock, compression_level, jpegquality, title_suffix, password_file, pulseaudio):
+         gobject.GObject.__init__(self)
+         self._window_to_id = {}
+         self._id_to_window = {}
+@@ -282,6 +282,12 @@
+         self.compression_level = compression_level
+         self.jpegquality = jpegquality
+ 
++        self.ROOT_PROPS = {"RESOURCE_MANAGER": "resource-manager"}
++        if pulseaudio:
++            self.ROOT_PROPS["PULSE_COOKIE"] = "pulse-cookie"
++            self.ROOT_PROPS["PULSE_ID"] = "pulse-id"
++            self.ROOT_PROPS["PULSE_SERVER"] = "pulse-server"
++
+         self._protocol = Protocol(sock, self.process_packet)
+         ClientSource(self._protocol)
+         self.send_hello()
+@@ -356,12 +362,6 @@
+         if blob is not None:
+             self.send(["server-settings", {"xsettings-blob": blob}])
+ 
+-    ROOT_PROPS = {
+-        "RESOURCE_MANAGER": "resource-manager",
+-        "PULSE_COOKIE": "pulse-cookie",
+-        "PULSE_ID": "pulse-id",
+-        "PULSE_SERVER": "pulse-server",
+-        }
+     
+     def _handle_root_prop_changed(self, obj, prop):
+         from wimpiggy.prop import prop_get
+Index: trunk/dev/xpra/scripts/server.py
+===================================================================
+--- trunk/dev/xpra/scripts/server.py	(revision 246)
++++ trunk/dev/xpra/scripts/server.py	(working copy)
+@@ -288,7 +288,7 @@
+ 
+     # This import is delayed because the module depends on gtk:
+     import xpra.server
+-    app = xpra.server.XpraServer(upgrading, sockets, opts.password_file)
++    app = xpra.server.XpraServer(upgrading, sockets, opts.password_file, opts.pulseaudio)
+     def cleanup_socket(self):
+         print "removing socket"
+         try:
+Index: trunk/dev/xpra/server.py
+===================================================================
+--- trunk/dev/xpra/server.py	(revision 246)
++++ trunk/dev/xpra/server.py	(working copy)
+@@ -225,7 +225,7 @@
+         "wimpiggy-child-map-event": one_arg_signal,
+         }
+ 
+-    def __init__(self, clobber, sockets, password_file):
++    def __init__(self, clobber, sockets, password_file, pulseaudio):
+         gobject.GObject.__init__(self)
+         
+         # Do this before creating the Wm object, to avoid clobbering its
+@@ -315,6 +315,8 @@
+ 
+         self.password_file = password_file
+         self.salt = None
++        
++        self.pulseaudio = pulseaudio
+ 
+         ### All right, we're ready to accept customers:
+         for sock in sockets:
+@@ -612,12 +614,13 @@
+                     self._xsettings_manager = XSettingsManager(v)
+                 elif k == "resource-manager":
+                     root_set("RESOURCE_MANAGER")
+-                elif k == "pulse-cookie":
+-                    root_set("PULSE_COOKIE")
+-                elif k == "pulse-id":
+-                    root_set("PULSE_ID")
+-                elif k == "pulse-server":
+-                    root_set("PULSE_SERVER")
++                elif self.pulseaudio:
++                    if k == "pulse-cookie":
++                        root_set("PULSE_COOKIE")
++                    elif k == "pulse-id":
++                        root_set("PULSE_ID")
++                    elif k == "pulse-server":
++                        root_set("PULSE_SERVER")
+ 
+     def _process_map_window(self, proto, packet):
+         (_, id, x, y, width, height) = packet
+Index: trunk/dev/xpra/scripts/main.py
+===================================================================
+--- trunk/dev/xpra/scripts/main.py	(revision 246)
++++ trunk/dev/xpra/scripts/main.py	(working copy)
+@@ -56,6 +56,9 @@
+                       dest="bind_tcp", default=None,
+                       metavar="[HOST]:PORT",
+                       help="Listen for connections over TCP (insecure)")
++    parser.add_option("--no-pulseaudio", action="store_false",
++					  dest="pulseaudio", default=True,
++					  help="Disable pulseaudio support via X11 root window properties")
+     parser.add_option("--password-file", action="store",
+                       dest="password_file", default=None,
+                       help="The file containing the password required to connect (useful to secure TCP mode)")
+@@ -210,7 +213,7 @@
+         parser.error("Compression level must be between 0 and 9 inclusive.")
+     if opts.jpegquality < 0 or opts.jpegquality > 100:
+         parser.error("Jpeg quality must be between 0 and 100 inclusive.")
+-    app = XpraClient(sock, opts.compression_level, opts.jpegquality, opts.title_suffix, opts.password_file)
++    app = XpraClient(sock, opts.compression_level, opts.jpegquality, opts.title_suffix, opts.password_file, opts.pulseaudio)
+     sys.stdout.write("Attached (press Control-C to detach)\n")
+     app.run()
+ 

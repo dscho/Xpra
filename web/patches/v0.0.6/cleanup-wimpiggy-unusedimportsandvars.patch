@@ -1,0 +1,212 @@
+### Eclipse Workspace Patch 1.0
+#P xpra
+Index: trunk/dev/wimpiggy/util.py
+===================================================================
+--- trunk/dev/wimpiggy/util.py	(revision 124)
++++ trunk/dev/wimpiggy/util.py	(working copy)
+@@ -5,7 +5,6 @@
+ 
+ import traceback
+ import sys
+-import types
+ import gobject
+ import gtk
+ 
+@@ -95,7 +94,7 @@
+     # server goes away, etc.), and we don't want to impose that on every user
+     # of wimpiggy.util.
+     import gtk
+-    for i in xrange(gtk.main_level()):
++    for _ in xrange(gtk.main_level()):
+         gtk.main_quit()
+ 
+ # If a user hits control-C, and we are currently executing Python code below
+Index: trunk/dev/wimpiggy/pseudoclient.py
+===================================================================
+--- trunk/dev/wimpiggy/pseudoclient.py	(revision 124)
++++ trunk/dev/wimpiggy/pseudoclient.py	(working copy)
+@@ -4,8 +4,6 @@
+ # later version. See the file COPYING for details.
+ 
+ import gtk
+-import gtk.gdk
+-import wimpiggy.lowlevel
+ 
+ class PseudoclientWindow(gtk.Window):
+     """A gtk.Window that acts like an ordinary client.
+Index: trunk/dev/wimpiggy/window.py
+===================================================================
+--- trunk/dev/wimpiggy/window.py	(revision 124)
++++ trunk/dev/wimpiggy/window.py	(working copy)
+@@ -18,11 +18,11 @@
+ from socket import gethostname
+ import wimpiggy.lowlevel
+ from wimpiggy.util import (AutoPropGObjectMixin,
+-                           one_arg_signal, n_arg_signal,
++                           one_arg_signal,
+                            non_none_list_accumulator)
+ from wimpiggy.event import add_event_receiver, remove_event_receiver
+ from wimpiggy.util import get_display_for
+-from wimpiggy.error import *
++from wimpiggy.error import trap, XError
+ from wimpiggy.prop import prop_get, prop_set
+ from wimpiggy.composite import CompositeHelper
+ 
+@@ -714,7 +714,7 @@
+                                   "WM_CLASS", "latin1")
+         if class_instance:
+             try:
+-                (c, i, fluff) = class_instance.split("\0")
++                (c, i, _) = class_instance.split("\0")
+             except ValueError:
+                 log.warn("Malformed WM_CLASS, ignoring")
+             else:
+Index: trunk/dev/wimpiggy/test_prop.py
+===================================================================
+--- trunk/dev/wimpiggy/test_prop.py	(revision 124)
++++ trunk/dev/wimpiggy/test_prop.py	(working copy)
+@@ -144,7 +144,7 @@
+         small_dat = struct.pack("@II", SMALL_W, SMALL_H) + str(small.get_data())
+         large_dat = struct.pack("@II", LARGE_W, LARGE_H) + str(large.get_data())
+ 
+-        icon_bytes = small_dat + large_dat + small_dat
++        #icon_bytes = small_dat + large_dat + small_dat
+ 
+         p.prop_set(self.win, "_NET_WM_ICON", "debug-CARDINAL",
+                    small_dat + large_dat + small_dat)
+Index: trunk/dev/wimpiggy/wm.py
+===================================================================
+--- trunk/dev/wimpiggy/wm.py	(revision 124)
++++ trunk/dev/wimpiggy/wm.py	(working copy)
+@@ -8,7 +8,7 @@
+ 
+ from sets import ImmutableSet
+ 
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ import wimpiggy.selection
+ from wimpiggy.world_window import WorldWindow
+ import wimpiggy.lowlevel
+Index: trunk/dev/wimpiggy/event.py
+===================================================================
+--- trunk/dev/wimpiggy/event.py	(revision 124)
++++ trunk/dev/wimpiggy/event.py	(working copy)
+@@ -3,7 +3,6 @@
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+ 
+-import types
+ import gobject
+ from wimpiggy.log import Logger
+ log = Logger()
+Index: trunk/dev/wimpiggy/selection.py
+===================================================================
+--- trunk/dev/wimpiggy/selection.py	(revision 124)
++++ trunk/dev/wimpiggy/selection.py	(working copy)
+@@ -11,13 +11,12 @@
+ import gobject
+ import gtk
+ from struct import pack, unpack
+-import time
+ 
+ from wimpiggy.util import no_arg_signal, one_arg_signal
+ from wimpiggy.lowlevel import (get_xatom, get_pywindow, sendClientMessage,
+                                myGetSelectionOwner, const)
+ from wimpiggy.event import add_event_receiver, remove_event_receiver
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ 
+ from wimpiggy.log import Logger
+ log = Logger()
+@@ -100,7 +99,7 @@
+             try:
+                 window = trap.call(getwin)
+                 log("got window")
+-            except XError, e:
++            except XError:
+                 log("Previous owner is already gone, not blocking")
+             else:
+                 log("Waiting for previous owner to exit...")
+Index: trunk/dev/wimpiggy/test_lowlevel.py
+===================================================================
+--- trunk/dev/wimpiggy/test_lowlevel.py	(revision 124)
++++ trunk/dev/wimpiggy/test_lowlevel.py	(working copy)
+@@ -6,7 +6,7 @@
+ from wimpiggy.test import *
+ import wimpiggy.lowlevel as l
+ import gtk
+-from wimpiggy.error import *
++from wimpiggy.error import trap, XError
+ 
+ class TestLowlevel(TestWithSession):
+     def root(self, disp=None):
+Index: trunk/dev/wimpiggy/test.py
+===================================================================
+--- trunk/dev/wimpiggy/test.py	(revision 124)
++++ trunk/dev/wimpiggy/test.py	(working copy)
+@@ -3,7 +3,6 @@
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+ 
+-import unittest
+ import subprocess
+ import sys
+ import os
+@@ -26,7 +25,7 @@
+     except exc_class:
+         pass
+     except:
+-        (cls, e, tb) = sys.exc_info()
++        (cls, e, _) = sys.exc_info()
+         raise AssertionError, (("unexpected exception: %s: %s\n"
+                                + "Original traceback:\n%s")
+                                % (cls, e, traceback.format_exc()))
+@@ -42,7 +41,6 @@
+         "signal_was_emitted": False,
+         "slot_exc": None,
+         }
+-    signal_was_emitted = False
+     def real_slot(*args, **kwargs):
+         backchannel["signal_was_emitted"] = True
+         if slot is not None:
+Index: trunk/dev/wimpiggy/keys.py
+===================================================================
+--- trunk/dev/wimpiggy/keys.py	(revision 127)
++++ trunk/dev/wimpiggy/keys.py	(working copy)
+@@ -6,7 +6,7 @@
+ import gobject
+ import gtk
+ from wimpiggy.util import one_arg_signal
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ from wimpiggy.event import add_event_receiver, remove_event_receiver
+ from wimpiggy.util import get_display_for
+ from wimpiggy.log import Logger
+Index: trunk/dev/wimpiggy/test_error.py
+===================================================================
+--- trunk/dev/wimpiggy/test_error.py	(revision 124)
++++ trunk/dev/wimpiggy/test_error.py	(working copy)
+@@ -4,7 +4,7 @@
+ # later version. See the file COPYING for details.
+ 
+ from wimpiggy.test import *
+-from wimpiggy.error import *
++from wimpiggy.error import trap, XError
+ # Need a way to generate X errors...
+ import wimpiggy.lowlevel
+ 
+Index: trunk/dev/wimpiggy/composite.py
+===================================================================
+--- trunk/dev/wimpiggy/composite.py	(revision 124)
++++ trunk/dev/wimpiggy/composite.py	(working copy)
+@@ -4,9 +4,8 @@
+ # later version. See the file COPYING for details.
+ 
+ import gobject
+-import gtk
+ from wimpiggy.util import one_arg_signal, AutoPropGObjectMixin
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ from wimpiggy.lowlevel import (xcomposite_redirect_window,
+                                xcomposite_unredirect_window,
+                                xcomposite_name_window_pixmap,

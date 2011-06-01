@@ -1,0 +1,144 @@
+diff --git a/xpra/client.py b/xpra/client.py
+index ccdd515..f2e4b42 100644
+--- a/xpra/client.py
++++ b/xpra/client.py
+@@ -1,4 +1,5 @@
+ # This file is part of Parti.
++# Copyright (C) 2011 Serviware (Arthur Huillet, <ahuillet@serviware.com>)
+ # Copyright (C) 2008, 2010 Nathaniel Smith <njs@pobox.com>
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+@@ -68,6 +69,8 @@ class ClientWindow(gtk.Window):
+         self._override_redirect = override_redirect
+         self._new_backing(w, h)
+         self._failed_pixbuf_index = 0
++        self._refresh_timer = None
++        self._refresh_requested = 0
+         self.update_metadata(metadata)
+         
+         self.set_app_paintable(True)
+@@ -156,6 +159,11 @@ class ClientWindow(gtk.Window):
+         cr.set_source_rgb(1, 1, 1)
+         cr.fill()
+ 
++    def _automatic_refresh_cb(self):
++        print("Automatic refresh for id ", self._id)
++        self._client.send(["buffer-refresh", self._id, True, 95])
++        self._refresh_requested = 1
++
+     def draw(self, x, y, width, height, coding, img_data):
+         gc = self._backing.new_gc()
+         if coding != "rgb24":
+@@ -191,6 +199,14 @@ class ClientWindow(gtk.Window):
+             self._backing.draw_rgb_image(gc, x, y, width, height, gtk.gdk.RGB_DITHER_NONE, img_data)
+         self.window.invalidate_rect(gtk.gdk.Rectangle(x, y, width, height), False)
+ 
++        if self._refresh_requested:
++            self._refresh_requested = 0
++        else:
++            if self._refresh_timer:
++                gobject.source_remove(self._refresh_timer)
++            if self._client.refresh_delay:
++                self._refresh_timer = gobject.timeout_add(int(1000 * self._client.refresh_delay), self._automatic_refresh_cb)
++
+     def do_expose_event(self, event):
+         if not self.flags() & gtk.MAPPED:
+             return
+@@ -303,7 +319,7 @@ class XpraClient(gobject.GObject):
+         "received-gibberish": n_arg_signal(1),
+         }
+ 
+-    def __init__(self, conn, compression_level, jpegquality, title_suffix, password_file, pulseaudio, clipboard, opts):
++    def __init__(self, conn, compression_level, jpegquality, title_suffix, password_file, pulseaudio, clipboard, refresh_delay, opts):
+         gobject.GObject.__init__(self)
+         self._window_to_id = {}
+         self._id_to_window = {}
+@@ -311,6 +327,7 @@ class XpraClient(gobject.GObject):
+         self.password_file = password_file
+         self.compression_level = compression_level
+         self.jpegquality = jpegquality
++        self.refresh_delay = refresh_delay
+ 
+         self._protocol = Protocol(conn, self.process_packet)
+         ClientSource(self._protocol)
+@@ -460,6 +477,8 @@ class XpraClient(gobject.GObject):
+         window = self._id_to_window[id]
+         del self._id_to_window[id]
+         del self._window_to_id[window]
++        if window._refresh_timer:
++            gobject.source_remove(window._refresh_timer)
+         window.destroy()
+ 
+     def _process_connection_lost(self, packet):
+diff --git a/xpra/platform/__init__.pyc b/xpra/platform/__init__.pyc
+index 7a8c3f2..2d064c1 100644
+Binary files a/xpra/platform/__init__.pyc and b/xpra/platform/__init__.pyc differ
+diff --git a/xpra/scripts/main.py b/xpra/scripts/main.py
+index b83b286..b61c942 100644
+--- a/xpra/scripts/main.py
++++ b/xpra/scripts/main.py
+@@ -100,6 +100,12 @@ def main(script_file, cmdline):
+                       help="How hard to work on compressing data."
+                       + " 0 to disable compression,"
+                       + " 9 for maximal (slowest) compression. Default: %default.")
++    parser.add_option("--auto-refresh-delay", action="store",
++                      dest="auto_refresh_delay", type="float", default=0.0,
++                      metavar="DELAY",
++                      help="Idle delay in seconds before doing automatic lossless refresh."
++                      + " 0.0 to disable."
++                      + " Default: %default.")
+     parser.add_option("--ssh", action="store",
+                       dest="ssh", default=DEFAULT_SSH_CMD, metavar="CMD",
+                       help="How to run ssh (default: '%default')")
+@@ -267,7 +273,7 @@ def run_client(parser, opts, extra_args):
+         parser.error("Compression level must be between 0 and 9 inclusive.")
+     if opts.jpegquality < 0 or opts.jpegquality > 100:
+         parser.error("Jpeg quality must be between 0 and 100 inclusive.")
+-    app = XpraClient(conn, opts.compression_level, opts.jpegquality, opts.title_suffix, opts.password_file, opts.pulseaudio, opts.clipboard, opts)
++    app = XpraClient(conn, opts.compression_level, opts.jpegquality, opts.title_suffix, opts.password_file, opts.pulseaudio, opts.clipboard, opts.auto_refresh_delay, opts)
+     app.connect("handshake-complete", handshake_complete_msg)
+     app.connect("received-gibberish", got_gibberish_msg)
+     app.run()
+diff --git a/xpra/server.py b/xpra/server.py
+index 5db038e..4702c9c 100644
+--- a/xpra/server.py
++++ b/xpra/server.py
+@@ -1,4 +1,5 @@
+ # This file is part of Parti.
++# Copyright (C) 2011 Serviware (Arthur Huillet, <ahuillet@serviware.com>)
+ # Copyright (C) 2008 Nathaniel Smith <njs@pobox.com>
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+@@ -217,6 +218,7 @@ class ServerSource(object):
+         # enabling jpeg compression (for example len(data) > N and/or
+         # width*height > M)
+         if self._protocol.jpegquality > 0:
++            print("sending with quality ", self._protocol.jpegquality)
+             im = Image.fromstring("RGB", (width,height), data)
+             buf=StringIO.StringIO()
+             im.save(buf,"JPEG", quality=self._protocol.jpegquality)
+@@ -776,6 +778,16 @@ class XpraServer(gobject.GObject):
+         log.info("Shutting down in response to request")
+         self.quit(False)
+ 
++    def _process_buffer_refresh(self, proto, packet):
++        (_, id, use_jpeg, jpeg_qual) = packet
++        window = self._id_to_window[id]
++        print("Requested refresh for window ", id)
++        qual_save = self._protocol.jpegquality
++        self._protocol.jpegquality = jpeg_qual
++        (x, y, w, h) = window.get_property("geometry")
++        self._damage(window, 0, 0, w, h)
++        self._protocol.jpegquality = qual_save
++
+     def _process_connection_lost(self, proto, packet):
+         log.info("Connection lost")
+         proto.close()
+@@ -803,6 +815,7 @@ class XpraServer(gobject.GObject):
+         "pointer-position": _process_pointer_position,
+         "close-window": _process_close_window,
+         "shutdown-server": _process_shutdown_server,
++        "buffer-refresh": _process_buffer_refresh,
+         # "clipboard-*" packets are handled below:
+         Protocol.CONNECTION_LOST: _process_connection_lost,
+         Protocol.GIBBERISH: _process_gibberish,

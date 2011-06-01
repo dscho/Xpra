@@ -1,0 +1,23 @@
+--- ./upstream/xpra/scripts/server.py	2009-05-13 19:40:08.000000000 +0700
++++ dev/xpra/scripts/server.py	2009-05-27 22:03:16.000000000 +0700
+@@ -240,7 +238,7 @@
+                                      "+extension", "Composite",
+                                      "-screen", "0", "2048x2048x24+32",
+                                      "-once"],
+-                                    executable="Xvfb")
++                                    executable=opts.xvfb_bin)
+         except OSError, e:
+             sys.stderr.write("Error starting Xvfb: %s\n" % (e,))
+         raw_cookie = os.urandom(16)
+--- ./upstream/xpra/scripts/main.py	2009-05-13 19:40:08.000000000 +0700
++++ dev/xpra/scripts/main.py	2009-05-27 22:04:31.000000000 +0700
+@@ -62,6 +65,9 @@
+     parser.add_option("--remote-xpra", action="store",
+                       dest="remote_xpra", default=None, metavar="CMD",
+                       help="How to run 'xpra' on the remote host")
++    parser.add_option("--xvfb-bin", action="store",
++                      dest="xvfb_bin", default="Xvfb",
++                      help="The Xvfb program to use. Defaults: Xvfb")
+     parser.add_option("-d", "--debug", action="store",
+                       dest="debug", default=None, metavar="FILTER1,FILTER2,...",
+                       help="List of categories to enable debugging for (or \"all\")")

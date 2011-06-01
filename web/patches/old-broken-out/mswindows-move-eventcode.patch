@@ -1,0 +1,312 @@
+diff -ur a/wimpiggy/composite.py b/wimpiggy/composite.py
+--- a/wimpiggy/composite.py	2009-11-08 19:17:54.000000000 +0700
++++ b/wimpiggy/composite.py	2009-11-10 18:26:55.000000000 +0700
+@@ -5,15 +5,15 @@
+ 
+ import gobject
+ from wimpiggy.util import one_arg_signal, AutoPropGObjectMixin
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ from wimpiggy.lowlevel import (xcomposite_redirect_window,
+                                xcomposite_unredirect_window,
+                                xcomposite_name_window_pixmap,
+                                xdamage_start, xdamage_stop,
+                                xdamage_acknowledge,
+-                               add_event_receiver, remove_event_receiver,
+                                get_parent, addXSelectInput, const,
+                                geometry_with_border)
++from wimpiggy.event import add_event_receiver, remove_event_receiver
+ 
+ from wimpiggy.log import Logger
+ log = Logger()
+diff -ur a/wimpiggy/lowlevel/wimpiggy.lowlevel.bindings.pyx b/wimpiggy/lowlevel/wimpiggy.lowlevel.bindings.pyx
+--- a/wimpiggy/lowlevel/wimpiggy.lowlevel.bindings.pyx	2009-11-08 19:17:54.000000000 +0700
++++ b/wimpiggy/lowlevel/wimpiggy.lowlevel.bindings.pyx	2009-11-10 18:39:48.000000000 +0700
+@@ -14,7 +14,8 @@
+ import gtk
+ import gtk.gdk
+ 
+-from wimpiggy.util import dump_exc, LameStruct, gtk_main_quit_really
++from wimpiggy.util import dump_exc, LameStruct, gtk_main_quit_really, get_display_for
++from wimpiggy.event import _maybe_send_event
+ from wimpiggy.error import trap, XError
+ 
+ from wimpiggy.log import Logger
+@@ -336,16 +337,6 @@
+         raise XError, BadWindow
+     return win
+ 
+-def get_display_for(obj):
+-    if isinstance(obj, gtk.gdk.Display):
+-        return obj
+-    elif isinstance(obj, (gtk.gdk.Drawable,
+-                          gtk.Widget,
+-                          gtk.Clipboard)):
+-        return obj.get_display()
+-    else:
+-        raise TypeError, "Don't know how to get a display from %r" % (obj,)
+-
+ cdef cGdkDisplay * get_raw_display_for(obj) except? NULL:
+     return <cGdkDisplay*> unwrap(get_display_for(obj), gtk.gdk.Display)
+ 
+@@ -1125,41 +1134,6 @@
+ # client that owns the window they are sent to, otherwise they go to any
+ # clients that are selecting for that mask they are sent with.
+ 
+-_ev_receiver_key = "wimpiggy-route-events-to"
+-def add_event_receiver(window, receiver):
+-    receivers = window.get_data(_ev_receiver_key)
+-    if receivers is None:
+-        receivers = set()
+-    if receiver not in receivers:
+-        receivers.add(receiver)
+-    window.set_data(_ev_receiver_key, receivers)
+-
+-def remove_event_receiver(window, receiver):
+-    receivers = window.get_data(_ev_receiver_key)
+-    if receivers is None:
+-        return
+-    receivers.discard(receiver)
+-    if not receivers:
+-        receivers = None
+-    window.set_data(_ev_receiver_key, receivers)
+-
+-def _maybe_send_event(window, signal, event):
+-    handlers = window.get_data(_ev_receiver_key)
+-    if handlers is not None:
+-        # Copy the 'handlers' list, because signal handlers might cause items
+-        # to be added or removed from it while we are iterating:
+-        for handler in list(handlers):
+-            if signal in gobject.signal_list_names(handler):
+-                log("  forwarding event to a %s handler's %s signal",
+-                    type(handler).__name__, signal)
+-                handler.emit(signal, event)
+-                log("  forwarded")
+-            else:
+-                log("  not forwarding to %s handler, it has no %s signal",
+-                    type(handler).__name__, signal)
+-    else:
+-        log("  no handler registered for this window, ignoring event")
+-
+ def _route_event(event, signal, parent_signal):
+     # Sometimes we get GDK events with event.window == None, because they are
+     # for windows we have never created a GdkWindow object for, and GDK
+diff -ur a/wimpiggy/selection.py b/wimpiggy/selection.py
+--- a/wimpiggy/selection.py	2009-11-08 19:17:54.000000000 +0700
++++ b/wimpiggy/selection.py	2009-11-10 18:31:22.000000000 +0700
+@@ -14,9 +14,9 @@
+ 
+ from wimpiggy.util import no_arg_signal, one_arg_signal
+ from wimpiggy.lowlevel import (get_xatom, get_pywindow, sendClientMessage,
+-                               myGetSelectionOwner, const,
+-                               add_event_receiver, remove_event_receiver)
+-from wimpiggy.error import *
++                               myGetSelectionOwner, const)
++from wimpiggy.event import add_event_receiver, remove_event_receiver
++from wimpiggy.error import trap
+ 
+ from wimpiggy.log import Logger
+ log = Logger()
+diff -ur a/wimpiggy/util.py b/wimpiggy/util.py
+--- a/wimpiggy/util.py	2009-11-08 19:17:54.000000000 +0700
++++ b/wimpiggy/util.py	2009-11-10 19:57:53.000000000 +0700
+@@ -6,6 +6,7 @@
+ import traceback
+ import sys
+ import gobject
++import gtk
+ 
+ class AutoPropGObjectMixin(object):
+     """Mixin for automagic property support in GObjects.
+@@ -58,6 +59,15 @@
+ no_arg_signal = n_arg_signal(0)
+ one_arg_signal = n_arg_signal(1)
+ 
++def get_display_for(obj):
++    if isinstance(obj, gtk.gdk.Display):
++        return obj
++    elif isinstance(obj, (gtk.gdk.Drawable,
++                          gtk.Widget,
++                          gtk.Clipboard)):
++        return obj.get_display()
++    else:
++        raise TypeError, "Don't know how to get a display from %r" % (obj,)
+ 
+ # Collects the results from signal handlers for a given signal into a list,
+ # ignoring all handlers that return None.  (This filtering is useful because
+@@ -83,7 +93,7 @@
+     # server goes away, etc.), and we don't want to impose that on every user
+     # of wimpiggy.util.
+     import gtk
+-    for i in xrange(gtk.main_level()):
++    for _ in xrange(gtk.main_level()):
+         gtk.main_quit()
+ 
+ # If a user hits control-C, and we are currently executing Python code below
+diff -ur a/wimpiggy/window.py b/wimpiggy/window.py
+--- a/wimpiggy/window.py	2009-11-08 19:17:54.000000000 +0700
++++ b/wimpiggy/window.py	2009-11-10 18:36:27.000000000 +0700
+@@ -20,7 +20,9 @@
+ from wimpiggy.util import (AutoPropGObjectMixin,
+                            one_arg_signal,
+                            non_none_list_accumulator)
+-from wimpiggy.error import *
++from wimpiggy.event import add_event_receiver, remove_event_receiver
++from wimpiggy.util import get_display_for
++from wimpiggy.error import trap, XError
+ from wimpiggy.prop import prop_get, prop_set
+ from wimpiggy.composite import CompositeHelper
+ 
+@@ -214,7 +216,7 @@
+ 
+         self.client_window = client_window
+         self._internal_set_property("client-window", client_window)
+-        wimpiggy.lowlevel.add_event_receiver(client_window, self)
++        add_event_receiver(client_window, self)
+ 
+         def setup():
+             # Keith Packard says that composite state is undefined following a
+@@ -256,7 +258,7 @@
+         self.emit("unmanaged", exiting)
+ 
+     def do_unmanaged(self, wm_exiting):
+-        wimpiggy.lowlevel.remove_event_receiver(self.client_window, self)
++        remove_event_receiver(self.client_window, self)
+         self._composite.disconnect(self._damage_forward_handle)
+         self._composite.destroy()
+ 
+@@ -419,7 +421,7 @@
+                                             wclass=gtk.gdk.INPUT_OUTPUT,
+                                             event_mask=gtk.gdk.PROPERTY_CHANGE_MASK)
+         wimpiggy.lowlevel.substructureRedirect(self.corral_window)
+-        wimpiggy.lowlevel.add_event_receiver(self.corral_window, self)
++        add_event_receiver(self.corral_window, self)
+         log("created corral window 0x%x", self.corral_window.xid)
+ 
+         # The WM_HINTS input field
+@@ -686,7 +688,7 @@
+             # actually display-clean.  Oh well.
+             pixmap = gtk.gdk.Pixmap(None,
+                                     surf.get_width(), surf.get_height(), 32)
+-            screen = wimpiggy.lowlevel.get_display_for(pixmap).get_default_screen()
++            screen = get_display_for(pixmap).get_default_screen()
+             pixmap.set_colormap(screen.get_rgba_colormap())
+             cr = pixmap.cairo_create()
+             cr.set_source_surface(surf)
+diff -ur a/wimpiggy/wm.py b/wimpiggy/wm.py
+--- a/wimpiggy/wm.py	2009-11-08 19:17:54.000000000 +0700
++++ b/wimpiggy/wm.py	2009-11-10 18:36:54.000000000 +0700
+@@ -8,12 +8,13 @@
+ 
+ from sets import ImmutableSet
+ 
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ import wimpiggy.selection
+ from wimpiggy.world_window import WorldWindow
+ import wimpiggy.lowlevel
+ from wimpiggy.prop import prop_set
+ from wimpiggy.util import no_arg_signal, one_arg_signal
++from wimpiggy.event import add_event_receiver
+ 
+ from wimpiggy.window import WindowModel, Unmanageable
+ 
+@@ -177,7 +178,7 @@
+ 
+         # Okay, ready to select for SubstructureRedirect and then load in all
+         # the existing clients.
+-        wimpiggy.lowlevel.add_event_receiver(self._root, self)
++        add_event_receiver(self._root, self)
+         wimpiggy.lowlevel.substructureRedirect(self._root)
+ 
+         for w in wimpiggy.lowlevel.get_children(self._root):
+diff -ur a/xpra/root_props.py b/xpra/root_props.py
+--- a/xpra/root_props.py	2009-11-08 19:17:54.000000000 +0700
++++ b/xpra/root_props.py	2009-11-10 18:54:56.000000000 +0700
+@@ -1,7 +1,7 @@
+ import gtk
+ import gobject
+ from wimpiggy.util import one_arg_signal
+-from wimpiggy.lowlevel import add_event_receiver
++from wimpiggy.event import add_event_receiver
+ 
+ from wimpiggy.log import Logger
+ log = Logger()
+diff -ur a/xpra/server.py b/xpra/server.py
+--- a/xpra/server.py	1970-01-01 07:00:00.000000000 +0700
++++ b/xpra/server.py	2009-10-13 21:19:20.000000000 +0700
+@@ -24,12 +28,12 @@
+                                xtest_fake_key,
+                                xtest_fake_button,
+                                is_override_redirect, is_mapped,
+-                               add_event_receiver,
+                                get_children)
++from wimpiggy.event import add_event_receiver
+ from wimpiggy.prop import prop_set
+ from wimpiggy.window import OverrideRedirectWindowModel, Unmanageable
+ from wimpiggy.keys import grok_modifier_map
+-from wimpiggy.error import *
++from wimpiggy.error import XError, trap
+ 
+ from wimpiggy.log import Logger
+ log = Logger()
+diff -urN a/wimpiggy/event.py b/wimpiggy/event.py
+--- a/wimpiggy/event.py	1970-01-01 07:00:00.000000000 +0700
++++ b/wimpiggy/event.py	2009-10-13 21:19:20.000000000 +0700
+@@ -0,0 +1,44 @@
++# This file is part of Parti.
++# Copyright (C) 2008, 2009 Nathaniel Smith <njs@pobox.com>
++# Parti is released under the terms of the GNU GPL v2, or, at your option, any
++# later version. See the file COPYING for details.
++
++import gobject
++from wimpiggy.log import Logger
++log = Logger()
++
++_ev_receiver_key = "wimpiggy-route-events-to"
++def add_event_receiver(window, receiver):
++    receivers = window.get_data(_ev_receiver_key)
++    if receivers is None:
++        receivers = set()
++    if receiver not in receivers:
++        receivers.add(receiver)
++    window.set_data(_ev_receiver_key, receivers)
++
++def remove_event_receiver(window, receiver):
++    receivers = window.get_data(_ev_receiver_key)
++    if receivers is None:
++        return
++    receivers.discard(receiver)
++    if not receivers:
++        receivers = None
++    window.set_data(_ev_receiver_key, receivers)
++
++def _maybe_send_event(window, signal, event):
++    handlers = window.get_data(_ev_receiver_key)
++    if handlers is not None:
++        # Copy the 'handlers' list, because signal handlers might cause items
++        # to be added or removed from it while we are iterating:
++        for handler in list(handlers):
++            if signal in gobject.signal_list_names(handler):
++                log("  forwarding event to a %s handler's %s signal",
++                    type(handler).__name__, signal)
++                handler.emit(signal, event)
++                log("  forwarded")
++            else:
++                log("  not forwarding to %s handler, it has no %s signal",
++                    type(handler).__name__, signal)
++    else:
++        log("  no handler registered for this window, ignoring event")
++
+--- as-sent/xpra/xsettings.py	2009-11-10 23:03:47.000000000 +0700
++++ dev/xpra/xsettings.py	2009-11-11 16:57:27.000000000 +0700
+@@ -5,8 +5,8 @@
+ from wimpiggy.selection import ManagerSelection
+ from wimpiggy.prop import prop_set, prop_get
+ from wimpiggy.lowlevel import (myGetSelectionOwner, const, get_pywindow,
+-                               add_event_receiver, remove_event_receiver,
+                                get_xatom)
++from wimpiggy.event import add_event_receiver, remove_event_receiver
+ from wimpiggy.log import Logger
+ log = Logger()
+ 

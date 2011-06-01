@@ -1,0 +1,12 @@
+diff -ur parti-all-0.0.7-pre-vanilla/xpra/scripts/server.py parti-all-0.0.7-pre/xpra/scripts/server.py
+--- parti-all-0.0.7-pre-vanilla/xpra/scripts/server.py	2009-04-03 08:29:09.000000000 +0200
++++ parti-all-0.0.7-pre/xpra/scripts/server.py	2009-04-28 23:39:42.669819625 +0200
+@@ -138,8 +138,6 @@
+     if ":" not in spec:
+         parser.error("TCP port must be specified as [HOST]:PORT")
+     (host, port) = spec.split(":", 1)
+-    if host == "":
+-        host = "127.0.0.1"
+     listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+     listener.bind((host, int(port)))
+     return listener

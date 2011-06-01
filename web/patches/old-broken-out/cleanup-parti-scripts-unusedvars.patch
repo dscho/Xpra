@@ -1,0 +1,36 @@
+diff -ur a/parti/scripts/main.py b/parti/scripts/main.py
+--- a/parti/scripts/main.py	2009-11-08 19:17:54.000000000 +0700
++++ b/parti/scripts/main.py	2009-11-10 18:24:59.000000000 +0700
+@@ -14,7 +14,7 @@
+     parser.add_option("--replace", action="store_true",
+                       dest="replace", default=False,
+                       help="Replace any running window manager with Parti")
+-    (options, args) = parser.parse_args(cmdline[1:])
++    (options, _) = parser.parse_args(cmdline[1:])
+ 
+     # This means, if an exception propagates to the gtk mainloop, then pass it
+     # on outwards.  Or at least it did at one time; dunno if it actually does
+diff -ur a/parti/scripts/repl.py b/parti/scripts/repl.py
+--- a/parti/scripts/repl.py	2009-11-08 19:17:54.000000000 +0700
++++ b/parti/scripts/repl.py	2009-11-10 18:25:13.000000000 +0700
+@@ -12,7 +12,7 @@
+ 
+ def main(cmdline):
+     parser = PartiOptionParser()
+-    (options, args) = parser.parse_args(cmdline[1:])
++    parser.parse_args(cmdline[1:])
+ 
+     # This means, if an exception propagates to the gtk mainloop, then pass it
+     # on outwards.  Or at least it did at one time; dunno if it actually does
+diff -ur a/parti/test_bus.py b/parti/test_bus.py
+--- a/parti/test_bus.py	2009-11-08 19:17:54.000000000 +0700
++++ b/parti/test_bus.py	2009-11-10 18:24:40.000000000 +0700
+@@ -16,7 +16,7 @@
+                 print "spawn_repl_window called on server"
+                 self.called = True
+         wm = MockWm()
+-        service = parti.bus.PartiDBusService(wm)
++        parti.bus.PartiDBusService(wm)
+         proxy = parti.bus.get_parti_proxy()
+         self.error = False
+         def replied():

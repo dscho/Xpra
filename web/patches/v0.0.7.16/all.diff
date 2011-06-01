@@ -1,0 +1,636 @@
+diff -urN upstream/parti/scripts/main.py dev/parti/scripts/main.py
+--- upstream/parti/scripts/main.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/parti/scripts/main.py	2010-08-25 12:46:10.000000000 +0100
+@@ -17,7 +17,7 @@
+     parser.add_option("-t", "--tray",
+                       dest="tray", default="CompositeTest",
+                       help="Set default tray type")
+-    (options, args) = parser.parse_args(cmdline[1:])
++    (options, _) = parser.parse_args(cmdline[1:])
+ 
+     # This means, if an exception propagates to the gtk mainloop, then pass it
+     # on outwards.  Or at least it did at one time; dunno if it actually does
+diff -urN upstream/parti/scripts/repl.py dev/parti/scripts/repl.py
+--- upstream/parti/scripts/repl.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/parti/scripts/repl.py	2010-08-25 12:46:11.000000000 +0100
+@@ -12,7 +12,7 @@
+ 
+ def main(cmdline):
+     parser = PartiOptionParser()
+-    (options, args) = parser.parse_args(cmdline[1:])
++    parser.parse_args(cmdline[1:])
+ 
+     # This means, if an exception propagates to the gtk mainloop, then pass it
+     # on outwards.  Or at least it did at one time; dunno if it actually does
+diff -urN upstream/wimpiggy/composite.py dev/wimpiggy/composite.py
+--- upstream/wimpiggy/composite.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/composite.py	2010-08-25 12:24:35.000000000 +0100
+@@ -5,7 +5,7 @@
+ 
+ import gobject
+ from wimpiggy.util import one_arg_signal, AutoPropGObjectMixin
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ from wimpiggy.lowlevel import (xcomposite_redirect_window,
+                                xcomposite_unredirect_window,
+                                xcomposite_name_window_pixmap,
+diff -urN upstream/wimpiggy/keys.py dev/wimpiggy/keys.py
+--- upstream/wimpiggy/keys.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/keys.py	2010-08-25 11:43:18.000000000 +0100
+@@ -6,7 +6,7 @@
+ import gobject
+ import gtk
+ from wimpiggy.util import one_arg_signal
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ from wimpiggy.lowlevel import (get_display_for,
+                                get_modifier_map, grab_key, ungrab_all_keys,
+                                add_event_receiver, remove_event_receiver)
+diff -urN upstream/wimpiggy/lowlevel/__init__.py dev/wimpiggy/lowlevel/__init__.py
+--- upstream/wimpiggy/lowlevel/__init__.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/lowlevel/__init__.py	2010-08-25 12:26:04.000000000 +0100
+@@ -3,7 +3,7 @@
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+ 
+-from wimpiggy.lowlevel.bindings import *
++from wimpiggy.lowlevel.bindings import sendClientMessage
+ 
+ from wimpiggy.log import Logger
+ log = Logger()
+diff -urN upstream/wimpiggy/prop.py dev/wimpiggy/prop.py
+--- upstream/wimpiggy/prop.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/prop.py	2010-08-25 12:18:22.000000000 +0100
+@@ -15,8 +15,8 @@
+ from wimpiggy.lowlevel import \
+      XGetWindowProperty, XChangeProperty, PropertyError, \
+      get_xatom, get_pyatom, get_xwindow, get_pywindow, const, \
+-     get_display_for, premultiply_argb_in_place
+-from wimpiggy.error import *
++     premultiply_argb_in_place
++from wimpiggy.error import trap, XError
+ from wimpiggy.log import Logger
+ log = Logger()
+ 
+diff -urN upstream/wimpiggy/selection.py dev/wimpiggy/selection.py
+--- upstream/wimpiggy/selection.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/selection.py	2010-08-25 11:43:53.000000000 +0100
+@@ -16,7 +16,7 @@
+ from wimpiggy.lowlevel import (get_xatom, get_pywindow, sendClientMessage,
+                                myGetSelectionOwner, const,
+                                add_event_receiver, remove_event_receiver)
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ 
+ from wimpiggy.log import Logger
+ log = Logger()
+diff -urN upstream/wimpiggy/test_error.py dev/wimpiggy/test_error.py
+--- upstream/wimpiggy/test_error.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/test_error.py	2010-08-25 11:45:17.000000000 +0100
+@@ -4,7 +4,7 @@
+ # later version. See the file COPYING for details.
+ 
+ from wimpiggy.test import *
+-from wimpiggy.error import *
++from wimpiggy.error import trap, XError
+ # Need a way to generate X errors...
+ import wimpiggy.lowlevel
+ 
+diff -urN upstream/wimpiggy/test_lowlevel.py dev/wimpiggy/test_lowlevel.py
+--- upstream/wimpiggy/test_lowlevel.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/test_lowlevel.py	2010-08-25 12:25:22.000000000 +0100
+@@ -3,10 +3,11 @@
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+ 
++import os
+ from wimpiggy.test import *
+ import wimpiggy.lowlevel as l
+ import gtk
+-from wimpiggy.error import *
++from wimpiggy.error import trap, XError
+ 
+ class TestLowlevel(TestWithSession):
+     def root(self, disp=None):
+@@ -130,8 +131,7 @@
+         w2 = self.window(self.display)
+         w3 = self.window(self.display)
+         gtk.gdk.flush()
+-        
+-        import os
++
+         def do_child(disp_name, xwindow1, xwindow2, xwindow3):
+             print "child: in do_child"
+             d2 = gtk.gdk.Display(disp_name)
+diff -urN upstream/wimpiggy/test.py dev/wimpiggy/test.py
+--- upstream/wimpiggy/test.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/test.py	2010-08-25 12:25:02.000000000 +0100
+@@ -7,7 +7,6 @@
+ import sys
+ import os
+ import traceback
+-import os
+ import atexit
+ import errno
+ import gobject
+@@ -25,7 +24,7 @@
+     except exc_class:
+         pass
+     except:
+-        (cls, e, tb) = sys.exc_info()
++        (cls, e, _) = sys.exc_info()
+         raise AssertionError, (("unexpected exception: %s: %s\n"
+                                + "Original traceback:\n%s")
+                                % (cls, e, traceback.format_exc()))
+diff -urN upstream/wimpiggy/window.py dev/wimpiggy/window.py
+--- upstream/wimpiggy/window.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/window.py	2010-08-25 11:46:16.000000000 +0100
+@@ -26,7 +26,7 @@
+ from wimpiggy.util import (AutoPropGObjectMixin,
+                            one_arg_signal,
+                            non_none_list_accumulator)
+-from wimpiggy.error import *
++from wimpiggy.error import trap, XError
+ from wimpiggy.prop import prop_get, prop_set
+ from wimpiggy.composite import CompositeHelper
+ 
+diff -urN upstream/wimpiggy/wm.py dev/wimpiggy/wm.py
+--- upstream/wimpiggy/wm.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/wm.py	2010-08-25 11:46:26.000000000 +0100
+@@ -14,7 +14,7 @@
+ else:
+     ImmutableSet = frozenset
+ 
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ import wimpiggy.selection
+ from wimpiggy.world_window import WorldWindow
+ import wimpiggy.lowlevel
+diff -urN upstream/wimpiggy/world_window.py dev/wimpiggy/world_window.py
+--- upstream/wimpiggy/world_window.py	2010-08-25 10:59:47.000000000 +0100
++++ dev/wimpiggy/world_window.py	2010-08-25 11:46:50.000000000 +0100
+@@ -8,7 +8,7 @@
+ import wimpiggy.lowlevel
+ import wimpiggy.window
+ import wimpiggy.prop
+-from wimpiggy.error import *
++from wimpiggy.error import trap
+ from wimpiggy.log import Logger
+ log = Logger()
+ 
+diff -urN upstream/xpra/client.py dev/xpra/client.py
+--- upstream/xpra/client.py	2010-08-25 10:59:48.000000000 +0100
++++ dev/xpra/client.py	2010-08-25 11:56:59.000000000 +0100
+@@ -85,7 +85,9 @@
+         self._metadata.update(metadata)
+         
+         title_main = self._metadata.get("title", "<untitled window>").decode("utf-8")
+-        if "client-machine" in self._metadata:
++        if self._client.title_suffix:
++            title_addendum = self._client.title_suffix
++        elif "client-machine" in self._metadata:
+             title_addendum = ("on %s, "
+                               % (self._metadata["client-machine"].decode("utf-8"),))
+         else:
+@@ -272,10 +274,14 @@
+         "received-gibberish": n_arg_signal(1),
+         }
+ 
+-    def __init__(self, conn, compression_level):
++    def __init__(self, conn, compression_level, jpegquality, title_suffix, password_file, pulseaudio):
+         gobject.GObject.__init__(self)
+         self._window_to_id = {}
+         self._id_to_window = {}
++        self.title_suffix = title_suffix
++        self.password_file = password_file
++        self.compression_level = compression_level
++        self.jpegquality = jpegquality
+ 
+         self._protocol = Protocol(conn, self.process_packet)
+         ClientSource(self._protocol)
+@@ -284,7 +290,7 @@
+             capabilities_request["deflate"] = compression_level
+         root_w, root_h = gtk.gdk.get_default_root_window().get_size()
+         capabilities_request["desktop_size"] = [root_w, root_h]
+-        self.send(["hello", capabilities_request])
++        self.send_hello()
+ 
+         self._keymap = gtk.gdk.keymap_get_default()
+         self._keymap.connect("keys-changed", self._keys_changed)
+@@ -326,13 +332,45 @@
+     def send_mouse_position(self, packet):
+         self._protocol.source.queue_mouse_position_packet(packet)
+ 
++    def send_hello(self, hash=None):
++        capabilities_request = dict(default_capabilities)
++        if hash:
++            capabilities_request["challenge_response"] = hash
++        if self.compression_level:
++            capabilities_request["deflate"] = self.compression_level
++        if self.jpegquality:
++            capabilities_request["jpeg"] = self.jpegquality
++        root_w, root_h = gtk.gdk.get_default_root_window().get_size()
++        capabilities_request["desktop_size"] = [root_w, root_h]
++        self.send(["hello", capabilities_request])
++
++    def _process_challenge(self, packet):
++        if not self.password_file:
++            log.error("password is required by the server")
++            gtk.main_quit()
++            return
++        passwordFile = open(self.password_file, "rU")
++        password = passwordFile.read()
++        (_, salt) = packet
++        hash = hmac.HMAC(password, salt)
++        self.send_hello(hash.hexdigest())
++
++    def version_no_minor(self, version):
++        if not version:
++            return    version
++        p = version.rfind(".")
++        if p>0:
++            return version[:p]
++        else:
++            return version
++
+     def _process_hello(self, packet):
+         (_, capabilities) = packet
+         if "deflate" in capabilities:
+             self._protocol.enable_deflate(capabilities["deflate"])
+-        if capabilities.get("__prerelease_version") != xpra.__version__:
+-            log.error("sorry, I only know how to talk to v%s servers",
+-                      xpra.__version__)
++        remote_version = capabilities.get("__prerelease_version")
++        if self.version_no_minor(remote_version) != self.version_no_minor(xpra.__version__):
++            log.error("sorry, I only know how to talk to v%s.x servers", self.version_no_minor(xpra.__version__))
+             gtk.main_quit()
+             return
+         if "desktop_size" in capabilities:
+@@ -366,8 +404,7 @@
+     def _process_draw(self, packet):
+         (_, id, x, y, width, height, coding, data) = packet
+         window = self._id_to_window[id]
+-        assert coding == "rgb24"
+-        window.draw(x, y, width, height, data)
++        window.draw(x, y, width, height, coding, data)
+ 
+     def _process_window_metadata(self, packet):
+         (_, id, metadata) = packet
+@@ -395,6 +432,7 @@
+         self.emit("received-gibberish", data)
+ 
+     _packet_handlers = {
++        "challenge": _process_challenge,
+         "hello": _process_hello,
+         "new-window": _process_new_window,
+         "new-override-redirect": _process_new_override_redirect,
+diff -urN upstream/xpra/dotxpra.py dev/xpra/dotxpra.py
+--- upstream/xpra/dotxpra.py	2010-08-25 10:59:48.000000000 +0100
++++ dev/xpra/dotxpra.py	2010-08-25 11:31:45.000000000 +0100
+@@ -3,7 +3,6 @@
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+ 
+-import os
+ import os.path
+ import glob
+ import socket
+diff -urN upstream/xpra/keys.py dev/xpra/keys.py
+--- upstream/xpra/keys.py	2010-08-25 10:59:48.000000000 +0100
++++ dev/xpra/keys.py	2010-08-25 12:20:01.000000000 +0100
+@@ -3,8 +3,6 @@
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+ 
+-from xpra.platform.gui import grok_modifier_map
+-
+ def mask_to_names(mask, modifier_map):
+     modifiers = []
+     for modifier in ["shift", "control",
+diff -urN upstream/xpra/proxy.py dev/xpra/proxy.py
+--- upstream/xpra/proxy.py	2010-08-25 10:59:48.000000000 +0100
++++ dev/xpra/proxy.py	2010-08-25 12:22:06.000000000 +0100
+@@ -3,8 +3,6 @@
+ # Parti is released under the terms of the GNU GPL v2, or, at your option, any
+ # later version. See the file COPYING for details.
+ 
+-import threading
+-
+ from wimpiggy.log import Logger
+ log = Logger()
+ 
+diff -urN upstream/xpra/scripts/main.py dev/xpra/scripts/main.py
+--- upstream/xpra/scripts/main.py	2010-08-25 10:59:48.000000000 +0100
++++ dev/xpra/scripts/main.py	2010-08-25 12:23:34.000000000 +0100
+@@ -72,6 +72,19 @@
+                           dest="bind_tcp", default=None,
+                           metavar="[HOST]:PORT",
+                           help="Listen for connections over TCP (insecure)")
++    parser.add_option("--no-pulseaudio", action="store_false",
++                      dest="pulseaudio", default=True,
++                      help="Disable pulseaudio support via X11 root window properties")
++    parser.add_option("--password-file", action="store",
++                      dest="password_file", default=None,
++                      help="The file containing the password required to connect (useful to secure TCP mode)")
++    parser.add_option("--title-suffix", action="store",
++                      dest="title_suffix", default=" (via xpra)",
++                      help="Text which is appended to the window's title")
++    parser.add_option("--jpeg-quality", action="store",
++                      metavar="LEVEL",
++                      dest="jpegquality", type="int", default="0",
++                      help="Use jpeg compression with given quality (1-100), 0 disables jpeg compression. Default: disabled.")
+     parser.add_option("-z", "--compress", action="store",
+                       dest="compression_level", type="int", default=3,
+                       metavar="LEVEL",
+@@ -239,7 +252,9 @@
+     conn = connect_or_fail(pick_display(parser, opts, extra_args))
+     if opts.compression_level < 0 or opts.compression_level > 9:
+         parser.error("Compression level must be between 0 and 9 inclusive.")
+-    app = XpraClient(conn, opts.compression_level)
++    if opts.jpegquality < 0 or opts.jpegquality > 100:
++        parser.error("Jpeg quality must be between 0 and 100 inclusive.")
++    app = XpraClient(conn, opts.compression_level, opts.jpegquality, opts.title_suffix, opts.password_file, opts.pulseaudio)
+     app.connect("handshake-complete", handshake_complete_msg)
+     app.connect("received-gibberish", got_gibberish_msg)
+     app.run()
+@@ -263,7 +278,7 @@
+         pass
+     if display_desc["local"]:
+         sockdir = DotXpra()
+-        for i in xrange(6):
++        for _ in xrange(6):
+             final_state = sockdir.server_state(display_desc["display"])
+             if final_state is DotXpra.LIVE:
+                 time.sleep(0.5)
+@@ -304,3 +319,6 @@
+                 else:
+                     sys.stdout.write(" (cleaned up)")
+             sys.stdout.write("\n")
++
++if __name__ == "__main__":
++    main("xpra.exe", sys.argv)
+diff -urN upstream/xpra/scripts/server.py dev/xpra/scripts/server.py
+--- upstream/xpra/scripts/server.py	2010-08-25 10:59:48.000000000 +0100
++++ dev/xpra/scripts/server.py	2010-08-25 12:24:57.000000000 +0100
+@@ -10,7 +10,6 @@
+ import gobject
+ import subprocess
+ import sys
+-import os
+ import os.path
+ import atexit
+ import signal
+@@ -63,7 +62,7 @@
+     def __call__(self, signum, frame):
+         while 1:
+             try:
+-                pid, status = os.waitpid(-1, os.WNOHANG)
++                pid, _ = os.waitpid(-1, os.WNOHANG)
+             except OSError:
+                 break
+             if pid == 0:
+@@ -303,7 +302,7 @@
+ 
+     # This import is delayed because the module depends on gtk:
+     import xpra.server
+-    app = xpra.server.XpraServer(upgrading, sockets)
++    app = xpra.server.XpraServer(upgrading, sockets, opts.password_file, opts.pulseaudio)
+     def cleanup_socket(self):
+         print "removing socket"
+         try:
+diff -urN upstream/xpra/server.py dev/xpra/server.py
+--- upstream/xpra/server.py	2010-08-25 10:59:48.000000000 +0100
++++ dev/xpra/server.py	2010-08-25 12:22:32.000000000 +0100
+@@ -14,6 +14,10 @@
+ import cairo
+ import sys
+ import subprocess
++import hmac
++import uuid
++import Image
++import StringIO
+ 
+ from wimpiggy.wm import Wm
+ from wimpiggy.util import (AdHocStruct,
+@@ -29,7 +33,7 @@
+ from wimpiggy.prop import prop_set
+ from wimpiggy.window import OverrideRedirectWindowModel, Unmanageable
+ from wimpiggy.keys import grok_modifier_map
+-from wimpiggy.error import *
++from wimpiggy.error import XError, trap
+ 
+ from wimpiggy.log import Logger
+ log = Logger()
+@@ -106,7 +110,7 @@
+         self._models[model].window = window
+ 
+     def window_size(self, model):
+-        (x, y, w, h) = self._models[model].geom
++        (_, _, w, h) = self._models[model].geom
+         return (w, h)
+ 
+     def window_position(self, model, w, h):
+@@ -165,17 +169,18 @@
+                 log.error("wtf, pixmap is None?")
+                 packet = None
+             else:
+-                (x2, y2, w2, h2, data) = self._get_rgb_data(pixmap, x, y, w, h)
++                (x2, y2, w2, h2, coding, data) = self._get_rgb_data(pixmap, x, y, w, h)
+                 if not w2 or not h2:
+                     packet = None
+                 else:
+-                    packet = ["draw", id, x2, y2, w2, h2, "rgb24", data]
++                    packet = ["draw", id, x2, y2, w2, h2, coding, data]
+         else:
+             packet = None
+         return packet, self._have_more()
+ 
+     def _get_rgb_data(self, pixmap, x, y, width, height):
+         pixmap_w, pixmap_h = pixmap.get_size()
++        coding = "rgb24"
+         # Just in case we somehow end up with damage larger than the pixmap,
+         # we don't want to start requesting random chunks of memory (this
+         # could happen if a window is resized but we don't throw away our
+@@ -187,7 +192,7 @@
+         if y + height > pixmap_h:
+             height = pixmap_h - y
+         if width <= 0 or height <= 0:
+-            return (0, 0, 0, 0, "")
++            return (0, 0, 0, 0, coding, "")
+         pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8, width, height)
+         pixbuf.get_from_drawable(pixmap, pixmap.get_colormap(),
+                                  x, y, 0, 0, width, height)
+@@ -201,14 +206,26 @@
+             for i in xrange(height):
+                 rows.append(raw_data[i*rowstride : i*rowstride+rowwidth])
+             data = "".join(rows)
+-        return (x, y, width, height, data)
++
++        # should probably have some other conditions for
++        # enabling jpeg compression (for example len(data) > N and/or
++        # width*height > M)
++        if self._protocol.jpegquality > 0:
++            im = Image.fromstring("RGB", (width,height), data)
++            buf=StringIO.StringIO()
++            im.save(buf,"JPEG", quality=self._protocol.jpegquality)
++            data=buf.getvalue()
++            buf.close()
++            coding = "jpeg"
++
++        return (x, y, width, height, coding, data)
+ 
+ class XpraServer(gobject.GObject):
+     __gsignals__ = {
+         "wimpiggy-child-map-event": one_arg_signal,
+         }
+ 
+-    def __init__(self, clobber, sockets):
++    def __init__(self, clobber, sockets, password_file, pulseaudio):
+         gobject.GObject.__init__(self)
+         
+         # Do this before creating the Wm object, to avoid clobbering its
+@@ -295,6 +312,11 @@
+         self._has_focus = 0
+         self._upgrading = False
+ 
++        self.password_file = password_file
++        self.salt = None
++        
++        self.pulseaudio = pulseaudio
++
+         ### All right, we're ready to accept customers:
+         for sock in sockets:
+             self.add_listen_socket(sock)
+@@ -305,16 +327,18 @@
+ 
+     def quit(self, upgrading):
+         self._upgrading = upgrading
++        log.info("\nxpra is terminating.")
+         gtk_main_quit_really()
+ 
+     def run(self):
+         gtk_main_quit_on_fatal_exceptions_enable()
+         gtk.main()
++        log.info("\nxpra end of gtk.main().")
+         return self._upgrading
+ 
+     def _new_connection(self, listener, *args):
+         log.info("New connection received")
+-        sock, addr = listener.accept()
++        sock, _ = listener.accept()
+         self._potential_protocols.append(Protocol(SocketConnection(sock),
+                                                   self.process_packet))
+         return True
+@@ -345,7 +369,7 @@
+         self._add_new_window_common(window)
+         for prop in self._window_export_properties:
+             window.connect("notify::%s" % prop, self._update_metadata)
+-        (x, y, w, h, depth) = window.get_property("client-window").get_geometry()
++        (x, y, w, h, _) = window.get_property("client-window").get_geometry()
+         self._desktop_manager.add_window(window, x, y, w, h)
+         self._send_new_window_packet(window)
+ 
+@@ -502,7 +526,7 @@
+ 
+     def _calculate_capabilities(self, client_capabilities):
+         capabilities = {}
+-        for cap in ("deflate", "__prerelease_version"):
++        for cap in ("deflate", "__prerelease_version", "challenge_response", "jpeg"):
+             if cap in client_capabilities:
+                 capabilities[cap] = client_capabilities[cap]
+         if "desktop_size" in client_capabilities:
+@@ -512,15 +536,52 @@
+                                             min(client_h, root_h)]
+         return capabilities
+ 
++    def version_no_minor(self, version):
++        if not version:
++            return    version
++        p = version.rfind(".")
++        if p>0:
++            return version[:p]
++        else:
++            return version
++
+     def _process_hello(self, proto, packet):
+         (_, client_capabilities) = packet
+         log.info("Handshake complete; enabling connection")
+         capabilities = self._calculate_capabilities(client_capabilities)
+-        if capabilities.get("__prerelease_version") != xpra.__version__:
++        remote_version = capabilities.get("__prerelease_version")
++        if self.version_no_minor(remote_version) != self.version_no_minor(xpra.__version__):
+             log.error("Sorry, this pre-release server only works with clients "
+-                      + "of exactly the same version (v%s)", xpra.__version__)
++                      + "of the same major version (v%s), but this client is using v%s", xpra.__version__, remote_version)
+             proto.close()
+             return
++        if self.password_file:
++            log.debug("password auth required")
++            client_hash = capabilities.get("challenge_response")
++            if not client_hash or not self.salt:
++                self.salt = "%s" % uuid.uuid4()
++                capabilities["challenge"] = self.salt
++                log.info("Password required, sending challenge: %s" % str(capabilities))
++                packet = ("challenge", self.salt)
++                from xpra.bencode import bencode
++                import select
++                data = bencode(packet)
++                written = 0
++                while written < len(data):
++                    select.select([], [proto._sock], [])
++                    written += proto._sock.send(data[written:])
++                return
++            passwordFile = open(self.password_file, "rU")
++            password  = passwordFile.read()
++            hash = hmac.HMAC(password, self.salt)
++            if client_hash != hash.hexdigest():
++                log.error("Password supplied does not match! dropping the connection.")
++                gobject.timeout_add(1000, self._login_failed, proto)
++                return
++            else:
++                log.info("Password matches!")
++                del capabilities["challenge_response"]
++                self.salt = None            #prevent replay attacks
+         # Okay, things are okay, so let's boot out any existing connection and
+         # set this as our new one:
+         if self._protocol is not None:
+@@ -530,6 +591,8 @@
+         self._send(["hello", capabilities])
+         if "deflate" in capabilities:
+             self._protocol.enable_deflate(capabilities["deflate"])
++        if "jpeg" in capabilities:
++            self._protocol.jpegquality = capabilities["jpeg"]
+         # We send the new-window packets sorted by id because this sorts them
+         # from oldest to newest -- and preserving window creation order means
+         # that the earliest override-redirect windows will be on the bottom,
+@@ -556,12 +619,13 @@
+                     self._xsettings_manager = XSettingsManager(v)
+                 elif k == "resource-manager":
+                     root_set("RESOURCE_MANAGER")
+-                elif k == "pulse-cookie":
+-                    root_set("PULSE_COOKIE")
+-                elif k == "pulse-id":
+-                    root_set("PULSE_ID")
+-                elif k == "pulse-server":
+-                    root_set("PULSE_SERVER")
++                elif self.pulseaudio:
++                    elif k == "pulse-cookie":
++                        root_set("PULSE_COOKIE")
++                    elif k == "pulse-id":
++                        root_set("PULSE_ID")
++                    elif k == "pulse-server":
++                        root_set("PULSE_SERVER")
+ 
+     def _process_map_window(self, proto, packet):
+         (_, id, x, y, width, height) = packet
+diff -urN upstream/yatest.py dev/yatest.py
+--- upstream/yatest.py	2010-08-25 10:59:48.000000000 +0100
++++ dev/yatest.py	2010-08-25 11:03:11.000000000 +0100
+@@ -41,7 +41,6 @@
+ #      they are defined, not where they have been imported?
+ 
+ import sys
+-import os
+ import os.path
+ import traceback
+ import signal

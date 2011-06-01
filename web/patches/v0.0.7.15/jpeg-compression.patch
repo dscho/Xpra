@@ -1,0 +1,137 @@
+diff -ur a/xpra/client.py b/xpra/client.py
+--- a/xpra/client.py	2009-11-10 21:57:32.000000000 +0700
++++ b/xpra/client.py	2009-11-10 21:59:09.000000000 +0700
+@@ -152,12 +152,19 @@
+         cr.set_source_rgb(1, 1, 1)
+         cr.fill()
+ 
+-    def draw(self, x, y, width, height, rgb_data):
+-        assert len(rgb_data) == width * height * 3
+-        (my_width, my_height) = self.window.get_size()
++    def draw(self, x, y, width, height, coding, img_data):
+         gc = self._backing.new_gc()
+-        self._backing.draw_rgb_image(gc, x, y, width, height,
+-                                     gtk.gdk.RGB_DITHER_NONE, rgb_data)
++        if coding != "rgb24":
++            loader = gtk.gdk.PixbufLoader(coding)
++            loader.write(img_data, len(img_data))
++            pixbuf = loader.get_pixbuf()
++            loader.close()
++            self._backing.draw_pixbuf(gc, pixbuf, 0, 0, x, y, width, height)
++        else:
++            assert len(img_data) == width * height * 3
++            self._backing.draw_rgb_image(gc, x, y, width, height,
++                                         gtk.gdk.RGB_DITHER_NONE, img_data)
++
+         self.window.invalidate_rect(gtk.gdk.Rectangle(x, y, width, height),
+                                     False)
+ 
+@@ -267,16 +274,15 @@
+ gobject.type_register(ClientWindow)
+ 
+ class XpraClient(gobject.GObject):
+-    def __init__(self, sock, compression_level):
++    def __init__(self, sock, compression_level, jpegquality):
+         gobject.GObject.__init__(self)
+         self._window_to_id = {}
+         self._id_to_window = {}
++        self.compression_level = compression_level
++        self.jpegquality = jpegquality
+ 
+         self._protocol = Protocol(sock, self.process_packet)
+         ClientSource(self._protocol)
+-        capabilities_request = dict(default_capabilities)
+-        if compression_level:
+-            capabilities_request["deflate"] = compression_level
+         root_w, root_h = gtk.gdk.get_default_root_window().get_size()
+         capabilities_request["desktop_size"] = [root_w, root_h]
+         self.send(["hello", capabilities_request])
+@@ -396,8 +425,7 @@
+     def _process_draw(self, packet):
+         (_, id, x, y, width, height, coding, data) = packet
+         window = self._id_to_window[id]
+-        assert coding == "rgb24"
+-        window.draw(x, y, width, height, data)
++        window.draw(x, y, width, height, coding, data)
+ 
+     def _process_window_metadata(self, packet):
+         (_, id, metadata) = packet
+diff -ur a/xpra/protocol.py b/xpra/protocol.py
+--- a/xpra/protocol.py	2009-11-08 19:17:54.000000000 +0700
++++ b/xpra/protocol.py	2009-11-10 19:04:37.000000000 +0700
+@@ -37,6 +37,7 @@
+         self._write_buf = ""
+         self._compressor = None
+         self._decompressor = None
++        self.jpegquality = 0
+         self._watch_tag = None
+         self._update_watch(force=True)
+ 
+diff -ur a/xpra/scripts/main.py b/xpra/scripts/main.py
+--- a/xpra/scripts/main.py	2009-11-08 19:17:54.000000000 +0700
++++ b/xpra/scripts/main.py	2009-11-10 21:56:15.000000000 +0700
+@@ -56,6 +56,10 @@
+                       help="How hard to work on compressing data."
+                       + " 0 to disable compression,"
+                       + "9 for maximal (slowest) compression. Default: %default.")
++    parser.add_option("--jpeg-quality", action="store",
++                      metavar="LEVEL",
++                      dest="jpegquality", type="int", default="0",
++                      help="Use jpeg compression with given quality (1-100), 0 disables jpeg compression. Default: disabled.")
+     parser.add_option("--ssh", action="store",
+                       dest="ssh", default="ssh", metavar="CMD",
+                       help="How to run ssh (default: '%default')")
+@@ -199,6 +199,9 @@
+     if opts.compression_level < 0 or opts.compression_level > 9:
+         parser.error("Compression level must be between 0 and 9 inclusive.")
+     app = XpraClient(sock, opts.compression_level)
++    if opts.jpegquality < 0 or opts.jpegquality > 100:
++        parser.error("Jpeg quality must be between 0 and 100 inclusive.")
++    app = XpraClient(sock, opts.compression_level, opts.jpegquality, opts.title_suffix, opts.password_file)
+     sys.stdout.write("Attached (press Control-C to detach)\n")
+     app.run()
+ 
+diff -ur a/xpra/server.py b/xpra/server.py
+--- a/xpra/server.py	2009-11-10 21:51:38.000000000 +0700
++++ b/xpra/server.py	2009-11-10 19:11:57.000000000 +0700
+@@ -201,7 +205,20 @@
+             for i in xrange(height):
+                 rows.append(raw_data[i*rowstride : i*rowstride+rowwidth])
+             data = "".join(rows)
+-        return (x, y, width, height, data)
++        coding = "rgb24"
++
++        # should probably have some other conditions for
++        # enabling jpeg compression (for example len(data) > N and/or
++        # width*height > M)
++        if self._protocol.jpegquality > 0:
++            im = Image.fromstring("RGB", (width,height), data)
++            buf=StringIO.StringIO()
++            im.save(buf,"JPEG", quality=self._protocol.jpegquality)
++            data=buf.getvalue()
++            buf.close()
++            coding = "jpeg"
++
++        return (x, y, width, height, coding, data)
+ 
+ class XpraServer(gobject.GObject):
+     __gsignals__ = {
+@@ -500,7 +513,7 @@
+ 
+     def _calculate_capabilities(self, client_capabilities):
+         capabilities = {}
+-        for cap in ("deflate", "__prerelease_version"):
++        for cap in ("deflate", "__prerelease_version", "jpeg"):
+             if cap in client_capabilities:
+                 capabilities[cap] = client_capabilities[cap]
+         if "desktop_size" in client_capabilities:
+@@ -528,6 +569,8 @@
+         self._send(["hello", capabilities])
+         if "deflate" in capabilities:
+             self._protocol.enable_deflate(capabilities["deflate"])
++        if "jpeg" in capabilities:
++            self._protocol.jpegquality = capabilities["jpeg"]
+         # We send the new-window packets sorted by id because this sorts them
+         # from oldest to newest -- and preserving window creation order means
+         # that the earliest override-redirect windows will be on the bottom,
+

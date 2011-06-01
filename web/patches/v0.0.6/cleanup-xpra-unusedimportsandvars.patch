@@ -1,0 +1,138 @@
+### Eclipse Workspace Patch 1.0
+#P xpra
+Index: trunk/dev/xpra/protocol.py
+===================================================================
+--- trunk/dev/xpra/protocol.py	(revision 124)
++++ trunk/dev/xpra/protocol.py	(working copy)
+@@ -7,7 +7,6 @@
+ import socket # for socket.error
+ import zlib
+ 
+-from wimpiggy.util import dump_exc
+ from xpra.bencode import bencode, bdecode
+ 
+ from wimpiggy.log import Logger
+Index: trunk/dev/xpra/client.py
+===================================================================
+--- trunk/dev/xpra/client.py	(revision 142)
++++ trunk/dev/xpra/client.py	(working copy)
+@@ -6,13 +6,10 @@
+ import gtk
+ import gobject
+ import cairo
+-import os
+-import os.path
+ import sys
+ import hmac
+ 
+-from wimpiggy.util import (one_arg_signal,
+-                           gtk_main_quit_really,
++from wimpiggy.util import (gtk_main_quit_really,
+                            gtk_main_quit_on_fatal_exceptions_enable)
+ from wimpiggy.keys import grok_modifier_map
+ 
+Index: trunk/dev/xpra/proxy.py
+===================================================================
+--- trunk/dev/xpra/proxy.py	(revision 124)
++++ trunk/dev/xpra/proxy.py	(working copy)
+@@ -5,10 +5,7 @@
+ 
+ import gobject
+ import os
+-import socket
+ 
+-import sys
+-
+ from wimpiggy.log import Logger
+ log = Logger()
+ 
+Index: trunk/dev/xpra/clipboard.py
+===================================================================
+--- trunk/dev/xpra/clipboard.py	(revision 124)
++++ trunk/dev/xpra/clipboard.py	(working copy)
+@@ -116,7 +116,7 @@
+         self.send(["clipboard-contents-none", request_id, selection])
+ 
+     def _process_clipboard_contents(self, packet):
+-        (_, request_id, selection,
++        (_, request_id, _,
+          type, format, wire_encoding, wire_data) = packet
+         raw_data = self._munge_wire_selection_to_raw(wire_encoding, type,
+                                                      format, wire_data)
+@@ -125,7 +125,7 @@
+         self._clipboard_got_contents(request_id, type, format, raw_data)
+ 
+     def _process_clipboard_contents_none(self, packet):
+-        (_, request_id, selection) = packet
++        (_, request_id, _) = packet
+         self._clipboard_got_contents(request_id, None, None, None)
+ 
+     def _clipboard_got_contents(self, request_id, type, format, data):
+Index: trunk/dev/xpra/server.py
+===================================================================
+--- trunk/dev/xpra/server.py	(revision 136)
++++ trunk/dev/xpra/server.py	(working copy)
+@@ -12,8 +12,6 @@
+ import gtk
+ import gobject
+ import cairo
+-import os
+-import os.path
+ import subprocess
+ import hmac
+ import uuid
+@@ -109,7 +107,7 @@
+         self._models[model].window = window
+ 
+     def window_size(self, model):
+-        (x, y, w, h) = self._models[model].geom
++        (_, _, w, h) = self._models[model].geom
+         return (w, h)
+ 
+     def window_position(self, model, w, h):
+@@ -336,7 +334,7 @@
+ 
+     def _new_connection(self, listener, *args):
+         log.info("New connection received")
+-        sock, addr = listener.accept()
++        sock, _ = listener.accept()
+         self._potential_protocols.append(Protocol(sock, self.process_packet))
+         return True
+ 
+@@ -365,14 +363,14 @@
+         self._add_new_window_common(window)
+         for prop in self._window_export_properties:
+             window.connect("notify::%s" % prop, self._update_metadata)
+-        (x, y, w, h, depth) = window.get_property("client-window").get_geometry()
++        (x, y, w, h, _) = window.get_property("client-window").get_geometry()
+         self._desktop_manager.add_window(window, x, y, w, h)
+         self._send_new_window_packet(window)
+ 
+     def _add_new_or_window(self, raw_window):
+         try:
+             window = OverrideRedirectWindowModel(raw_window)
+-        except Unmanageable, e:
++        except Unmanageable:
+             return
+         self._add_new_window_common(window)
+         window.connect("notify::geometry", self._or_window_geometry_changed)
+@@ -537,8 +535,8 @@
+                 data = bencode(packet)
+                 written = 0
+                 while written < len(data):
+-                	select.select([], [proto._sock], [])
+-                	written += proto._sock.send(data[written:])
++                    select.select([], [proto._sock], [])
++                    written += proto._sock.send(data[written:])
+                 return
+             passwordFile = open(self.password_file, "rU")
+             password  = passwordFile.read()
+@@ -628,7 +626,7 @@
+             trap.call_unsynced(xtest_fake_button,
+                                gtk.gdk.display_get_default(),
+                                button, depressed)
+-        except XError, e:
++        except XError:
+             log.warn("Failed to pass on (un)press of mouse button %s"
+                      + " (perhaps your Xvfb does not support mousewheels?)",
+                      button)

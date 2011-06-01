@@ -1,0 +1,62 @@
+diff -ur parti-all-0.0.7-pre-vanilla/xpra/client.py parti-all-0.0.7-pre/xpra/client.py
+--- parti-all-0.0.7-pre-vanilla/xpra/client.py	2009-04-03 08:29:09.000000000 +0200
++++ parti-all-0.0.7-pre/xpra/client.py	2009-05-04 20:04:12.667360498 +0200
+@@ -87,10 +87,10 @@
+     def update_metadata(self, metadata):
+         self._metadata.update(metadata)
+         
+-        self.set_title(u"%s (via xpra)"
+-                       % self._metadata.get("title",
++        self.set_title(u"%s%s"
++                       % (self._metadata.get("title",
+                                             "<untitled window>"
+-                                            ).decode("utf-8"))
++                                            ).decode("utf-8"), self._client.title_suffix))
+ 
+         if "size-constraints" in self._metadata:
+             size_metadata = self._metadata["size-constraints"]
+@@ -268,10 +268,11 @@
+ gobject.type_register(ClientWindow)
+ 
+ class XpraClient(gobject.GObject):
+-    def __init__(self, sock, compression_level):
++    def __init__(self, sock, compression_level, title_suffix):
+         gobject.GObject.__init__(self)
+         self._window_to_id = {}
+         self._id_to_window = {}
++        self.title_suffix = title_suffix
+ 
+         self._protocol = Protocol(sock, self.process_packet)
+         ClientSource(self._protocol)
+Binary files parti-all-0.0.7-pre-vanilla/xpra/__init__.pyc and parti-all-0.0.7-pre/xpra/__init__.pyc differ
+diff -ur parti-all-0.0.7-pre-vanilla/xpra/scripts/main.py parti-all-0.0.7-pre/xpra/scripts/main.py
+--- parti-all-0.0.7-pre-vanilla/xpra/scripts/main.py	2009-04-03 08:29:09.000000000 +0200
++++ parti-all-0.0.7-pre/xpra/scripts/main.py	2009-05-04 20:06:09.439195803 +0200
+@@ -53,6 +53,9 @@
+                       dest="bind_tcp", default=None,
+                       metavar="[HOST]:PORT",
+                       help="Listen for connections over TCP (insecure)")
++    parser.add_option("--title-suffix", action="store",
++                      dest="title_suffix", default=" (via xpra)",
++                      help="Text which is appended to the window's title")
+     parser.add_option("-z", "--compress", action="store",
+                       dest="compression_level", type="int", default=3,
+                       metavar="LEVEL",
+@@ -146,8 +149,6 @@
+     elif display_name.startswith("tcp:"):
+         host_spec = display_name[4:]
+         (host, port) = host_spec.split(":", 1)
+-        if host == "":
+-            host = "127.0.0.1"
+         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+         sock.connect((host, int(port)))
+         return sock, True
+@@ -160,7 +161,7 @@
+     sock, local = client_sock(parser, opts, pick_display(parser, extra_args))
+     if opts.compression_level < 0 or opts.compression_level > 9:
+         parser.error("Compression level must be between 0 and 9 inclusive.")
+-    app = XpraClient(sock, opts.compression_level)
++    app = XpraClient(sock, opts.compression_level, opts.title_suffix)
+     sys.stdout.write("Attached\n")
+     app.run()
+ 
