@@ -3,8 +3,8 @@
 <head>
  <title>xpra packages</title>
  <meta http-equiv="content-type" content="text/html; charset=iso-8859-15" />
- <meta name="description" content="xpra packages" />
- <link rel="stylesheet" href="http://xpra.devloop.org.uk/main.css" type="text/css" media="screen,projection" />
+ <meta name="description" content="xpra packages: dev installation using our repository" />
+ <link rel="stylesheet" href="http://winswitch.org/main.css" type="text/css" media="screen,projection" />
  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
  <link rel="icon" type="image/png" href="/favicon.png" />
 </head>
@@ -13,7 +13,7 @@
 
   <div id="logoheader">
    <div id="logoicon">
-	   <img src="http://xpra.devloop.org.uk/xpra-logo.png" alt="xpra icon" />
+	   <img src="http://winswitch.org/xpra-logo.png" alt="xpra icon" />
    </div>
    <div id="logotitle">
 	   packages
@@ -36,8 +36,8 @@
 	  <h2><img src="./debian.png" alt="debian logo" />Ubuntu / Debian</h2>
 		To install xpra easily, run the following code as root:
 	<pre><code>
-	wget -O - http://xpra.devloop.org.uk/gpg.asc | apt-key add -
-	echo "deb http://xpra.devloop.org.uk/ <b>VERSION</b> main" &gt; /etc/apt/sources.list.d/xpra.list
+	wget -O - http://winswitch.org/gpg.asc | apt-key add -
+	echo "deb http://winswitch.org/ <b>VERSION</b> main" &gt; /etc/apt/sources.list.d/xpra.list
 	apt-get update
 	apt-get install xpra
 	</code></pre>
@@ -45,13 +45,11 @@
 		the list of packages and finally download and install xpra.
 		<br />
 		<b>Note:</b> You must replace <b>VERSION</b> with your distribution codename. (<a href="http://www.tech-recipes.com/rx/2768/ubuntu_what_version_am_i_running/">here</a> is how to find out what it is) <br />
-		We have packages for Ubuntu (Karmic, Jaunty, Intrepid and Hardy) and Debian (Lenny, Squeeze and Sid).
+		We have packages for Ubuntu (Natty, Maverick, Lucid, Karmic, Jaunty, Intrepid and Hardy) and Debian (Lenny, Squeeze and Sid).
 		<p>
-		Source and information about xpra can be found <a href="http://partiwm.org/wiki/xpra">here</a>.
+		Source and information about the original xpra version can be found <a href="http://partiwm.org/wiki/xpra">here</a>.
 		</p>
-		<b>Note:</b> Ubuntu packages are now available for the upcoming Karmic release:
-		<a href="http://packages.ubuntu.com/karmic/xpra">directly from ubuntu.com</a>,
-		but these <b>do not</b> contain many of the patches we include here.
+		<b>Note:</b> The packages available from Debian and Ubuntu's main repositories are well out of date and <b>do not</b> contain many of the patches we include here.
 	</div>
   </div>
 
