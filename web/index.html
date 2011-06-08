@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
- <title>xpra packages</title>
+ <title>xpra up to date packages</title>
  <meta http-equiv="content-type" content="text/html; charset=iso-8859-15" />
- <meta name="description" content="xpra packages" />
+ <meta name="description" content="xpra up to date packages" />
  <link rel="stylesheet" href="http://xpra.devloop.org.uk/main.css" type="text/css" media="screen,projection" />
  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
  <link rel="icon" type="image/png" href="/favicon.png" />
@@ -29,7 +29,7 @@
 	   <img src="http://xpra.devloop.org.uk/xpra-logo.png" alt="xpra icon" />
    </div>
    <div id="logotitle">
-	   packages
+	   up to date packages
    </div>
    <div id="logo_tr">
 		<a href="http://devloop.org.uk"><span class="lighter">/</span>dev<span class="lighter">/</span>loop<span class="lighter">.org.uk</span></a>
@@ -39,25 +39,36 @@
   <div id="navigation">
    <ul>
     <li class="selected_true"><a href="/">Xpra</a></li>
-    <li class="selected_false"><a href="/patches/">Patches</a></li>
+    <li class="selected_false"><a href="/src/">Source</a></li>
+    <li class="selected_false"><a href="/trac/">Bug Tracker</a></li>
    </ul>
   </div>
 
   <div id="fullcontent">
 	<div class="box">
+		The source and packages you can find here add the following enhancements to the upstream version:
+		<ul>
+			<li>Better Mac OS X support</li>
+			<li>Better Microsoft Windows support (standalone installer provided <a href="http://winswitch.org/dists/windows/Xpra_Setup.exe">here</a>)</li>
+			<li>JPEG image compression</li>
+			<li>Adaptive JPEG mode (bandwidth constrained)</li>
+			<li>Support for password protection option (useful for securing TCP mode)</li>
+			<li>Ability to disable pulseaudio and clipboard synchronization</li>
+			<li>Support for using existing displays or Xdummy in place of Xvfb, RANDR support</li>
+			<li>Lots of small fixes</li>
+		</ul>
+	</div>
+
+	<div class="box">
 	  <h2><a href="http://shifter.devloop.org.uk/"><img src="./shifter-logo.png" alt="shifter logo" /> Front End</a></h2>
-  		There is now a front-end for xpra, available <a href="http://shifter.devloop.org.uk/">here</a>.
+  		There is now a front-end for xpra, available <a href="http://winswitch.org/downloads/">here</a>.
   		<br />
-  		The installer packages and repositories already contain xpra, amongst other things.
-  		<br />
-  		This version also supports Microsoft Windows and Mac OSX, which aren't supported in the &quot;official&quot; version.
+  		The installer packages and repositories already contain xpra, amongst other things, follow the instructions there for installation.
   	</div>
 
 	<div class="box">
 	  <h2>Upstream</h2>
 	  	The upstream version of xpra, minus the enhancements we've built in, can be found <a href="http://code.google.com/p/partiwm/wiki/xpra">here</a>.
-	  	<br />
-	  	The patches we include can be found <a href="./patches/">here</a>.
 	</div>
   </div>
 
