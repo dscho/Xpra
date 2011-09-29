@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
- <title>xpra up to date packages</title>
+ <title>xpra up-to-date fork</title>
  <meta http-equiv="content-type" content="text/html; charset=iso-8859-15" />
- <meta name="description" content="xpra up to date packages" />
+ <meta name="description" content="xpra up-to-date fork" />
  <link rel="stylesheet" href="http://xpra.devloop.org.uk/main.css" type="text/css" media="screen,projection" />
  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
  <link rel="icon" type="image/png" href="/favicon.png" />
@@ -29,7 +29,7 @@
 	   <img src="./xpra-logo.png" alt="xpra icon" />
    </div>
    <div id="logotitle">
-	   up to date packages
+	   up-to-date fork
    </div>
    <div id="logo_tr">
 		<a href="http://devloop.org.uk"><span class="lighter">/</span>dev<span class="lighter">/</span>loop<span class="lighter">.org.uk</span></a>
@@ -57,35 +57,53 @@
 
   <div id="fullcontent">
 	<div class="box">
-		The source and packages you can find here add the following enhancements to the upstream version:
+		<h2><img src="./icons/gears.png" alt="gears" /> About</h2>
+		Xpra is 'screen for X': it allows you to run X programs, usually on
+		a remote host, direct their display to your local machine, and then to
+		disconnect from these programs and reconnect from the same or another
+		machine, without losing any state.
+		<br />
+		Xpra is "rootless" or "seamless": programs you run under it show up on your desktop as regular programs,
+		managed by your regular window manager.
+  	</div>
+
+	<div class="box">
+		<h2><img src="./icons/features.png" alt="features" /> Enhancements</h2>
+		This fork adds the following enhancements over the original version:
 		<ul>
-			<li>Better Mac OS X support</li>
-			<li>Better Microsoft Windows support (standalone installer provided <a href="http://winswitch.org/dists/windows/Xpra_Setup.exe">here</a>)</li>
-			<li>JPEG image compression</li>
-			<li>Adaptive JPEG mode (bandwidth constrained)</li>
+			<li>Better platform support: Mac OS X, Microsoft Windows (standalone installer provided <a href="http://winswitch.org/dists/windows/Xpra_Setup.exe">here</a>)
+			 and Android (work in progress)</li>
+			<li>Up to date packages for most platforms and distributions (inc Debian/Ubuntu repository)</li>
+			<li>JPEG image compression, including adaptive JPEG mode (bandwidth constrained)</li>
+			<li>non-US keyboard layout support</li>
+			<li>Handles screen update storms, lower CPU overhead in network code</li>
 			<li>Support for password protection option (useful for securing TCP mode)</li>
+			<li>Forwarding of system bell and cursors changes</li>
+			<li>Support for using existing displays or Xdummy in place of Xvfb, RandR support</li>
+			<li>Clean client disconnection</li>
 			<li>Ability to disable pulseaudio and clipboard synchronization</li>
-			<li>Support for using existing displays or Xdummy in place of Xvfb, RANDR support</li>
 			<li>Lots of small fixes</li>
 		</ul>
 	</div>
 
 	<div class="box">
 	  <h2><a href="http://winswitch.org/"><img src="./winswitch-logo.png" alt="winswitch logo" /> Front End</a></h2>
-  		There is now a front-end for xpra, available <a href="http://winswitch.org/downloads/">here</a>.
+  		There is a front-end for xpra, available <a href="http://winswitch.org/downloads/">here</a>.
   		<br />
-  		The installer packages and repositories already contain xpra, amongst other things, follow the instructions there for installation.
+  		The installer packages and repositories already contain xpra, amongst other things,
+  		follow the instructions there for installation
+  		and install only the &quot;xpra&quot; package if you do not wish to try the GUI.
   	</div>
 
 	<div class="box">
-	  <h2><a href="/src/">Source Releases</a></h2>
+	  <h2><a href="/src/"><img src="./icons/source.png" alt="source" /> Source Releases</a></h2>
 	  You can find source code releases <a href="/src/">here</a>.
 	  <br />
-	  We <u>try</u> to stick to a monthly release cycle if possible. 
+	  We <u>try</u> to stick to a monthly release cycle whenever possible.
 	</div>
 
 	<div class="box">
-	  <h2>Repository</h2>
+	  <h2><img src="./icons/repository.png" alt="repository" /> Repository</h2>
 	  The subversion repository is located here: <br />
 	  <a href="http://xpra.devloop.org.uk/svn/Xpra/"><code>http://xpra.devloop.org.uk/svn/Xpra/</code></a>
 	  <br />
@@ -93,10 +111,10 @@
 	</div>
 
 	<div class="box">
-	  <h2>Upstream</h2>
-	  	The upstream version of xpra can be found <a href="http://code.google.com/p/partiwm/wiki/xpra">here</a>.
+	  <h2><img src="./icons/extlink.png" alt="external link" />  Upstream</h2>
+	  	The original version of xpra can be found <a href="http://code.google.com/p/partiwm/wiki/xpra">here</a>.
 	  	<br />
-	  	It is now well out of date, we do not recommend that you use it.
+	  	Note that it is now well out of date and is very rarely getting updated (no new official releases in 2 years), there is very little point in using that version.
 	</div>
   </div>
 
