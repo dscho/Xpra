@@ -131,10 +131,18 @@ span.lighter {
 }
 
 /* main body */
+div#content {
+	width: 90%;
+}
 #content,#fullcontent,#subcontent{
+	display: table-cell;
 	float:left;
 	font-size:0.9em;
 	padding:30px 10px 20px 30px;
+	width: 90%;
+}
+div.buttons {
+	clear: both;
 }
 
 /* header styles */
