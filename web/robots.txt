@@ -1,0 +1,12 @@
+User-Agent: *
+Disallow: /trac/*?rev=*
+Disallow: /trac/*&rev=*
+Disallow: /trac/*?order*
+Disallow: /trac/browser/*
+Disallow: /trac/changeset/*
+Disallow: /trac/log/*
+Disallow: /trac/milestone/*
+Disallow: /newticket
+Disallow: /search
+Disallow: /beta
+Disallow: /pool
