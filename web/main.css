@@ -22,7 +22,7 @@ a:hover{
 	text-decoration:none;
 }
 a.ext:before {
-	content: url(extlink.png)
+	content: url(/icons/extlink.png)
 }
 img{
 	border: none;
@@ -34,7 +34,7 @@ p{
 ul,li{
 	margin: 0px;
 	padding: 0px;
-	list-style-image: url(star.png);
+	list-style-image: url(/icons/star.png);
 }
 li {
 	margin-left: 20px;
@@ -219,12 +219,12 @@ div#footer a:hover{
 
 /* the box and codebox */
 .box,.codebox{
-	margin:0 0 20px 0;
-	padding:10px;
+	margin: 0 0 10px 0;
+	padding: 2px 10px 2px 10px;
 	border:1px solid #c0c0c0;
 	background-color:#e0fbe5;
 	color:#505050;
-	line-height:1.5em;
+	line-height:1.3em;
 }
 .codebox{
 	border:1px solid #a0a0a0;
@@ -260,16 +260,16 @@ select#docnav, select#docnav option {
 	font:1.0em serif;
 }
 #docnav a.previous:before {
-	content: url(arrow-left-circle-small.png)
+	content: url(/icons/arrow-left-circle-small.png)
 }
 #docnav a.next:after {
-	content: url(arrow-right-circle-small.png)
+	content: url(/icons/arrow-right-circle-small.png)
 }
 #docnav a.index:before {
-	content: url(arrow-up-circle-small.png)
+	content: url(/icons/arrow-up-circle-small.png)
 }
 #docnav a.index:after {
-	content: url(arrow-up-circle-small.png)
+	content: url(/icons/arrow-up-circle-small.png)
 }
 form, fieldset, select {
 	float: left;

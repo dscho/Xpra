@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+ <title>xpra: build</title>
+ <meta http-equiv="content-type" content="text/html; charset=iso-8859-15" />
+ <meta name="description" content="xpra how to build from source" />
+ <link rel="stylesheet" href="/main.css" type="text/css" media="screen,projection" />
+ <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+ <link rel="icon" type="image/png" href="/favicon.png" />
+ <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-20104003-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+ </script>
+</head>
+<body>
+ <div id="container">
+
+  <div id="logoheader">
+   <div id="logoicon">
+	   <img src="/icons/xpra-logo.png" alt="xpra icon" />
+   </div>
+   <div id="logotitle">
+	   How to build
+   </div>
+   <div id="logo_tr">
+		<a href="http://devloop.org.uk"><span class="lighter">/</span>dev<span class="lighter">/</span>loop<span class="lighter">.org.uk</span></a>
+   </div>
+  </div>
+ 
+  <div id="navigation">
+   <ul>
+    <li class="selected_false"><a href="/">Xpra</a></li>
+    <li class="selected_false"><a href="/src/">Source</a></li>
+    <li class="selected_true"><a href="/build.html">Build</a></li>
+    <li class="selected_false"><a href="/trac/">Bug Tracker</a></li>
+    <li>
+	&nbsp;
+	<g:plusone size="small"></g:plusone>
+	<script type="text/javascript">
+	  (function() {
+	    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+	    po.src = 'https://apis.google.com/js/plusone.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	  })();
+	</script>
+	</li>
+   </ul>
+  </div>
+
+  <div id="fullcontent">
+	<div class="box">
+	  <h2>Building the client Only</h2>
+	  The client is much more lightweight compared to the server and can be compiled as pure Python code
+	  without needing any extra header files or compilers.
+	  <br />
+	  Should you wish to only build the client, simply apply
+	  <a href="http://xpra.org/trac/browser/trunk/src/disable-posix-server.patch">this patch</a> before building.
+	</div>
+
+	<div class="box">
+	  <h2><img src="/icons/fedora.png" alt="Fedora" /> Fedora and <img src="/icons/centos.png" alt="CentOS" /> CentOS</h2>
+	  For building you will need to install:
+	  <div class="codebox">
+	  	<pre><code>yum install gcc python-devel libXtst-devel libXdamage-devel \
+	  	gtk2-devel pygtk2-devel pygobject2-devel</code></pre>
+	  </div>
+	  Fedora users can install <a class="ext" href="http://cython.org/"><code>Cython</code></a> via yum:
+	  <div class="codebox">
+		<pre><code>yum install Cython</code></pre>
+	  </div>
+	  But CentOS users will need to <a class="ext" href="http://cython.org/#download">download</a> and build from source (which is trivial),
+	  or rely on third party packages.
+	  <br />
+	  <br />
+	  For running the server, you will also need <code>Xvfb</code>, <code>xauth</code> and keyboard utilities
+	  - only the keyboard utilities are needed when using the client.
+	  <div class="codebox">
+		<pre><code>yum install xorg-x11-server-Xvfb xorg-x11-xauth xorg-x11-xkb-utils</code></pre>
+	  </div> 
+	</div>
+
+	<div class="box">
+	  <h2><img src="/icons/debian.png" alt="Debian" /> Debian and <img src="/icons/ubuntu.png" alt="Ubuntu" /> Ubuntu</h2>
+	  For building you will need to install:
+	  <div class="codebox">
+		<pre><code>apt-get install libx11-dev libxtst-dev libxcomposite-dev libxdamage-dev \
+	  	python-all-dev python-gobject-dev python-gtk2-dev cython</code></pre>
+	  </div>
+	  <br />
+	  <br />
+	  For running the server, you will also need <code>Xvfb</code>, <code>xauth</code> and keyboard utilities
+	  - only the keyboard utilities are needed when using the client.
+	  <div class="codebox">
+		<pre><code>yum install xvfb xauth x11-xkb-utils</code></pre>
+	  </div> 
+	</div>
+
+	<div class="box">
+	  <h2><img src="/icons/opensuse.png" alt="openSUSE" /> openSUSE</h2>
+	  For building you will need to install:
+	  <div class="codebox">
+		<pre><code>zypper install gcc python-cython python-devel \
+		gtk2-devel python-gtk-devel python-gobject2-devel</code></pre>
+	  </div>
+	  For running the server, you will also need <code>Xvfb</code>, <code>xauth</code> and keyboard utilities
+	  - only the keyboard utilities are needed when using the client.
+	  <div class="codebox">
+		<pre><code>yum install xorg-x11-server-extra xorg-x11-xauth xkeyboard-config</code></pre>
+	  </div> 
+	</div>
+
+	<div class="box">
+	  <h2><img src="/icons/windows.png" alt="windows" /> Microsoft Windows and <img src="/icons/osx.png" alt="osx" /> Mac OS X</h2>
+	  Building on those platforms is totally non-trivial,
+	  please refer to the build instructions for <a href="http://winswitch.org">WindowSwitch</a>:
+	  <ul>
+	  	<li><a href="http://winswitch.org/dev/macosx.html">Mac OS X</a></li>
+	  	<li><a href="http://winswitch.org/dev/win32.html">Microsoft Windows</a></li>
+	  </ul>
+	</div>
+
+	<div class="box">
+	  <h2><img src="/icons/gears.png" alt="gears" />  Building and Installing</h2>
+	    For installing into the local <code>./install</code> directory as a normal user,
+	    simply run the <a href="http://xpra.org/trac/browser/trunk/src/do-build">do-build</a> script.
+	    <br />
+	    For installing globally via sudo:
+	    <div class="codebox">
+		  <pre><code>rm -rf build install
+python make_constants_pxi.py wimpiggy/lowlevel/constants.txt wimpiggy/lowlevel/constants.pxi
+sudo CFLAGS=-O0 python setup.py install<code></pre>
+		</div>
+	</div>
+
+	<div class="box">
+	  <h2><img src="/icons/remove.png" alt="remove" />  Uninstalling</h2>
+		<code>setuptools</code> does not provide any uninstallation mechanism,
+		this has nothing to do with Xpra and affects all python packages on your system.
+		<br />
+		That said, it is generally enough to remove (but you must ensure that these are the correct files
+		as you may damage your system otherwise!):
+		<div class="codebox">
+		  <pre><code>/usr/bin/xpra
+/usr/bin/parti
+/usr/bin/parti-repl</code></pre>
+		</div>
+		And the following python packages and eggs:
+		<div class="codebox">
+		  <pre><code>xpra
+parti*
+wimpiggy</code></pre>
+        </div>
+        These are usually located in a python subdirectory named "<code>site-packages</code>" or "<code>dist-packages</code>".
+	</div>
+  </div>
+
+  <div id="footer">
+   <div id="validators">
+	<a href="http://validator.w3.org/check?uri=referer">
+		<img src="/icons/valid-xhtml11-blue.png" alt="Valid XHTML 1.1" />
+	</a>
+	<a href="http://jigsaw.w3.org/css-validator/check/referer">
+		<img src="/icons/vcss-blue.gif" alt="Valid CSS!" />
+	</a>
+   </div>
+   <span id="copyleft">
+	<a href="http://www.devloop.org.uk">devloop.org.uk hosted project</a> <img src="/icons/copyleft-tiny.png" alt="copyleft" /> <a href="http://nagafix.co.uk/">copyleft 2010 - 2011 Nagafix Ltd</a>
+   </span>
+   <div id="email">
+	<a href="mailto:webmaster@devloop.org.uk"><img src="/icons/message.png" alt="message" /> <span>webmaster@devloop.org.uk</span></a>
+   </div>
+  </div>
+
+ </div>
+</body>
+</html>
