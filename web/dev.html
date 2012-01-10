@@ -97,7 +97,10 @@
 		<pre><code>apt-get install libx11-dev libxtst-dev libxcomposite-dev libxdamage-dev \
 	  	python-all-dev python-gobject-dev python-gtk2-dev cython</code></pre>
 	  </div>
-	  <br />
+	  <p class="smallnote">If you encounter errors on <code>char [32] keys_return</code> .. <code>Expected ')'</code>,
+	  then your version of cython is probably too old, either upgrade it (from <a href="http://backports-master.debian.org/">backports</a>)
+	  or <a href="http://docs.cython.org/src/quickstart/install.html">build it from source</a>.
+	  </p>
 	  <br />
 	  For running the server, you will also need <code>Xvfb</code>, <code>xauth</code> and keyboard utilities
 	  - only the keyboard utilities are needed when using the client.
