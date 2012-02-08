@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+ <title>xpra: Xdummy</title>
+ <meta http-equiv="content-type" content="text/html; charset=iso-8859-15" />
+ <meta name="description" content="building and using Xdummy with Xpra" />
+ <link rel="stylesheet" href="/main.css" type="text/css" media="screen,projection" />
+ <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+ <link rel="icon" type="image/png" href="/favicon.png" />
+ <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-20104003-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+ </script>
+</head>
+<body>
+ <div id="container">
+
+  <div id="logoheader">
+   <div id="logoicon">
+	   <img src="/icons/xpra-logo.png" alt="xpra icon" />
+   </div>
+   <div id="logotitle">
+	   up-to-date fork
+   </div>
+   <div id="logo_tr">
+		<a href="http://devloop.org.uk"><span class="lighter">/</span>dev<span class="lighter">/</span>loop<span class="lighter">.org.uk</span></a>
+   </div>
+  </div>
+ 
+  <div id="navigation">
+   <ul>
+    <li class="selected_false"><a href="/">Xpra</a></li>
+    <li class="selected_true"><a href="/Xdummy.html">Xdummy</a></li>
+    <li class="selected_false"><a href="/src/">Source</a></li>
+    <li class="selected_false"><a href="/dev.html">Build</a></li>
+    <li class="selected_false"><a href="/trac/">Bug Tracker</a></li>
+    <li>
+	&nbsp;
+	<g:plusone size="small"></g:plusone>
+	<script type="text/javascript">
+	  (function() {
+	    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+	    po.src = 'https://apis.google.com/js/plusone.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	  })();
+	</script>
+	</li>
+   </ul>
+  </div>
+
+  <div id="fullcontent">
+	<div class="box">
+		<h2><img src="/icons/gears.png" alt="gears" /> About</h2>
+		Xdummy was <a href="http://www.karlrunge.com/x11vnc/Xdummy">originally developed</a> by Karl Runge to allow a standard X11 server to be used by
+		non-root users with the <a href="http://cgit.freedesktop.org/xorg/driver/xf86-video-dummy/">dummy driver</a> &quot;<code>xf86-video-dummy</code>&quot;.
+		<br />
+		The problem with that approach was that it was really just a hack (ie: using <code>LD_SO_PRELOAD</code> tricks to
+		fool the X11 server process) and therefore not suitable for deployment in many environments.
+		<br />
+		<br />
+		In the context of Xpra, this allows us to use a better, more up to date X11 display server, one that supports more extensions,
+		especially the <code>RandR</code> extension. For many display bugs (ie: <a href="http://xpra.org/trac/ticket/1">#1</a>, <a href="http://xpra.org/trac/ticket/2">#2</a>)
+		this is the only workable solution: it allows Xpra to resize the virtual display to match the client's resolution so as to prevent windows and
+		menus from overflowing beyond the edge of the screen.
+  	</div>
+
+	<div class="box">
+		<h2><img src="/icons/question.png" alt="question" /> Status</h2>
+		There are two changes to core Xorg code which are needed:
+		<ul>
+			<li><a href="http://cgit.freedesktop.org/xorg/xserver/commit/?id=ead968a4300c0adeff89b9886e888b6d284c75cc">The xserver patch</a>:
+				which is part of the 1.12 release branch.
+				<br />
+			<li><a href="http://cgit.freedesktop.org/xorg/driver/xf86-video-dummy/commit/?id=fb0888f90d5d1c10d69ec2add0a66e88c94f5d5c">This xf86-video-dummy patch</a>:
+				which is part of version 0.3.5 and later.
+				<br />
+				<span class="smallnote">(if your client screen is smaller than 2048x2048, you may no need it)</span>
+			</li>
+		</ul>
+		If your distribution ships older versions of those packages,
+		you may want to try one of <a href="http://xpra.org/src/Xdummy/">our patched binary packages</a>
+		<span class="smallnote">(no warranties given or implied)</span>
+	</div>
+
+	<div class="box">
+	  <h2><img src="/icons/gears.png" alt="gears" /> Usage</a></h2>
+		With this new xserver, you can start a new display using the dummy driver without needing any special privileges
+		whilst still specifying your own log and config files:
+	    <div class="codebox">
+		<pre><code>Xorg +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf :10
+</code></pre></div>
+		You can find a sample configuration file for dummy here: <a href="./src/Xdummy/xorg.conf">xorg.conf</a>.
+		<br />
+		<br />
+		With Xpra, you can specify this virtual framebuffer alternative using the <code>--xvfb</code> switch:
+		<div class="codebox">
+		<pre><code>xpra --xvfb="Xorg +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf" start :10
+</code></pre></div>
+		<!--
+		Those using <a href="http://winswitch.org/">Window Switch</a> should have the correct settings automatically detected when the initial configuration is created,
+		but if an upgrade (or patch) provides the new xserver features, you can then change the settings manually:
+	    <div class="codebox">
+		<pre><code>xpra_xvfb_command="/usr/local/bin/Xdummy +extension GLX +extension RANDR +extension RENDER -logfile ${logfile} -config /usr/share/winswitch/xorg-xdummy-xpra.conf"
+</code></pre></div>
+		-->	
+  	</div>
+
+  </div>
+
+  <div id="footer">
+   <div id="validators">
+	<a href="http://validator.w3.org/check?uri=referer">
+		<img src="/icons/valid-xhtml11-blue.png" alt="Valid XHTML 1.1" />
+	</a>
+	<a href="http://jigsaw.w3.org/css-validator/check/referer">
+		<img src="/icons/vcss-blue.gif" alt="Valid CSS!" />
+	</a>
+   </div>
+   <span id="copyleft">
+	<a href="http://www.devloop.org.uk">devloop.org.uk hosted project</a> <img src="/icons/copyleft-tiny.png" alt="copyleft" /> <a href="http://nagafix.co.uk/">copyleft 2010 - 2012 Nagafix Ltd</a>
+   </span>
+   <div id="email">
+	<a href="mailto:webmaster@devloop.org.uk"><img src="/icons/message.png" alt="message" /> <span>webmaster@devloop.org.uk</span></a>
+   </div>
+  </div>
+
+ </div>
+</body>
+</html>

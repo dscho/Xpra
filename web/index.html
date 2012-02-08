@@ -39,6 +39,7 @@
   <div id="navigation">
    <ul>
     <li class="selected_true"><a href="/">Xpra</a></li>
+    <li class="selected_false"><a href="/Xdummy.html">Xdummy</a></li>
     <li class="selected_false"><a href="/src/">Source</a></li>
     <li class="selected_false"><a href="/dev.html">Build</a></li>
     <li class="selected_false"><a href="/trac/">Bug Tracker</a></li>
@@ -76,16 +77,17 @@
 			 and Android (work in progress)</li>
 			<li>Up to date packages for most platforms and distributions (inc Debian/Ubuntu repository)</li>
 			<li>System tray menu for easy disconnection</li>
+			<li>Memory Mapped data transfers for local connections - fast!</li>
 			<li>JPEG and PNG image compression (optional), including adaptive JPEG mode (bandwidth constrained)</li>
 			<li>non-US keyboard layout support</li>
 			<li>Handles screen update storms and fast screen refresh rates</li>
 			<li>Much lower CPU overhead in network code</li>
-			<li>Support for password protection option which is useful for securing TCP mode</li>
+			<li>Support for password protection option which is useful for securing plain TCP connections</li>
 			<li>Forwarding of system bell and curstom application cursors</li>
 			<li>Forwarding of application notifications</li>
-			<li>Support for &quot;Xdummy&quot; and the RandR extension which fixes a number of otherwise unfixable display bugs</li>
-			<li>Clean client disconnection</li>
+			<li>Support for <a href="./Xdummy.html">Xdummy</a> and the RandR extension which fixes a number of otherwise unfixable display bugs</li>
 			<li>Ability to disable pulseaudio and clipboard synchronization</li>
+			<li>Clean client disconnection</li>
 			<li>Lots of small fixes</li>
 		</ul>
 	</div>
@@ -104,15 +106,18 @@
 	<div class="box">
 	  <h2><a href="/src/"><img src="/icons/forward.png" alt="forward" /> Get Started</a></h2>
 		On the machine which will export the application (xterm in this example):
+	    <div class="codebox">
 		<pre><code>xpra start :100
 DISPLAY=:100 xterm
-</code></pre>
+</code></pre></div>
 		For the simple case, we can then attach to this session from the same machine with:
+		<div class="codebox">
 		<pre><code>xpra attach :100
-</code></pre>
+</code></pre></div>
 		If connecting from a remote machine, you would use something like:
+		<div class="codebox">
 		<pre><code>xpra attach ssh:serverhostname:100
-</code></pre>
+</code></pre></div>
 	</div>
 
 	<div class="box">
