@@ -63,10 +63,17 @@
 		Xpra is 'screen for X': it allows you to run X programs, usually on
 		a remote host, direct their display to your local machine, and then to
 		disconnect from these programs and reconnect from the same or another
-		machine, without losing any state.
+		machine, without losing any state. It gives you remote access
+		to individual applications.
 		<br />
 		Xpra is "rootless" or "seamless": programs you run under it show up on your desktop as regular programs,
 		managed by your regular window manager.
+		<br />
+		Sessions can be accessed over SSH, or password protected over plain TCP sockets.
+		<br />
+		Xpra is usable over reasonably slow links and does its best to adapt to changing network bandwidth limits. (see also adaptive JPEG mode)
+		<br />
+		Xpra is open-source (GPLv2+), multi-platform and multi-language, with current clients written in Python and Java.
   	</div>
 
 	<div class="box">
@@ -75,17 +82,18 @@
 		<ul>
 			<li>Better platform support: Mac OS X, Microsoft Windows (standalone installer provided <a href="http://winswitch.org/dists/windows/Xpra_Setup.exe">here</a>)
 			 and Android (beta APK <a href="/dists/Android/Xpra.apk">here</a>)</li>
-			<li>Up to date packages for most platforms and distributions (Debian/Ubuntu <a href="http://winswitch.org/downloads/debian-repository.html">repository</a>)</li>
+			<li>Up to date packages for most platforms and distributions <span class="smallnote">(ie: Debian/Ubuntu <a href="http://winswitch.org/downloads/debian-repository.html">repository</a>)</span></li>
 			<li>System tray menu for easy disconnection</li>
 			<li>Memory Mapped data transfers for local connections - fast!</li>
 			<li>JPEG and PNG image compression (optional), including adaptive JPEG mode (bandwidth constrained)</li>
 			<li>non-US keyboard layout support</li>
 			<li>Handles screen update storms and fast screen refresh rates</li>
 			<li>Much lower CPU overhead in network code</li>
-			<li>Support for password protection option which is useful for securing plain TCP connections</li>
-			<li>Forwarding of system bell and curstom application cursors</li>
-			<li>Forwarding of application notifications</li>
-			<li>Support for <a href="./Xdummy.html">Xdummy</a> and the RandR extension which fixes a number of otherwise unfixable display bugs</li>
+			<li>Support for password protection option for securing plain TCP connections</li>
+			<li>Forwarding of system bell and custom application cursors</li>
+			<li>Forwarding of application notifications <span class="smallnote">(requires its own dbus daemon)</span></li>
+			<li>Support for <a href="./Xdummy.html">Xdummy</a> and the RandR extension
+				which fixes a number of otherwise unfixable display bugs <span class="smallnote">(ie: <a href="/trac/ticket/1">#1</a>, <a href="/trac/ticket/2">#2</a>)</span></li>
 			<li>Ability to disable pulseaudio and clipboard synchronization</li>
 			<li>Clean client disconnection</li>
 			<li>Lots of small fixes</li>
