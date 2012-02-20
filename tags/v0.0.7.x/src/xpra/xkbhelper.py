@@ -145,6 +145,10 @@ def do_set_keymap(xkbmap_layout, xkbmap_variant,
 
     display = os.environ.get("DISPLAY")
     if xkbmap_print:
+        #there may be a junk header, if so remove it:
+        pos = xkbmap_print.find("xkb_keymap {")
+        if pos>0:
+            xkbmap_print = xkbmap_print[pos:]
         exec_keymap_command(["xkbcomp", "-", display], xkbmap_print)
 
 
