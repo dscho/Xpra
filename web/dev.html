@@ -65,6 +65,7 @@
 	  <br />
 	  Should you wish to only build the client, simply apply
 	  <a href="http://xpra.org/trac/browser/trunk/src/disable-posix-server.patch">this patch</a> before building.
+	  <p class="smallnote">(this step is not necessary on Microsoft Windows and Mac OS X which do not support running the server anyway)</p>
 	</div>
 
 	<div class="box">
@@ -143,7 +144,7 @@
 	    <div class="codebox">
 		  <pre><code>rm -rf build install
 python make_constants_pxi.py wimpiggy/lowlevel/constants.txt wimpiggy/lowlevel/constants.pxi
-sudo CFLAGS=-O0 python setup.py install<code></pre>
+sudo CFLAGS=-O0 python setup.py install</code></pre>
 		</div>
 	</div>
 
@@ -166,6 +167,27 @@ parti*
 wimpiggy</code></pre>
         </div>
         These are usually located in a python subdirectory named "<code>site-packages</code>" or "<code>dist-packages</code>".
+	</div>
+
+	<div class="box">
+	  <h2><img src="/icons/bugs.png" alt="remove" />  Debugging</h2>
+		Debugging generally involves first turning on verbose debugging by adding &quot;<code>-d all</code>&quot; to the xpra command line.
+		<br />
+		However, if the error comes from the X Window system, you may see an error like this one when the application crashes:  
+		<div class="codebox">
+		  <pre><code>The program 'xpra' received an X Window System error.
+This probably reflects a bug in the program.
+The error was ...</code></pre>
+		</div>
+		To debug these issues, one must use <code>gdb</code> and ensure that <code>gtk/gdk</code> use synchronous X11 calls.
+		<br />
+		Start xpra with <code>GDK_SYNCHRONIZE</code> set to '1':
+		<div class="codebox">
+		  <pre><code>GDK_SYNCHRONIZE=1 xpra start (...)</code></pre>
+		</div>
+		You can then attach gdb to the process and get a backtrace (&quot;<code>bt</code>&quot;) when the error occurs.
+		<p class="smallnote">(you should not need to set any breakpoints, the exit path should be enough: either <code>exit</code> or <code>_exit</code>.
+		Using a breakpoint on <code>_XError</code> may give a few false positives and cause problems of its own..)</p>
 	</div>
   </div>
 
