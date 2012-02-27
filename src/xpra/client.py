@@ -900,8 +900,11 @@ class XpraClient(XpraClientBase):
         self.server_capabilities = capabilities
         if not self.session_name:
             self.session_name = capabilities.get("session_name", "Xpra")
-        import glib
-        glib.set_application_name(self.session_name)
+        try:
+            import glib
+            glib.set_application_name(self.session_name)
+        except ImportError, e:
+            log.error("glib is missing, cannot set the application name, please install glib's python bindings: %s", e)
         self.keyboard_as_properties = capabilities.get("keyboard_as_properties", False)
         self._raw_keycodes_feature = capabilities.get("raw_keycodes_feature", False)
         self._raw_keycodes_full = capabilities.get("raw_keycodes_full", False)
