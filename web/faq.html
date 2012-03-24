@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+ <title>xpra: FAQ</title>
+ <meta http-equiv="content-type" content="text/html; charset=iso-8859-15" />
+ <meta name="description" content="xpra faq" />
+ <link rel="stylesheet" href="/main.css" type="text/css" media="screen,projection" />
+ <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+ <link rel="icon" type="image/png" href="/favicon.png" />
+ <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-20104003-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+ </script>
+</head>
+<body>
+ <div id="container">
+
+  <div id="logoheader">
+   <div id="logoicon">
+	   <img src="/icons/xpra-logo.png" alt="xpra icon" />
+   </div>
+   <div id="logotitle">
+	   How to build
+   </div>
+   <div id="logo_tr">
+		<a href="http://devloop.org.uk"><span class="lighter">/</span>dev<span class="lighter">/</span>loop<span class="lighter">.org.uk</span></a>
+   </div>
+  </div>
+ 
+  <div id="navigation">
+   <ul>
+    <li class="selected_false"><a href="/">Xpra</a></li>
+    <li class="selected_false"><a href="/Xdummy.html">Xdummy</a></li>
+    <li class="selected_false"><a href="/src/">Source</a></li>
+    <li class="selected_false"><a href="/build.html">Build</a></li>
+    <li class="selected_true"><a href="/faq.html">FAQ</a></li>
+    <li class="selected_false"><a href="https://xpra.org/trac/">Bug Tracker</a></li>
+    <li>
+	&nbsp;
+	<g:plusone size="small"></g:plusone>
+	<script type="text/javascript">
+	  (function() {
+	    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+	    po.src = 'https://apis.google.com/js/plusone.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	  })();
+	</script>
+	</li>
+   </ul>
+  </div>
+
+  <div id="fullcontent">
+  	<a name="general"></a>
+	<div class="box">
+	  <h2>General</h2>
+	  <ul>
+	  	<li class="q">Why this fork?</li>
+	  	<li class="a">This fork started in order to provide features needed to work with <a href="http://winswitch.org/about/">winswitch</a> and grew from there</li>
+	  	<li class="q">Which version shall I be using?</li>
+	  	<li class="a">Please always used the latest released version, currently <code>0.1.x</code></li>
+	  </ul>
+	</div>
+
+	<a name="features"></a>
+	<div class="box">
+	  <h2>Features</h2>
+	  <ul>
+	  	<li class="q">How do I use notifications forwarding?</li>
+	  	<li class="a">System notifications use <a class="ext" href="http://www.freedesktop.org/wiki/Software/dbus">dbus</a>, so you must start the xpra server within its own dbus session (see <code>dbus-launch</code> for details).
+	  		This is one of the things that <a href="http://winswitch.org/about">winswitch</a> does for you.
+	  	</li>
+	  	<li class="q">How do I use mmap with different users?</li>
+	  	<li class="a">Please see the <code>--mmap-group</code> option: the two users need to be in the same group, the mmap file created by the client will use the group-id of the server socket file.
+	  		You must generally also use the <code>--socket-dir</code> option to place the socket in a location which is available to both users (ie: <code>/tmp</code>)
+	  	</li>
+	  	<li class="q">How do I enable OpenGL or other X11 extensions?</li>
+	  	<li class="a">Please see <a href="/Xdummy.html">Xdummy</a></li>
+	  </ul>
+	</div>
+
+	<a name="warnings"></a>
+	<div class="box">
+	  <h2>Warnings and Messages</h2>
+	  <ul>
+	  	<li class="q">&quot;<code>Xlib:  extension "RANDR" missing on display</code>&quot; and &quot;<code>Randr not supported: X server does not support required extension Randr</code>&quot;</li>
+	  	<li class="a">The virtual framebuffer (typically <code>Xvfb</code>) does not support Randr, this may cause some display problems, try using <a href="/Xdummy.html">Xdummy</a> instead</li>
+	  	<li class="q">&quot;<code>cannot register our notification forwarder ...</code>&quot;</li>
+	  	<li class="a">The xpra server was started from a GUI session which already had a dbus instance and a notification daemon, notifications forwarding will not work.
+	  		<br />
+	  		See <a href="#features">&quot;How do I use notifications forwarding&quot;</a> (above)
+	  	</li>
+	  	<li class="q">&quot;<code>Uh-oh, our size doesn't fit window sizing constraints ..</code>&quot;</li>
+	  	<li class="a">This means that xpra failed to create a window matching the desired constraints, you may experience display artifacts around the window's borders</li>
+	  </ul>
+	</div>
+
+	<a name="platforms"></a>
+	<div class="box">
+	  <h2>Platforms</h2>
+	  <ul>
+	  	<li class="q">Does this work with Windows, Mac OS X, Android?</li>
+	  	<li class="a">Some platforms have known limitations: limited clipboard support on Windows, no clipboard support on Mac OS X, no soft keyboard input on Android, etc.
+	  		<br />
+	  		If you find a bug or missing feature, please do <a href="/index.html#help">let us know</a>.
+	  	</li>
+	  	<li class="q">Does this work with KDE?</li>
+	  	<li class="a">Not well, the default theme engine (called <code>oxygen</code>) causes various problems: older versions simply crashed, newer versions prevent clicks from propagating to xpra</li>
+	  	<li class="q">Can this KDE bug be fixed?</li>
+	  	<li class="a">Yes, but the KDE developers are <a href="https://bugs.kde.org/show_bug.cgi?id=274485">not interested</a></li>
+	  </ul>
+	  
+	</div>
+  </div>
+
+  <div id="footer">
+   <div id="validators">
+	<a href="http://validator.w3.org/check?uri=referer">
+		<img src="/icons/valid-xhtml11-blue.png" alt="Valid XHTML 1.1" />
+	</a>
+	<a href="http://jigsaw.w3.org/css-validator/check/referer">
+		<img src="/icons/vcss-blue.gif" alt="Valid CSS!" />
+	</a>
+   </div>
+   <span id="copyleft">
+	<a href="http://www.devloop.org.uk">devloop.org.uk hosted project</a> <img src="/icons/copyleft-tiny.png" alt="copyleft" /> <a href="http://nagafix.co.uk/">copyleft 2010 - 2012 Nagafix Ltd</a>
+   </span>
+   <div id="email">
+	<a href="mailto:webmaster@devloop.org.uk"><img src="/icons/message.png" alt="message" /> <span>webmaster@devloop.org.uk</span></a>
+   </div>
+  </div>
+
+ </div>
+</body>
+</html>

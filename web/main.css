@@ -324,3 +324,12 @@ img.stat {
 	font-weight:normal;
 	font-style: italic;
 }
+
+li.q {
+	color: #222;
+	list-style-image: url(/icons/question-small.png);
+}
+li.a {
+	color: #242;
+	list-style-image: url(/icons/arrow.png);
+}
