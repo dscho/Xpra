@@ -59,16 +59,23 @@
   </div>
 
   <div id="fullcontent">
+  	<a name="client"></a>
 	<div class="box">
-	  <h2>Building the client Only</h2>
+	  <h2>Building the client only, without x264</h2>
 	  The client is much more lightweight compared to the server and can be compiled as pure Python code
 	  without needing any extra header files or compilers.
+	  By default, the platform specific instructions below assume that you will not be <a href="#x264">building x264 support</a>.
 	  <br />
-	  Should you wish to only build the client, simply apply
-	  <a href="http://xpra.org/trac/browser/trunk/src/disable-posix-server.patch">this patch</a> before building.
-	  <p class="smallnote">(this step is not necessary on Microsoft Windows and Mac OS X which do not support running the server anyway)</p>
+	  To build the client only, without x264 support, apply:
+	  <ul>
+		<li><a href="http://xpra.org/trac/browser/trunk/src/disable-posix-server.patch">disable-posix-server.patch</a></li>
+		<li><a href="http://xpra.org/trac/browser/trunk/src/disable-x264.patch">disable-x264.patch</a></li>
+	  </ul>
+	  before building.
+	  <p class="smallnote">(this first patch is not necessary on Microsoft Windows or Mac OS X since they do not support running the server anyway)</p>
 	</div>
 
+  	<a name="fedora"></a>
 	<div class="box">
 	  <h2><img src="/icons/fedora.png" alt="Fedora" /> Fedora and <img src="/icons/centos.png" alt="CentOS" /> CentOS</h2>
 	  For building you will need to install:
@@ -93,6 +100,7 @@
 	  </div> 
 	</div>
 
+  	<a name="debian"></a>
 	<div class="box">
 	  <h2><img src="/icons/debian.png" alt="Debian" /> Debian and <img src="/icons/ubuntu.png" alt="Ubuntu" /> Ubuntu</h2>
 	  For building you will need to install:
@@ -112,6 +120,7 @@
 	  </div> 
 	</div>
 
+  	<a name="suse"></a>
 	<div class="box">
 	  <h2><img src="/icons/opensuse.png" alt="openSUSE" /> openSUSE</h2>
 	  For building you will need to install:
@@ -126,6 +135,7 @@
 	  </div> 
 	</div>
 
+  	<a name="windows"></a>
 	<div class="box">
 	  <h2><img src="/icons/windows.png" alt="windows" /> Microsoft Windows and <img src="/icons/osx.png" alt="osx" /> Mac OS X</h2>
 	  Building on those platforms is totally non-trivial,
@@ -136,6 +146,7 @@
 	  </ul>
 	</div>
 
+  	<a name="build"></a>
 	<div class="box">
 	  <h2><img src="/icons/gears.png" alt="gears" />  Building and Installing</h2>
 	    For installing into the local <code>./install</code> directory as a normal user,
@@ -149,6 +160,18 @@ sudo CFLAGS=-O0 python setup.py install</code></pre>
 		</div>
 	</div>
 
+  	<a name="x264"></a>
+	<div class="box">
+	  <h2><img src="/icons/vlc.png" alt="VLC Icon" /> x264 Encoding</h2>
+		To build <a class="ext" href="http://www.videolan.org/developers/x264.html">x264</a> support, you will need to install the x264 development headers.
+		Additionally this will require <a class="ext" href="http://cython.org/">Cython</a> which is used to build the glue to the shared library.
+		<br />
+		On Mac OS X, please follow <a href="https://xpra.org/trac/ticket/94#comment:7">these instructions</a>.
+		<br />
+		On Microsoft Windows, you will need patience, Visual Studio and some undocumented magic incantations.
+	</div>
+
+  	<a name="uninstall"></a>
 	<div class="box">
 	  <h2><img src="/icons/remove.png" alt="remove" />  Uninstalling</h2>
 		<code>setuptools</code> does not provide any uninstallation mechanism,
@@ -170,6 +193,7 @@ wimpiggy</code></pre>
         These are usually located in a python subdirectory named "<code>site-packages</code>" or "<code>dist-packages</code>".
 	</div>
 
+  	<a name="bugs"></a>
 	<div class="box">
 	  <h2><img src="/icons/bugs.png" alt="remove" />  Debugging</h2>
 		Debugging generally involves first turning on verbose debugging by adding &quot;<code>-d all</code>&quot; to the xpra command line.
