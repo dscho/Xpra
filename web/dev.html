@@ -61,15 +61,18 @@
   <div id="fullcontent">
   	<a name="client"></a>
 	<div class="box">
-	  <h2>Building the client only, without x264</h2>
+	  <h2>Building the minimal Python client only</h2>
 	  The client is much more lightweight compared to the server and can be compiled as pure Python code
 	  without needing any extra header files or compilers.
-	  By default, the platform specific instructions below assume that you will not be <a href="#x264">building x264 support</a>.
+	  <br />
+	  However, if you want to use <code>x264</code> or <code>vpx</code> video encoding,
+	  you will need many header files and a C compiler.
 	  <br />
 	  To build the client only, without x264 support, apply:
 	  <ul>
 		<li><a href="http://xpra.org/trac/browser/trunk/src/disable-posix-server.patch">disable-posix-server.patch</a></li>
 		<li><a href="http://xpra.org/trac/browser/trunk/src/disable-x264.patch">disable-x264.patch</a></li>
+		<li><a href="http://xpra.org/trac/browser/trunk/src/disable-vpx.patch">disable-vpx.patch</a></li>
 	  </ul>
 	  before building.
 	  <p class="smallnote">(this first patch is not necessary on Microsoft Windows or Mac OS X since they do not support running the server anyway)</p>
@@ -97,7 +100,16 @@
 	  - only the keyboard utilities are needed when using the client.
 	  <div class="codebox">
 		<pre><code>yum install xorg-x11-server-Xvfb xorg-x11-xauth xorg-x11-xkb-utils</code></pre>
-	  </div> 
+	  </div>
+	  For x264 support, Fedora users should install <a class="ext" href="http://atrpms.net/">atrpms</a> then:
+	  <div class="codebox">
+		<pre><code>yum install ffmpeg-devel x264-devel libvpx-devel</code></pre>
+	  </div>
+	  <!--
+		rpm --import http://packages.atrpms.net/RPM-GPG-KEY.atrpms
+		http://packages.atrpms.net/name/atrpms-repo/
+	  -->
+	  <span class="smallnote">(building x264/vpx on CentOS is out of scope)</span>
 	</div>
 
   	<a name="debian"></a>
@@ -117,7 +129,17 @@
 	  - only the keyboard utilities are needed when using the client.
 	  <div class="codebox">
 		<pre><code>yum install xvfb xauth x11-xkb-utils</code></pre>
-	  </div> 
+	  </div>
+	  For x264 and vpx support, you should install:
+	  <div class="codebox">
+		<pre><code>apt-get install libx264-dev libvpx-dev libswscale-dev libavcodec-dev</code></pre>
+	  </div>
+	  <b>Notes:</b>
+	  <ul>
+	  	<li>some, generally older, distributions may not have all the development libraries available.</li>
+	  	<li>Many distributions ship incomplete <code>libvpx-dev</code> packages that are missing the crucial <code>vpx.pc</code> package config file,
+	  		you may want to <a href="./vpx.pc">download this copy</a> and place it in your package config directory - at your own risk. (generally <code>/usr/lib/pkgconfig/</code> or <code>/usr/lib64/pkgconfig/</code>)</li>
+	  </ul>
 	</div>
 
   	<a name="suse"></a>
@@ -174,15 +196,16 @@ sudo CFLAGS=-O0 python setup.py install</code></pre>
 		</div>
 	</div>
 
-  	<a name="x264"></a>
+  	<a name="video"></a>
 	<div class="box">
-	  <h2><img src="/icons/vlc.png" alt="VLC Icon" /> x264 Encoding</h2>
-		To build <a class="ext" href="http://www.videolan.org/developers/x264.html">x264</a> support, you will need to install the x264 development headers.
-		Additionally this will require <a class="ext" href="http://cython.org/">Cython</a> which is used to build the glue to the shared library.
-		<br />
+	  <h2><img src="/icons/vlc.png" alt="VLC Icon" /> x264/vpx Video Encoding</h2>
+	  	On Unices, you can check if your system has the required development headers by running:
+	    <div class="codebox">
+		  <pre><code>pkg-config --libs --cflags vpx libswscale libavcodec
+pkg-config --libs --cflags x264 libswscale libavcodec</div>
 		On Mac OS X, please follow <a href="https://xpra.org/trac/ticket/94#comment:7">these instructions</a>.
 		<br />
-		On Microsoft Windows, you will need patience, Visual Studio and some undocumented magic incantations.
+		On Microsoft Windows, you will need patience, Visual Studio and some undocumented <a href="https://xpra.org/trac/ticket/94#comment:18">magic incantations</a>.
 	</div>
 
   	<a name="uninstall"></a>
