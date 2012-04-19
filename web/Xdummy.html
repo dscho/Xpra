@@ -107,13 +107,13 @@
 		<br />
 		With Xpra, you can specify this virtual framebuffer alternative using the <code>--xvfb</code> switch:
 		<div class="codebox">
-		<pre><code>xpra --xvfb="Xorg +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf" start :10
+		<pre><code>xpra --xvfb="Xorg -nolisten tcp +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf" start :10
 </code></pre></div>
 		<!--
 		Those using <a href="http://winswitch.org/">Window Switch</a> should have the correct settings automatically detected when the initial configuration is created,
 		but if an upgrade (or patch) provides the new xserver features, you can then change the settings manually:
 	    <div class="codebox">
-		<pre><code>xpra_xvfb_command="/usr/local/bin/Xdummy +extension GLX +extension RANDR +extension RENDER -logfile ${logfile} -config /usr/share/winswitch/xorg-xdummy-xpra.conf"
+		<pre><code>xpra_xvfb_command="/usr/local/bin/Xdummy -nolisten tcp +extension GLX +extension RANDR +extension RENDER -logfile ${logfile} -config /usr/share/winswitch/xorg-xdummy-xpra.conf"
 </code></pre></div>
 		-->	
   	</div>
