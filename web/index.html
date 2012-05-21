@@ -83,15 +83,17 @@
 		<h2><img src="/icons/features.png" alt="features" /> Enhancements</h2>
 		This fork adds the following enhancements over the original version:
 		<ul>
-			<li>Better platform support: Mac OS X, Microsoft Windows (standalone installer provided <a href="http://winswitch.org/dists/windows/Xpra_Setup.exe">here</a>)
-			 and Android (beta APK <a href="/dists/Android/Xpra.apk">here</a>)</li>
-			<li>Up to date packages for most platforms and distributions <span class="smallnote">(ie: Debian/Ubuntu <a href="http://winswitch.org/downloads/debian-repository.html">repository</a>)</span></li>
-			<li>System tray menu for easy disconnection</li>
-			<li>Memory Mapped data transfers for local connections - fast!</li>
-			<li>JPEG and PNG image compression (optional), including adaptive JPEG mode (bandwidth constrained)</li>
+			<li>Better platform support: Mac OS X, Microsoft Windows (standalone installer provided <a href="http://winswitch.org/dists/windows/Xpra_Setup.exe">here</a>),
+			Solaris/FreeBSD/OpenBSD and Android (beta APK <a href="/dists/Android/Xpra.apk">here</a>)</li>
+			<li>Up to date binary packages for most Linux platforms and distributions <span class="smallnote">(ie: Debian/Ubuntu <a href="http://winswitch.org/downloads/debian-repository.html">repository</a>)</span></li>
+			<li>Zero-copy and much lower CPU overhead in network code</li>
+			<li>System tray menu for easy disconnection, access to options and statistics</li>
+			<li>Memory-mapped data transfers for local connections - extremelly fast!</li>
+			<li><a class="ext" href="http://www.videolan.org/developers/x264.html">x264</a>,
+				<a class="ext" href="http://www.webmproject.org/tools/vp8-sdk/group__vp8__encoder.html">VPX</a>,
+				JPEG and PNG image compression (all optional, but recommended)</li>
 			<li>non-US keyboard layout support</li>
 			<li>Handles screen update storms and fast screen refresh rates</li>
-			<li>Much lower CPU overhead in network code</li>
 			<li>Support for password protection option for securing plain TCP connections</li>
 			<li>Forwarding of system bell and custom application cursors</li>
 			<li>Forwarding of application notifications <span class="smallnote">(requires its own dbus daemon)</span></li>
