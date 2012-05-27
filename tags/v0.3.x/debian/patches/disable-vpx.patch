@@ -1,0 +1,15 @@
+Description: Disable vpx encoding support.
+ Author: Antoine Martin <antoine@nagafix.co.uk>
+ Forwarded: not-needed
+ 
+--- a/setup.py	(revision 756)
++++ b/setup.py	(working copy)
+@@ -228,7 +228,7 @@
+ 
+ 
+ 
+-vpx_ENABLED = True
++vpx_ENABLED = False
+ filtered_args = []
+ for arg in sys.argv:
+     if arg == "--without-x264":
