@@ -62,9 +62,15 @@ So basically it's screen for remote X apps.
 
 %changelog
 * Wed May 23 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.1-1
+- fix DoS in network connections setup code
+- fix for non-ascii characters in source file
 - log remote IP or socket address
 - more graceful disconnection of invalid clients
-- updates to man page and xpra command help page
+- updates to the man page and xpra command help page
+- support running the automated tests against older versions
+- "xpra info" to report the number of clients connected
+- compile cython extensions with -O2
+- use xpra's own icon for its own windows (about and info dialogs)
 
 * Sun May 20 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.0-1
 - zero-copy network code, per packet compression
