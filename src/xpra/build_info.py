@@ -16,3 +16,9 @@ LOCAL_MODIFICATIONS="unknown"
 # The values which may appear below are generated during the build process
 # or when using the make-src-snapshot.sh script.
 # They will override the default values defined above.
+BUILD_DATE='2012-05-24'
+BUILT_BY='root'
+BUILT_ON='antoine-laptop'
+BUILD_BIT='64bit'
+BUILD_CPU='x86_64'
+REVISION='869'
