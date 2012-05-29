@@ -61,7 +61,7 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed May 23 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.1-1
+* Tue May 29 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.1-1
 - fix DoS in network connections setup code
 - fix for non-ascii characters in source file
 - log remote IP or socket address
@@ -69,7 +69,6 @@ So basically it's screen for remote X apps.
 - updates to the man page and xpra command help page
 - support running the automated tests against older versions
 - "xpra info" to report the number of clients connected
-- compile cython extensions with -O2
 - use xpra's own icon for its own windows (about and info dialogs)
 
 * Sun May 20 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.0-1
@@ -307,7 +306,7 @@ cd parti-all-%{version}
 cd parti-all-%{version}
 rm -rf build install
 python make_constants_pxi.py wimpiggy/lowlevel/constants.txt wimpiggy/lowlevel/constants.pxi
-CFLAGS=-O2 python setup.py build
+CFLAGS=-O0 python setup.py build
 
 %install
 rm -rf $RPM_BUILD_ROOT
