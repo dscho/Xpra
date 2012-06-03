@@ -333,3 +333,7 @@ li.a {
 	color: #242;
 	list-style-image: url(/icons/arrow.png);
 }
+
+div#ticketchange {
+	clear: both;
+}
