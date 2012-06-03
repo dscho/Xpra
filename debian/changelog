@@ -1,3 +1,11 @@
+xpra (0.3.2-1) UNRELEASED; urgency=low
+  * fix missing 'a' key using OS X clients
+  * fix debian packaging for xpra_launcher
+  * fix unicode decoding problems in window title
+  * fix latency issue
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Mon, 04 Jun 2012 00:14:00 +0700
+
 xpra (0.3.1-1) UNRELEASED; urgency=low
   * fix DoS in network connections setup code
   * fix for non-ascii characters in source file
@@ -6,7 +14,6 @@ xpra (0.3.1-1) UNRELEASED; urgency=low
   * updates to the man page and xpra command help page
   * support running the automated tests against older versions
   * "xpra info" to report the number of clients connected
-  * compile cython extensions with -O2
   * use xpra's own icon for its own windows (about and info dialogs)
   * log remote IP or socket address
   * more graceful disconnection of invalid clients
