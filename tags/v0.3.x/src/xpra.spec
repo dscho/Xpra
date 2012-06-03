@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.3.1
+%define version 0.3.2
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -61,6 +61,12 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Mon Jun 06 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.2-1
+- fix missing 'a' key using OS X clients
+- fix debian packaging for xpra_launcher
+- fix unicode decoding problems in window title
+- fix latency issue
+
 * Tue May 29 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.1-1
 - fix DoS in network connections setup code
 - fix for non-ascii characters in source file
