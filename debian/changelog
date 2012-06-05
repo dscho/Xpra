@@ -1,3 +1,6 @@
+xpra (0.3.2-2) UNRELEASED; urgency=low
+  * fix debian packaging of xpra_launcher
+
 xpra (0.3.2-1) UNRELEASED; urgency=low
   * fix missing 'a' key using OS X clients
   * fix debian packaging for xpra_launcher
