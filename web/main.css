@@ -352,3 +352,7 @@ li.a {
 div#ticketchange {
 	clear: both;
 }
+
+form.trac-comment-editor, div.ticketdraft  {
+	clear: both;
+}
