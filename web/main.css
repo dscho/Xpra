@@ -130,7 +130,10 @@ span.lighter {
 	color:#2022D0;
 }
 
-form#search input {
+form#search {
+	margin: 0px;
+}
+form#search input[type='text'] {
 	font-size: 0.95em;
 	line-height: 0.95em;
 	height: 0.95em;
@@ -285,6 +288,8 @@ form, fieldset, select {
 	float: left;
 	display: inline;
 	border: none;
+	padding: 0px;
+	margin: 0px;
 }
 
 ul.faq {
