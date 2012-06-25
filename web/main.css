@@ -130,6 +130,16 @@ span.lighter {
 	color:#2022D0;
 }
 
+form#search input {
+	font-size: 0.95em;
+	line-height: 0.95em;
+	height: 0.95em;
+}
+form#search input.submit {
+	margin: auto;
+	vertical-align: middle;
+}
+
 /* main body */
 div#content {
 	width: 90%;
