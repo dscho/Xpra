@@ -20,6 +20,9 @@
   })();
 
  </script>
+ <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+    {parsetags:'explicit'}
+ </script>
 </head>
 <body>
  <div id="container">
@@ -45,16 +48,12 @@
     <li class="selected_false"><a href="/faq.html">FAQ</a></li>
     <li class="selected_false"><a href="https://www.xpra.org/trac/">Bug Tracker</a></li>
     <li>
-	&nbsp;
-	<g:plusone size="small"></g:plusone>
-	<script type="text/javascript">
-	  (function() {
-	    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-	    po.src = 'https://apis.google.com/js/plusone.js';
-	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-	  })();
-	</script>
-	</li>
+		&nbsp;
+		<div id="plusone-div" class="plusone"></div>
+		<script type="text/javascript">
+		    gapi.plusone.render('plusone-div', {"size": "small"});
+		</script>
+    </li>
 	<li>
 		<form id="search" method="get" action="http://www.google.com/search">
 			<fieldset>
@@ -69,7 +68,7 @@
 
   <div id="fullcontent">
 	<div class="box">
-		<a name="about"></a>
+		<a id="about"></a>
 		<h2><img src="/icons/gears.png" alt="gears" /> About</h2>
 		Xdummy was <a href="http://www.karlrunge.com/x11vnc/Xdummy">originally developed</a> by Karl Runge to allow a standard X11 server to be used by
 		non-root users with the <a href="http://cgit.freedesktop.org/xorg/driver/xf86-video-dummy/">dummy driver</a> &quot;<code>xf86-video-dummy</code>&quot;.
@@ -85,13 +84,13 @@
   	</div>
 
 	<div class="box">
-		<a name="status"></a>
+		<a id="status"></a>
 		<h2><img src="/icons/question.png" alt="question" /> Status</h2>
 		There are two changes to core Xorg code which are needed:
 		<ul>
 			<li><a href="http://cgit.freedesktop.org/xorg/xserver/commit/?id=ead968a4300c0adeff89b9886e888b6d284c75cc">The xserver patch</a>:
 				which is part of the 1.12 release branch.
-				<br />
+			</li>
 			<li><a href="http://cgit.freedesktop.org/xorg/driver/xf86-video-dummy/commit/?id=fb0888f90d5d1c10d69ec2add0a66e88c94f5d5c">This xf86-video-dummy patch</a>:
 				which is part of version 0.3.5 and later.
 				<br />
@@ -104,8 +103,8 @@
 	</div>
 
 	<div class="box">
-	  <a name="usage"></a>
-	  <h2><img src="/icons/gears.png" alt="gears" /> Usage</a></h2>
+	  <a id="usage"></a>
+	  <h2><img src="/icons/gears.png" alt="gears" /> Usage</h2>
 		With this new xserver, you can start a new display using the dummy driver without needing any special privileges
 		whilst still specifying your own log and config files:
 	    <div class="codebox">

@@ -20,6 +20,9 @@
   })();
 
  </script>
+ <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+    {parsetags:'explicit'}
+ </script>
 </head>
 <body>
  <div id="container">
@@ -45,16 +48,12 @@
     <li class="selected_true"><a href="/faq.html">FAQ</a></li>
     <li class="selected_false"><a href="https://www.xpra.org/trac/">Bug Tracker</a></li>
     <li>
-	&nbsp;
-	<g:plusone size="small"></g:plusone>
-	<script type="text/javascript">
-	  (function() {
-	    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-	    po.src = 'https://apis.google.com/js/plusone.js';
-	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-	  })();
-	</script>
-	</li>
+		&nbsp;
+		<div id="plusone-div" class="plusone"></div>
+		<script type="text/javascript">
+		    gapi.plusone.render('plusone-div', {"size": "small"});
+		</script>
+    </li>
 	<li>
 		<form id="search" method="get" action="http://www.google.com/search">
 			<fieldset>

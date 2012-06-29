@@ -20,6 +20,9 @@
   })();
 
  </script>
+ <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+    {parsetags:'explicit'}
+ </script>
 </head>
 <body>
  <div id="container">
@@ -45,16 +48,12 @@
     <li class="selected_false"><a href="/faq.html">FAQ</a></li>
     <li class="selected_false"><a href="https://www.xpra.org/trac/">Bug Tracker</a></li>
     <li>
-	&nbsp;
-	<g:plusone size="small"></g:plusone>
-	<script type="text/javascript">
-	  (function() {
-	    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-	    po.src = 'https://apis.google.com/js/plusone.js';
-	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-	  })();
-	</script>
-	</li>
+		&nbsp;
+		<div id="plusone-div" class="plusone"></div>
+		<script type="text/javascript">
+		    gapi.plusone.render('plusone-div', {"size": "small"});
+		</script>
+    </li>
 	<li>
 		<form id="search" method="get" action="http://www.google.com/search">
 			<fieldset>
@@ -68,7 +67,7 @@
   </div>
 
   <div id="fullcontent">
-  	<a name="client"></a>
+  	<a id="client"></a>
 	<div class="box">
 	  <h2>Building the minimal Python client only</h2>
 	  The client is much more lightweight compared to the server and can be compiled as pure Python code
@@ -87,7 +86,7 @@
 	  <p class="smallnote">(this first patch is not necessary on Microsoft Windows or Mac OS X since they do not support running the server anyway)</p>
 	</div>
 
-  	<a name="fedora"></a>
+  	<a id="fedora"></a>
 	<div class="box">
 	  <h2><img src="/icons/fedora.png" alt="Fedora" /> Fedora and <img src="/icons/centos.png" alt="CentOS" /> CentOS</h2>
 	  For building you will need to install:
@@ -114,14 +113,10 @@
 	  <div class="codebox">
 		<pre><code>yum install ffmpeg-devel x264-devel libvpx-devel</code></pre>
 	  </div>
-	  <!--
-		rpm --import http://packages.atrpms.net/RPM-GPG-KEY.atrpms
-		http://packages.atrpms.net/name/atrpms-repo/
-	  -->
 	  <span class="smallnote">(building x264/vpx on CentOS is out of scope)</span>
 	</div>
 
-  	<a name="debian"></a>
+  	<a id="debian"></a>
 	<div class="box">
 	  <h2><img src="/icons/debian.png" alt="Debian" /> Debian and <img src="/icons/ubuntu.png" alt="Ubuntu" /> Ubuntu</h2>
 	  For building you will need to install:
@@ -151,7 +146,7 @@
 	  </ul>
 	</div>
 
-  	<a name="suse"></a>
+  	<a id="suse"></a>
 	<div class="box">
 	  <h2><img src="/icons/opensuse.png" alt="openSUSE" /> openSUSE</h2>
 	  For building you will need to install:
@@ -166,13 +161,13 @@
 	  </div> 
 	</div>
 
-  	<a name="gentoo"></a>
+  	<a id="gentoo"></a>
 	<div class="box">
 	  <h2><img src="/icons/gentoo.png" alt="gentoo" /> Gentoo</h2>
 	  You can find up-to-date ebuilds <a href="/dist/gentoo">here</a>
 	</div>
 
-  	<a name="arch"></a>
+  	<a id="arch"></a>
 	<div class="box">
 	  <h2><img src="/icons/archlinux.png" alt="arch linux" /> Arch Linux</h2>
 	  Package build for stable versions can be found <a class="ext" href="https://aur.archlinux.org/packages.php?ID=49348">here</a>
@@ -180,7 +175,7 @@
 	  The bleeding edge svn build is <a class="ext" href="https://aur.archlinux.org/packages.php?ID=58161">here</a>
 	</div>
 
-  	<a name="windows"></a>
+  	<a id="windows"></a>
 	<div class="box">
 	  <h2><img src="/icons/windows.png" alt="windows" /> Microsoft Windows and <img src="/icons/osx.png" alt="osx" /> Mac OS X</h2>
 	  Building on those platforms is totally non-trivial,
@@ -191,7 +186,7 @@
 	  </ul>
 	</div>
 
-  	<a name="build"></a>
+  	<a id="build"></a>
 	<div class="box">
 	  <h2><img src="/icons/gears.png" alt="gears" />  Building and Installing</h2>
 	    For installing into the local <code>./install</code> directory as a normal user,
@@ -205,19 +200,20 @@ sudo CFLAGS=-O0 python setup.py install</code></pre>
 		</div>
 	</div>
 
-  	<a name="video"></a>
+  	<a id="video"></a>
 	<div class="box">
 	  <h2><img src="/icons/vlc.png" alt="VLC Icon" /> x264/vpx Video Encoding</h2>
 	  	On Unices, you can check if your system has the required development headers by running:
 	    <div class="codebox">
 		  <pre><code>pkg-config --libs --cflags vpx libswscale libavcodec
-pkg-config --libs --cflags x264 libswscale libavcodec</div>
+pkg-config --libs --cflags x264 libswscale libavcodec</code></pre>
+        </div>
 		On Mac OS X, please follow <a href="https://www.xpra.org/trac/ticket/94#comment:7">these instructions</a>.
 		<br />
 		On Microsoft Windows, you will need patience, Visual Studio and some undocumented <a href="https://www.xpra.org/trac/ticket/94#comment:18">magic incantations</a>.
 	</div>
 
-  	<a name="uninstall"></a>
+  	<a id="uninstall"></a>
 	<div class="box">
 	  <h2><img src="/icons/remove.png" alt="remove" />  Uninstalling</h2>
 		<code>setuptools</code> does not provide any uninstallation mechanism,
@@ -239,7 +235,7 @@ wimpiggy</code></pre>
         These are usually located in a python subdirectory named "<code>site-packages</code>" or "<code>dist-packages</code>".
 	</div>
 
-  	<a name="bugs"></a>
+  	<a id="bugs"></a>
 	<div class="box">
 	  <h2><img src="/icons/bugs.png" alt="remove" />  Debugging</h2>
 		Debugging generally involves first turning on verbose debugging by adding &quot;<code>-d all</code>&quot; to the xpra command line.
