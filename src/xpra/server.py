@@ -1582,7 +1582,7 @@ class XpraServer(gobject.GObject):
                 for d in batch.last_delays:
                     batch_delays.append(d)
         if len(batch_delays)>0:
-            info["min_batch_delay"] = int(max(batch_delays))
+            info["min_batch_delay"] = int(min(batch_delays))
             info["max_batch_delay"] = int(max(batch_delays))
             info["avg_batch_delay"] = int(sum(batch_delays)/len(batch_delays))
 
