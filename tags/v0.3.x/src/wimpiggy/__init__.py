@@ -3,5 +3,5 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-__version__ = "0.3.2"
+__version__ = "0.3.3"
 svn_revision="unknown"
