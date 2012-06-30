@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.3.2
+%define version 0.3.3
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -61,6 +61,13 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Sat Jun 30 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.3-1
+- do not try to free the empty x264/vpx buffers after a decompression failure
+- fix missing "damage-sequence" packet for sequence zero
+- non-US keyboard layout fix
+- correctly calculate min_match_delay shown in statistics via "xpra info"
+- require x264-libs for x264 support on Fedora
+
 * Mon Jun 06 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.2-1
 - fix missing 'a' key using OS X clients
 - fix debian packaging for xpra_launcher
