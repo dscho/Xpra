@@ -3,6 +3,7 @@ v0.3.3 (2012-07-03)
 	-- fix missing "damage-sequence" packet for sequence zero
 	-- prevent large clipboard packets from causing the connection to drop, and ensure they are compressed
 	-- fix for connection with older clients and server without raw packet support and rgb24 encoding
+	-- high latency fix: reduce batch delay when screen updates slow down
 	-- non-US keyboard layout fix
 	-- correctly calculate min_match_delay shown in statistics via "xpra info"
 	-- require x264-libs for x264 support on Fedora
