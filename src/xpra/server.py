@@ -70,7 +70,7 @@ log = Logger()
 
 import xpra
 from xpra.deque import maxdeque
-from xpra.protocol import Protocol, SocketConnection, dump_packet, RGB24
+from xpra.protocol import Protocol, SocketConnection, dump_packet, Compressible
 from xpra.keys import mask_to_names, get_gtk_keymap, DEFAULT_MODIFIER_NUISANCE, ALL_X11_MODIFIERS
 from xpra.xkbhelper import do_set_keymap, set_all_keycodes, set_modifiers_from_meanings, clear_modifiers, set_modifiers_from_keycodes
 from xpra.xposix.xclipboard import ClipboardProtocolHelper
@@ -629,7 +629,7 @@ class ServerSource(object):
             from xpra.vpx.codec import ENCODERS as vpx_encoders, Encoder as vpxEncoder      #@UnresolvedImport
             data = self.video_encode(vpx_encoders, vpxEncoder, wid, x, y, w, h, coding, data, rowstride)
         elif coding=="rgb24":
-            data = RGB24(data)
+            data = Compressible(data)
         elif coding=="mmap":
             pass
         else:
@@ -1750,6 +1750,8 @@ class XpraServer(gobject.GObject):
                 log.error("cannot use mmap file '%s': %s", mmap_file, e)
                 self.close_mmap()
         self._protocol = proto
+        #max packet size from client (the biggest we can get are clipboard packets)
+        self._protocol.max_packet_size = 1024*1024  #1MB
         self._protocol.raw_packets = bool(capabilities.get("raw_packets", False))
         batch_config = DamageBatchConfig()
         batch_config.enabled = bool(capabilities.get("batch.enabled", DamageBatchConfig.ENABLED))
