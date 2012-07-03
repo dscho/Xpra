@@ -64,6 +64,7 @@ So basically it's screen for remote X apps.
 * Tue Jul 03 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.3-1
 - do not try to free the empty x264/vpx buffers after a decompression failure
 - fix missing "damage-sequence" packet for sequence zero
+- fix window focus with some Tk based application (ie: git gui)
 - prevent large clipboard packets from causing the connection to drop, and ensure they are compressed
 - fix for connection with older clients and server without raw packet support and rgb24 encoding
 - high latency fix: reduce batch delay when screen updates slow down
