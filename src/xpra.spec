@@ -61,9 +61,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Sat Jun 30 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.3-1
+* Tue Jul 03 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.3-1
 - do not try to free the empty x264/vpx buffers after a decompression failure
 - fix missing "damage-sequence" packet for sequence zero
+- prevent large clipboard packets from causing the connection to drop, and ensure they are compressed
+- fix for connection with older clients and server without raw packet support and rgb24 encoding
 - non-US keyboard layout fix
 - correctly calculate min_match_delay shown in statistics via "xpra info"
 - require x264-libs for x264 support on Fedora

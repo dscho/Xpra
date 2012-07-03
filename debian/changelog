@@ -1,10 +1,12 @@
 xpra (0.3.3-1) UNRELEASED; urgency=low
   * do not try to free the empty x264/vpx buffers after a decompression failure
   * fix missing "damage-sequence" packet for sequence zero
+  * prevent large clipboard packets from causing the connection to drop, and ensure they are compressed
+  * fix for connection with older clients and server without raw packet support and rgb24 encoding
   * non-US keyboard layout fix
   * correctly calculate min_match_delay shown in statistics via "xpra info"
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 30 Jun 2012 15:48:27 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 03 Jul 2012 16:11:08 +0700
 
 xpra (0.3.2-2) UNRELEASED; urgency=low
   * fix debian packaging of xpra_launcher

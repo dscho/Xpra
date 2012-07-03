@@ -1,6 +1,8 @@
-v0.3.3 (2012-06-30)
+v0.3.3 (2012-07-03)
 	-- do not try to free the empty x264/vpx buffers after a decompression failure
 	-- fix missing "damage-sequence" packet for sequence zero
+	-- prevent large clipboard packets from causing the connection to drop, and ensure they are compressed
+	-- fix for connection with older clients and server without raw packet support and rgb24 encoding
 	-- non-US keyboard layout fix
 	-- correctly calculate min_match_delay shown in statistics via "xpra info"
 	-- require x264-libs for x264 support on Fedora
