@@ -452,6 +452,17 @@ class ServerSource(object):
                 update_batch_delay("damage data queue overflow: %s" % self._damage_data_queue.qsize(), logp10(self._damage_data_queue.qsize()-2))
         if not last_delta:
             return
+
+        if batch.last_updated+0.5<now:
+                elapsed = now-batch.last_updated
+                n_skipped_calcs = elapsed / 0.025
+                new_delay = max(batch.min_delay, min(batch.max_delay, batch.delay / logp2(n_skipped_calcs)))
+                log("update_batch_delay: wid=%s, skipped %s times (%s ms), slashing delay by %s, was %s, now %s",
+                            wid, n_skipped_calcs, 1000*elapsed, logp2(n_skipped_calcs), batch.delay, new_delay)
+                batch.delay = new_delay
+                batch.last_updated = now
+                return
+
         #figure out how many pixels behind we are, rather than just the number of packets
         all_unprocessed = list(self._damage_packet_sizes)[-delta:]
         unprocessed = [pixels for (uwid,pixels,_) in all_unprocessed if uwid==wid]
