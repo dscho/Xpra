@@ -164,7 +164,6 @@ from xpra.keys import mask_to_names, DEFAULT_MODIFIER_MEANINGS, DEFAULT_MODIFIER
 from xpra.window_backing import new_backing
 from xpra.platform.gui import ClientExtras
 from xpra.scripts.main import ENCODINGS
-from xpra.version_util import is_compatible_with
 
 if sys.version < '3':
     import codecs
@@ -931,9 +930,8 @@ class XpraClient(XpraClientBase):
         log.debug("Automatic refresh for all windows ")
         self.send_refresh(-1)
 
-    def _process_hello(self, packet):
-        capabilities = packet[1]
-        self.server_capabilities = capabilities
+    def parse_server_capabilities(self, capabilities):
+        XpraClientBase.parse_server_capabilities(self, capabilities)
         if not self.session_name:
             self.session_name = capabilities.get("session_name", "Xpra")
         try:
@@ -941,10 +939,6 @@ class XpraClient(XpraClientBase):
             glib.set_application_name(self.session_name)
         except ImportError, e:
             log.warn("glib is missing, cannot set the application name, please install glib's python bindings: %s", e)
-        self._remote_version = capabilities.get("version") or capabilities.get("__prerelease_version")
-        if not is_compatible_with(self._remote_version):
-            self.quit(1)
-            return
         #figure out the maximum actual desktop size and use to
         #calculate the maximum size of a packet (a full screen update packet)
         root_w, root_h = get_root_size()
