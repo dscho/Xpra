@@ -640,7 +640,7 @@ class ServerSource(object):
             from xpra.vpx.codec import ENCODERS as vpx_encoders, Encoder as vpxEncoder      #@UnresolvedImport
             data = self.video_encode(vpx_encoders, vpxEncoder, wid, x, y, w, h, coding, data, rowstride)
         elif coding=="rgb24":
-            data = Compressible(data)
+            data = Compressible("rgb24", data)
         elif coding=="mmap":
             pass
         else:
@@ -1066,7 +1066,7 @@ class XpraServer(gobject.GObject):
         self.send_cursor()
 
     def send_cursor(self):
-        self._send(["cursor", self.cursor_image or ""])
+        self._send(["cursor", Compressible("cursor", self.cursor_image or "")])
 
     def _bell_signaled(self, wm, event):
         log("_bell_signaled(%s,%r)", wm, event)
