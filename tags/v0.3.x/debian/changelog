@@ -1,5 +1,12 @@
 xpra (0.3.3-1) UNRELEASED; urgency=low
   * do not try to free the empty x264/vpx buffers after a decompression failure
+  * fix xpra command exit code (zero) when no error occurred
+  * fix Xvfb deadlock on shutdown
+  * fix wrongly removing unix domain socket on startup failure
+  * fix wrongly killing Xvfb on startup failure
+  * ensure clients use raw_packets if the server supports it (fixes 'gibberish' compressed packet errors)
+  * fix screen resolution reported by the server
+  * honour the --no-tray command line argument
   * fix missing "damage-sequence" packet for sequence zero
   * fix window focus with some Tk based application (ie: git gui)
   * prevent large clipboard packets from causing the connection to drop, and ensure they are compressed
@@ -8,7 +15,7 @@ xpra (0.3.3-1) UNRELEASED; urgency=low
   * non-US keyboard layout fix
   * correctly calculate min_match_delay shown in statistics via "xpra info"
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 03 Jul 2012 17:12:39 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 04 Jul 2012 22:02:54 +0700
 
 xpra (0.3.2-2) UNRELEASED; urgency=low
   * fix debian packaging of xpra_launcher
