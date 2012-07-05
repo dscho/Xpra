@@ -328,12 +328,31 @@ def run_server(parser, opts, mode, xpra_file, extra_args):
         except OSError, e:
             sys.stderr.write("Error running xauth: %s\n" % e)
 
+    def xvfb_error(instance_exists=False):
+        if clobber:
+            return False
+        if xvfb.poll() is None:
+            return False
+        sys.stderr.write("\n")
+        sys.stderr.write("Xvfb command has terminated! xpra cannot continue\n")
+        sys.stderr.write("\n")
+        if instance_exists:
+            sys.stderr.write("There is an X11 server already running on display %s:\n" % display_name)
+            sys.stderr.write("You may want to use:\n" % display_name)
+            sys.stderr.write("  'xpra upgrade' if an instance of xpra is still connected to it\n")
+            sys.stderr.write("  'xpra --use-display start' to connect xpra to an existing X11 server only\n")
+        return True
+
+    if xvfb_error():
+        return  1
     # Whether we spawned our server or not, it is now running -- or at least
     # starting.  First wait for it to start up:
     try:
         wait_for_x_server(display_name, 3) # 3s timeout
     except Exception, e:
         sys.stderr.write("%s\n" % e)
+        return  1
+    if xvfb_error(True):
         return  1
     # Now we can safely load gtk and connect:
     assert "gtk" not in sys.modules
@@ -348,6 +367,8 @@ def run_server(parser, opts, mode, xpra_file, extra_args):
     if clobber:
         xvfb_pid = get_pid()
     else:
+        if xvfb_error(True):
+            return  1
         xvfb_pid = xvfb.pid
 
     def kill_xvfb():
