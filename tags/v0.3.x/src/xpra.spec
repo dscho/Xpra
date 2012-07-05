@@ -61,7 +61,7 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Jul 04 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.3-1
+* Wed Jul 06 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.3-1
 - do not try to free the empty x264/vpx buffers after a decompression failure
 - fix xpra command exit code (zero) when no error occurred
 - fix Xvfb deadlock on shutdown
@@ -70,13 +70,15 @@ So basically it's screen for remote X apps.
 - ensure clients use raw_packets if the server supports it (fixes 'gibberish' compressed packet errors)
 - fix screen resolution reported by the server
 - honour the --no-tray command line argument
+- detect Xvfb startup failures and avoid taking over other displays
+- don't record invalid placeholder value for "server latency"
 - fix missing "damage-sequence" packet for sequence zero
 - fix window focus with some Tk based application (ie: git gui)
-- prevent large clipboard packets from causing the connection to drop, and ensure they are compressed
+- prevent large clipboard packets from causing the connection to drop
 - fix for connection with older clients and server without raw packet support and rgb24 encoding
 - high latency fix: reduce batch delay when screen updates slow down
 - non-US keyboard layout fix
-- correctly calculate min_match_delay shown in statistics via "xpra info"
+- correctly calculate min_batch_delay shown in statistics via "xpra info"
 - require x264-libs for x264 support on Fedora
 
 * Mon Jun 06 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.2-1

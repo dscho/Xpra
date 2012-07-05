@@ -1,4 +1,4 @@
-v0.3.3 (2012-07-04)
+v0.3.3 (2012-07-06)
 ======================
 	-- do not try to free the empty x264/vpx buffers after a decompression failure
 	-- fix xpra command exit code (zero) when no error occurred
@@ -8,14 +8,17 @@ v0.3.3 (2012-07-04)
 	-- ensure clients use raw_packets if the server supports it (fixes 'gibberish' compressed packet errors)
 	-- fix screen resolution reported by the server
 	-- honour the --no-tray command line argument
+	-- detect Xvfb startup failures and avoid taking over other displays
+	-- don't record invalid placeholder value for "server latency"
 	-- fix missing "damage-sequence" packet for sequence zero
 	-- fix window focus with some Tk based application (ie: git gui)
-	-- prevent large clipboard packets from causing the connection to drop, and ensure they are compressed
+	-- prevent large clipboard packets from causing the connection to drop
 	-- fix for connection with older clients and server without raw packet support and rgb24 encoding
 	-- high latency fix: reduce batch delay when screen updates slow down
 	-- non-US keyboard layout fix
-	-- correctly calculate min_match_delay shown in statistics via "xpra info"
+	-- correctly calculate min_batch_delay shown in statistics via "xpra info"
 	-- require x264-libs for x264 support on Fedora
+
 
 v0.3.2 (2012-06-04)
 ======================
