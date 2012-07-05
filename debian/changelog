@@ -7,15 +7,17 @@ xpra (0.3.3-1) UNRELEASED; urgency=low
   * ensure clients use raw_packets if the server supports it (fixes 'gibberish' compressed packet errors)
   * fix screen resolution reported by the server
   * honour the --no-tray command line argument
+  * detect Xvfb startup failures and avoid taking over other displays
+  * don't record invalid placeholder value for "server latency"
   * fix missing "damage-sequence" packet for sequence zero
   * fix window focus with some Tk based application (ie: git gui)
-  * prevent large clipboard packets from causing the connection to drop, and ensure they are compressed
+  * prevent large clipboard packets from causing the connection to drop
   * fix for connection with older clients and server without raw packet support and rgb24 encoding
   * high latency fix: reduce batch delay when screen updates slow down
   * non-US keyboard layout fix
-  * correctly calculate min_match_delay shown in statistics via "xpra info"
+  * correctly calculate min_batch_delay shown in statistics via "xpra info"
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 04 Jul 2012 22:02:54 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 06 Jul 2012 00:04:58 +0700
 
 xpra (0.3.2-2) UNRELEASED; urgency=low
   * fix debian packaging of xpra_launcher
