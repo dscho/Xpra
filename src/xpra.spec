@@ -69,6 +69,7 @@ So basically it's screen for remote X apps.
 - fix wrongly killing Xvfb on startup failure
 - ensure clients use raw_packets if the server supports it (fixes 'gibberish' compressed packet errors)
 - fix screen resolution reported by the server
+- fix maximum packet size check wrongly dropping valid connections
 - honour the --no-tray command line argument
 - detect Xvfb startup failures and avoid taking over other displays
 - don't record invalid placeholder value for "server latency"
