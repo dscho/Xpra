@@ -586,9 +586,9 @@ class ServerSource(object):
                 if packet:
                     log("data_to_packet: adding to packet queue, size=%s, full=%s", self._damage_packet_queue.qsize(), self._damage_packet_queue.full())
                     if self._damage_packet_queue.full():
-                        self._protocol.source_has_more()
+                        gobject.idle_add(self._protocol.source_has_more)
                     self._damage_packet_queue.put(packet)
-                    self._protocol.source_has_more()
+                    gobject.idle_add(self._protocol.source_has_more)
             except Exception, e:
                 log.error("error processing damage data: %s", e, exc_info=True)
 
