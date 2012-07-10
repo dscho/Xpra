@@ -1,10 +1,11 @@
-v0.3.3 (2012-07-06)
+v0.3.3 (2012-07-10)
 ======================
 	-- do not try to free the empty x264/vpx buffers after a decompression failure
 	-- fix xpra command exit code (zero) when no error occurred
 	-- fix Xvfb deadlock on shutdown
 	-- fix wrongly removing unix domain socket on startup failure
 	-- fix wrongly killing Xvfb on startup failure
+	-- fix race in network code and meta data packets
 	-- ensure clients use raw_packets if the server supports it (fixes 'gibberish' compressed packet errors)
 	-- fix screen resolution reported by the server
 	-- fix maximum packet size check wrongly dropping valid connections
