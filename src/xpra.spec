@@ -61,12 +61,13 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Jul 06 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.3-1
+* Tue Jul 10 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.3-1
 - do not try to free the empty x264/vpx buffers after a decompression failure
 - fix xpra command exit code (zero) when no error occurred
 - fix Xvfb deadlock on shutdown
 - fix wrongly removing unix domain socket on startup failure
 - fix wrongly killing Xvfb on startup failure
+- fix race in network code and meta data packets
 - ensure clients use raw_packets if the server supports it (fixes 'gibberish' compressed packet errors)
 - fix screen resolution reported by the server
 - fix maximum packet size check wrongly dropping valid connections

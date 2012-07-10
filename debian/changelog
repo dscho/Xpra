@@ -4,6 +4,7 @@ xpra (0.3.3-1) UNRELEASED; urgency=low
   * fix Xvfb deadlock on shutdown
   * fix wrongly removing unix domain socket on startup failure
   * fix wrongly killing Xvfb on startup failure
+  * fix race in network code and meta data packets
   * ensure clients use raw_packets if the server supports it (fixes 'gibberish' compressed packet errors)
   * fix screen resolution reported by the server
   * fix maximum packet size check wrongly dropping valid connections
@@ -18,7 +19,7 @@ xpra (0.3.3-1) UNRELEASED; urgency=low
   * non-US keyboard layout fix
   * correctly calculate min_batch_delay shown in statistics via "xpra info"
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 06 Jul 2012 15:36:32 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 10 Jul 2012 16:10:37 +0700
 
 xpra (0.3.2-2) UNRELEASED; urgency=low
   * fix debian packaging of xpra_launcher
