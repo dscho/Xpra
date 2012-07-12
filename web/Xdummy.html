@@ -116,15 +116,20 @@
 		With this new xserver, you can start a new display using the dummy driver without needing any special privileges
 		whilst still specifying your own log and config files:
 	    <div class="codebox">
-		<pre><code>Xorg +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf :10
+		<pre><code>Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf :10
 </code></pre></div>
 		You can find a sample configuration file for dummy here: <a href="/xorg.conf">xorg.conf</a>.
 		<br />
 		<br />
 		With Xpra, you can specify this virtual framebuffer alternative using the <code>--xvfb</code> switch:
 		<div class="codebox">
-		<pre><code>xpra --xvfb="Xorg -nolisten tcp +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf" start :10
+		<pre><code>xpra --xvfb="Xorg -noreset -nolisten tcp +extension GLX +extension RANDR +extension RENDER -logfile ${HOME}/.xpra/Xvfb-10.log -config ${HOME}/xorg.conf" start :10
 </code></pre></div>
+		<p class="smallnote">(the <code>-noreset</code> option is only needed if the window manager is not
+		the first application started on the display, for example if you use the <code>--start-child=</code> option,
+		or if you want the display to survive once the window manager exits
+		- generally, this is a good idea since xpra could crash and when it exits cleanly via "xpra stop" it takes care
+		of shutting down the X11 server anyway)</p>
 		<!--
 		Those using <a href="http://winswitch.org/">Window Switch</a> should have the correct settings automatically detected when the initial configuration is created,
 		but if an upgrade (or patch) provides the new xserver features, you can then change the settings manually:
