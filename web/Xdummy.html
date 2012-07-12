@@ -119,6 +119,11 @@
 		<pre><code>Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf :10
 </code></pre></div>
 		You can find a sample configuration file for dummy here: <a href="/xorg.conf">xorg.conf</a>.
+		<p class="smallnote">(It contains many of the most common resolutions you are likely to need,
+		including those found on phones and tablets. <br />
+		However if your client uses unusual resolutions, for instance multiple screens of differing sizes,
+		you may need to add new <a class="ext" href="http://en.wikipedia.org/wiki/XFree86_Modeline">Modelines</a>
+		to match your specific resolution)</p>
 		<br />
 		<br />
 		With Xpra, you can specify this virtual framebuffer alternative using the <code>--xvfb</code> switch:
