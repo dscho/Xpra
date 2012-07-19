@@ -209,7 +209,8 @@ pkg-config --libs --cflags x264 libswscale libavcodec</code></pre>
         </div>
 		On Mac OS X, please follow <a href="https://www.xpra.org/trac/ticket/94#comment:7">these instructions</a>.
 		<br />
-		On Microsoft Windows, you will need patience, Visual Studio and some undocumented <a href="https://www.xpra.org/trac/ticket/94#comment:18">magic incantations</a>.
+		On Microsoft Windows, you must modify the <a href="https://www.xpra.org/trac/browser/trunk/src/setup.py#L77">disutils setup.py</a>
+		to match the location where you have installed the x264 and vpx library and headers. (more details therein)
 	</div>
 
   	<a id="uninstall"></a>
