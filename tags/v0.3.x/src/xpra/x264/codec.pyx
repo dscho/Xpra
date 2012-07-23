@@ -64,6 +64,7 @@ cdef class Decoder(xcoder):
     def clean(self):
         if self.context!=NULL:
             clean_decoder(self.context)
+            free(self.context)
             self.context = NULL
 
     def decompress_image(self, input):
