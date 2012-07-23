@@ -214,6 +214,7 @@ class ApplicationWindow:
 		opts.ssh = DEFAULT_SSH_CMD
 		opts.remote_xpra = ".xpra/run-xpra"
 		opts.debug = None
+                opts.no_tray = False
 		opts.dock_icon = None
 		opts.tray_icon = None
 		opts.window_icon = None
