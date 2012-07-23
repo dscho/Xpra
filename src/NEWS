@@ -1,3 +1,15 @@
+v0.3.4 (2012-07-23)
+======================
+	-- fix window size hints not applied
+	-- fix free uninitialized pointers in error codepath
+	-- fix crash with 1 pixel wide/high windows
+	-- fix keyboard support for MS Windows and OSX clients
+	-- explicitly include all icons
+	-- handle invalid packets in the correct thread
+	-- try harder to exit cleanly
+	-- ensure all required attributes are set by the GUI launcher
+
+
 v0.3.3 (2012-07-10)
 ======================
 	-- do not try to free the empty x264/vpx buffers after a decompression failure
