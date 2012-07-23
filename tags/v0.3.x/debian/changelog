@@ -1,3 +1,15 @@
+xpra (0.3.4-1) UNRELEASED; urgency=low
+  * fix window size hints not applied
+  * fix free uninitialized pointers in error codepath
+  * fix crash with 1 pixel wide/high windows
+  * fix keyboard support for MS Windows and OSX clients
+  * explicitly include all icons
+  * handle invalid packets in the correct thread
+  * try harder to exit cleanly
+  * ensure all required attributes are set by the GUI launcher
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Mon, 23 Jul 2012 18:12:23 +0700
+
 xpra (0.3.3-1) UNRELEASED; urgency=low
   * do not try to free the empty x264/vpx buffers after a decompression failure
   * fix xpra command exit code (zero) when no error occurred
