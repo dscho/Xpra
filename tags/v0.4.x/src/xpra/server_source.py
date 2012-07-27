@@ -255,9 +255,9 @@ class ServerSource(object):
         self._damage_data_qsizes = maxdeque(NRECS)  #size of the damage_data_queue before we add a new record to it
                                                     #(event_time, size)
         self._damage_packet_qsizes = maxdeque(NRECS)#size of the damage_packet_queue before we add a new packet to it
-                                                    #(event_time, size)
+                                                    #(event_time, wid, size)
         self._damage_packet_qpixels = maxdeque(NRECS) #number of pixels waiting in the damage_packet_queue before we add a new packet to it
-                                                    #(event_time, size)
+                                                    #(event_time, wid, size)
 
         if DEBUG_DELAY:
             self._debug_delay_messages = []
@@ -310,7 +310,7 @@ class ServerSource(object):
             if self._ordinary_packets:
                 packet = self._ordinary_packets.pop(0)
             elif len(self._damage_packet_queue)>0:
-                packet, _, start_send_cb, end_send_cb = self._damage_packet_queue.popleft()
+                packet, _, _, start_send_cb, end_send_cb = self._damage_packet_queue.popleft()
             have_more = packet is not None and (bool(self._ordinary_packets) or len(self._damage_packet_queue)>0)
         return packet, start_send_cb, end_send_cb, have_more
 
@@ -431,7 +431,7 @@ class ServerSource(object):
         info["damage_packet_queue_size.current"] = len(self._damage_packet_queue)
         qsizes = [x for _,x in list(self._damage_packet_qsizes)]
         add_list_stats(info, "damage_packet_queue_size",  qsizes)
-        qpixels = [x[1] for x in list(self._damage_packet_queue)]
+        qpixels = [x[2] for x in list(self._damage_packet_queue)]
         if len(qpixels)>0:
             info["damage_packet_queue_pixels.current"] = qpixels[-1]
         add_list_stats(info, "damage_packet_queue_pixels",  qsizes)
@@ -853,13 +853,14 @@ class ServerSource(object):
         msg, factor, weight = self.queue_inspect(self._damage_packet_qsizes)
         return ("damage packet queue size: %s" % msg, factor, weight)
 
-    def get_damage_packet_queue_pixels_factor(self, low_limit):
+    def get_damage_packet_queue_pixels_factor(self, wid, low_limit):
         """
             Returns the batch delay change factor based on
             the number of pixels waiting in the packet queue.
             See 'queue_inspect'
         """
-        msg, factor, weight = self.queue_inspect(self._damage_packet_qpixels, target=low_limit)
+        time_size = [(event_time, pixels) for (event_time, dwid, pixels) in list(self._damage_packet_qpixels) if dwid==wid]
+        msg, factor, weight = self.queue_inspect(time_size, target=low_limit)
         return ("damage packet queue pixels: %s" % msg, factor, weight)
 
     def get_damage_data_queue_factor(self):
@@ -1000,7 +1001,7 @@ class ServerSource(object):
         factors.append(self.get_elasped_time_factor(batch, max_latency))
         factors.append(self.get_client_latency_factor(avg_client_latency, recent_client_latency))
         factors.append(self.get_damage_packet_queue_size_factor())
-        factors.append(self.get_damage_packet_queue_pixels_factor(low_limit))
+        factors.append(self.get_damage_packet_queue_pixels_factor(wid, low_limit))
         factors.append(self.get_damage_data_queue_factor())
         factors.append(self.get_pending_acks_factor(ack_pending))
         factors.append(self.get_client_backlog_factor(window, ack_pending, avg_client_latency, time.time()-avg_client_latency, low_limit))
@@ -1270,8 +1271,8 @@ class ServerSource(object):
         damage_in_latency = now-process_damage_time
         self._damage_in_latency.append((now, width*height, actual_batch_delay, damage_in_latency))
         self._damage_packet_qsizes.append((now, len(self._damage_packet_queue)))
-        self._damage_packet_queue.append((packet, width*height, start_send, damage_packet_sent))
-        self._damage_packet_qpixels.append((now, sum([x[1] for x in list(self._damage_packet_queue)])))
+        self._damage_packet_queue.append((packet, wid, width*height, start_send, damage_packet_sent))
+        self._damage_packet_qpixels.append((now, wid, sum([x[1] for x in list(self._damage_packet_queue) if x[2]==wid])))
         gobject.idle_add(self._protocol.source_has_more)
 
     def client_ack_damage(self, damage_packet_sequence, wid, width, height, decode_time):
