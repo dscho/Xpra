@@ -200,16 +200,16 @@ ext_modules = []
 cmdclass = {}
 def cython_version_check():
     from Cython.Compiler.Version import version as cython_version_string
-    cython_version = [int(part) for part in cython_version_string.split(".")]
+    from distutils.version import LooseVersion
     # This was when the 'for 0 < i < 10:' syntax as added, bump upwards as
     # necessary:
-    NEEDED_CYTHON = (0, 14, 0)
-    if tuple(cython_version) < NEEDED_CYTHON:
+    NEEDED_CYTHON = "0.14.0"
+    if LooseVersion(cython_version_string) < LooseVersion(NEEDED_CYTHON):
         sys.exit("ERROR: Your version of Cython is too old to build this package\n"
                  "You have version %s\n"
                  "Please upgrade to Cython %s or better"
-                 % (cython_version_string,
-                    ".".join([str(part) for part in NEEDED_CYTHON])))
+                 % (cython_version_string, NEEDED_CYTHON))
+
 def cython_add(extension):
     global ext_modules, cmdclass
     cython_version_check()
