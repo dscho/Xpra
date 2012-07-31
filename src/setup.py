@@ -230,8 +230,8 @@ ext_modules = []
 cmdclass = {}
 def cython_version_check(min_version):
     from Cython.Compiler.Version import version as cython_version_string
-    cython_version = [int(part) for part in cython_version_string.split(".")]
-    if tuple(cython_version) < min_version:
+    from distutils.version import LooseVersion
+    if LooseVersion(cython_version_string) < LooseVersion(".".join([str(x) for x in min_version])):
         sys.exit("ERROR: Your version of Cython is too old to build this package\n"
                  "You have version %s\n"
                  "Please upgrade to Cython %s or better"
