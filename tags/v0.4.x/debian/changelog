@@ -1,3 +1,12 @@
+xpra (0.4.1-1) UNRELEASED; urgency=low
+  * fix clipboard bugs
+  * fix batch delay calculations with multiple windows
+  * fix tests (update import statements)
+  * robustify cython version string parsing
+  * fix source files changed detection during build
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 31 Jul 2012 21:15:21 +0700
+
 xpra (0.4.0-1) UNRELEASED; urgency=low
   * fix client application resizing its own window
   * fix window dimensions hints not applied
