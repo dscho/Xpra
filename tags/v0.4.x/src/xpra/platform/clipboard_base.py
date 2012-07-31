@@ -87,15 +87,17 @@ class ClipboardProtocolHelperBase(object):
         # Other types need special handling, and all types need to be
         # converting into an endian-neutral format:
         if format == 32:
-            sizeof_long = struct.calcsize("=I")
-            assert sizeof_long == 4, "struct.calcsize('=I)=%s" % sizeof_long
-            binfmt = "=" + "I" * (len(data) // sizeof_long)
+            #important note: on 64 bits, format=32 means 8 bytes, not 4 
+            #that's just the way it is... 
+            sizeof_long = struct.calcsize("@L")
+            assert sizeof_long in (4, 8), "struct.calcsize('@L)=%s" % sizeof_long
+            binfmt = "@" + "L" * (len(data) // sizeof_long)
             ints = struct.unpack(binfmt, data)
             return ("integers", ints)
         elif format == 16:
             sizeof_short = struct.calcsize("=H")
             assert sizeof_short == 2
-            binfmt = "=" + "H" * (len(data) // sizeof_short)
+            binfmt = "@" + "H" * (len(data) // sizeof_short)
             ints = struct.unpack(binfmt, data)
             return ("integers", ints)
         elif format == 8:
@@ -117,7 +119,7 @@ class ClipboardProtocolHelperBase(object):
                 format_char = "B"
             else:
                 raise Exception("unknown encoding format: %s" % format)
-            return struct.pack("=" + format_char * len(data), *data)
+            return struct.pack("@" + format_char * len(data), *data)
         else:
             assert False
 
