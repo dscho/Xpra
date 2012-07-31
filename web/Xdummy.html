@@ -128,8 +128,10 @@
 		<br />
 		With Xpra, you can specify this virtual framebuffer alternative using the <code>--xvfb</code> switch:
 		<div class="codebox">
-		<pre><code>xpra --xvfb="Xorg -dpi 96 -noreset -nolisten tcp +extension GLX +extension RANDR +extension RENDER -logfile ${HOME}/.xpra/Xvfb-10.log -config ${HOME}/xorg.conf" start :10
-</code></pre></div>
+		<pre><code>xpra --xvfb="Xorg -dpi 96 -noreset -nolisten tcp \
+			+extension GLX +extension RANDR +extension RENDER \
+			-logfile ${HOME}/.xpra/Xvfb-10.log -config ${HOME}/xorg.conf" \
+			start :10</code></pre></div>
 		<p class="smallnote">(the <code>-noreset</code> option is only needed if the window manager is not
 		the first application started on the display, for example if you use the <code>--start-child=</code> option,
 		or if you want the display to survive once the window manager exits
