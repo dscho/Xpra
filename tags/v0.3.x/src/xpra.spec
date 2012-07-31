@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.3.4
+%define version 0.3.5
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -61,6 +61,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Tue Jul 31 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.5-1
+- fix clipboard bugs
+- robustify cython version string parsing
+- fix source files changed detection during build
+
 * Mon Jul 23 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.4-1
 - fix window size hints not applied
 - fix free uninitialized pointers in error codepath

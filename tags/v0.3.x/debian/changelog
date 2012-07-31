@@ -1,3 +1,10 @@
+xpra (0.3.5-1) UNRELEASED; urgency=low
+  * fix clipboard bugs
+  * robustify cython version string parsing
+  * fix source files changed detection during build
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 31 Jul 2012 21:11:55 +0700
+
 xpra (0.3.4-1) UNRELEASED; urgency=low
   * fix window size hints not applied
   * fix free uninitialized pointers in error codepath
