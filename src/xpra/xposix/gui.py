@@ -204,7 +204,6 @@ class ClientExtras(ClientExtrasBase):
             log.error("cannot import x11 bell bindings (will use gtk fallback) : %s", e)
 
     def setup_xprops(self, pulseaudio):
-        self.client.connect("handshake-complete", self.setup_xprops)
         self.ROOT_PROPS = {
             "RESOURCE_MANAGER": "resource-manager"
             }
