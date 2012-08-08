@@ -1397,7 +1397,7 @@ class ServerSource(object):
             self._video_encoder_lock.acquire()
             encoder = encoders.get(wid)
             if encoder and (encoder.get_width()!=w or encoder.get_height()!=h):
-                log("%s: window dimensions have changed from %s to %s", (coding, encoder.get_width(), encoder.get_height()), (w, h))
+                log("%s: window dimensions have changed from %sx%s to %sx%s", coding, encoder.get_width(), encoder.get_height(), w, h)
                 encoder.clean()
                 encoder.init(w, h)
             if encoder is None:
