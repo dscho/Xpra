@@ -106,11 +106,15 @@ struct x264lib_ctx *init_decoder(int width, int height)
 
 void clean_decoder(struct x264lib_ctx *ctx)
 {
-	if (ctx->codec_ctx)
+	if (ctx->codec_ctx) {
 		avcodec_close(ctx->codec_ctx);
 		av_free(ctx->codec_ctx);
-	if (ctx->yuv2rgb)
+		ctx->codec_ctx = NULL;
+	}
+	if (ctx->yuv2rgb) {
 		sws_freeContext(ctx->yuv2rgb);
+		ctx->yuv2rgb = NULL;
+	}
 }
 
 #ifndef _WIN32
