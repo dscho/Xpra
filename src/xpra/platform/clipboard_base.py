@@ -196,13 +196,6 @@ class ClipboardProxy(gtk.Invisible):
 
     def do_selection_request_event(self, event):
         debug("do_selection_request_event(%s)", event)
-        try:
-            from wimpiggy.prop import prop_get
-            from wimpiggy.error import trap
-        except ImportError:
-            gtk.Invisible.do_selection_request_event(self, event)
-            return
-
         # Black magic: the superclass default handler for this signal
         # implements all the hards parts of selection handling, occasionally
         # calling back to the do_selection_get handler (below) to actually get
@@ -238,6 +231,13 @@ class ClipboardProxy(gtk.Invisible):
         if target == "TIMESTAMP":
             pass
         elif target == "MULTIPLE":
+            try:
+                from wimpiggy.prop import prop_get
+                from wimpiggy.error import trap
+            except ImportError:
+                gtk.Invisible.do_selection_request_event(self, event)
+                return
+
             def get_targets(targets):
                 atoms = prop_get(event.window, event.property, ["multiple-conversion"])
                 debug("MULTIPLE clipboard atoms: %r", atoms)
