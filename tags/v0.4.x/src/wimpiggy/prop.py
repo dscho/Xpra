@@ -175,7 +175,7 @@ def NetWMIcons(disp, data):
     return icons[-1][1]
 
 def _get_atom(disp, d):
-    unpacked = struct.unpack("=I", d)[0]
+    unpacked = struct.unpack("@I", d)[0]
     pyatom = get_pyatom(disp, unpacked)
     if not pyatom:
         log.error("invalid atom: %s - %s", repr(d), repr(unpacked))
@@ -198,7 +198,7 @@ _prop_types = {
                lambda disp, d: d.decode("latin1"),
                "\0"),
     "atom": (str, "ATOM", 32,
-             lambda disp, a: struct.pack("=I", get_xatom(a)),
+             lambda disp, a: struct.pack("@I", get_xatom(a)),
               _get_atom,
              ""),
     "u32": ((int, long), "CARDINAL", 32,
