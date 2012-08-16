@@ -1,12 +1,17 @@
 xpra (0.3.6-1) UNRELEASED; urgency=low
-  * fix clipboard atom packing (was more noticeable with qt and Java applications)
-  * fix clipboard selection for non X11 clients: only 'multiple' codepath requires X11 bindings
+  * fix clipboard atom packing (was more noticeable with qt and Java
+    applications)
+  * fix clipboard selection for non X11 clients: only 'multiple' codepath
+    requires X11 bindings
   * fix python3 build
   * fix potential double free in x264 error path
-  * fix logging format error on "window dimensions have changed.." (parameter grouping was wrong)
+  * fix logging format error on "window dimensions have changed.." (parameter
+    grouping was wrong)
   * fix colour bleeding with x264 (ie: green on black text)
-  * remove incorrect and unnecessary callback to setup_xprops which may have caused the pulseaudio flag to use the wrong value
-  * delay 'check packet size' to allow the limit to be raised - important over slower links where it triggers more easily
+  * remove incorrect and unnecessary callback to setup_xprops which may have
+    caused the pulseaudio flag to use the wrong value
+  * delay 'check packet size' to allow the limit to be raised - important over
+    slower links where it triggers more easily
 
  -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 16 Aug 2012 15:20:58 +0700
 
