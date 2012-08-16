@@ -70,7 +70,7 @@ struct x264lib_ctx *init_encoder(int width, int height)
 	ctx->encoder = x264_encoder_open(&param);
 	ctx->width = width;
 	ctx->height = height;
-	ctx->rgb2yuv = sws_getContext(ctx->width, ctx->height, PIX_FMT_RGB24, ctx->width, ctx->height, PIX_FMT_YUV420P, SWS_POINT, NULL, NULL, NULL);
+	ctx->rgb2yuv = sws_getContext(ctx->width, ctx->height, PIX_FMT_RGB24, ctx->width, ctx->height, PIX_FMT_YUV420P, SWS_SINC | SWS_ACCURATE_RND, NULL, NULL, NULL);
 
 	return ctx;
 }
@@ -101,7 +101,7 @@ struct x264lib_ctx *init_decoder(int width, int height)
 	memset(ctx, 0, sizeof(struct x264lib_ctx));
 	ctx->width = width;
 	ctx->height = height;
-	ctx->yuv2rgb = sws_getContext(ctx->width, ctx->height, PIX_FMT_YUV420P, ctx->width, ctx->height, PIX_FMT_RGB24, SWS_POINT | SWS_ACCURATE_RND, NULL, NULL, NULL);
+	ctx->yuv2rgb = sws_getContext(ctx->width, ctx->height, PIX_FMT_YUV420P, ctx->width, ctx->height, PIX_FMT_RGB24, SWS_SINC | SWS_ACCURATE_RND, NULL, NULL, NULL);
 
 	avcodec_register_all();
 
