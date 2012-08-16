@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.4.1
+%define version 0.4.2
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -86,6 +86,16 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Thu Aug 16 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.2-1
+- fix clipboard atom packing (was more noticeable with qt and Java applications)
+- fix clipboard selection for non X11 clients: only 'multiple' codepath requires X11 bindings
+- fix python3 build
+- fix potential double free in x264 error path
+- fix logging format error on "window dimensions have changed.." (parameter grouping was wrong)
+- fix colour bleeding with x264 (ie: green on black text)
+- remove incorrect and unnecessary callback to setup_xprops which may have caused the pulseaudio flag to use the wrong value
+- delay 'check packet size' to allow the limit to be raised - important over slower links where it triggers more easily
+
 * Tue Jul 31 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.1-1
 - fix clipboard bugs
 - fix batch delay calculations with multiple windows
