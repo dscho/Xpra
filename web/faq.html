@@ -86,6 +86,8 @@
 	  	<li class="a">Please make sure that you are not running a clipboard manager which may interfere with xpra's clipboard synchronization code (ie: <code>klipper</code> is known to cause such problems)</li>
 	  	<li class="q">I cannot click on menus</li>
 	  	<li class="a">If you are using Qt/KDE, please see &quot;can this KDE bug be fixed?&quot; in the <a href="#platforms">platforms</a> section below</li>
+	  	<li class="q">Cannot use Xpra with NFS home</li>
+	  	<li class="a">Use the <code>socket-dir</code> option to place Xpra's log files and sockets to a location that is not NFS mounted (ie: <code>/tmp/</code>)</li>
 	  </ul>
 	</div>
 
