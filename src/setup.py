@@ -26,11 +26,11 @@ assert wimpiggy.__version__ == parti.__version__ == xpra.__version__
 
 print(" ".join(sys.argv))
 
-
 #NOTE: these variables are defined here to make it easier
 #to keep their line number unchanged.
 #There are 3 empty lines in between each var so patches
 #cannot cause further patches to fail to apply due to context changes.
+from xpra.platform import XPRA_LOCAL_SERVERS_SUPPORTED
 
 
 
@@ -126,7 +126,7 @@ if sys.platform.startswith("win"):
     for dll_file, md5sum in md5sums.items():
         filename = os.path.join(C_DLLs, *dll_file.split("/"))
         if not os.path.exists(filename) or not os.path.isfile(filename):
-            raise Exception("DLL file %s is missing or not a file!" % filename)
+            sys.exit("ERROR: DLL file %s is missing or not a file!" % filename)
         sys.stdout.write("verifying md5sum for %s: " % filename)
         f = open(filename, mode='rb')
         data = f.read()
@@ -198,7 +198,7 @@ if sys.platform.startswith("win"):
             #add_to_keywords(kw, 'libraries', "")
             add_to_keywords(kw, 'extra_link_args', "/LIBPATH:%s" % gtk2_lib_dir)
         else:
-            raise Exception("unknown package config: %s" % str(packages))
+            sys.exit("ERROR: unknown package config: %s" % str(packages))
         return kw
 
     import py2exe    #@UnresolvedImport
@@ -228,7 +228,7 @@ if sys.platform.startswith("win"):
                    ('', ['COPYING']),
                    ('', ['README.xpra']),
                    ('', ['website.url']),
-                   ('', ['etc/xpra/xpra.conf']),
+                   ('', ['etc/xpra/client-only/xpra.conf']),
                    ('icons', glob.glob('icons\\*.*')),
                    ('Microsoft.VC90.CRT', glob.glob('%s\\Microsoft.VC90.CRT\\*.*' % C_DLLs)),
                    ('Microsoft.VC90.MFC', glob.glob('%s\\Microsoft.VC90.MFC\\*.*' % C_DLLs)),
@@ -264,7 +264,7 @@ else:
                     valid_option = option
                     break
             if not valid_option:
-                raise Exception("cannot find a valid pkg-config package for %s" % (options,))
+                sys.exit("ERROR: cannot find a valid pkg-config package for %s" % (options,))
             packages.append(valid_option)
         print("pkgconfig(%s,%s) using package names=%s" % (packages_options, ekw, packages))
         flag_map = {'-I': 'include_dirs',
@@ -275,7 +275,7 @@ else:
         (output, _) = proc.communicate()
         status = proc.wait()
         if status!=0:
-            raise Exception("call to pkg-config ('%s') failed" % (cmd,))
+            sys.exit("ERROR: call to pkg-config ('%s') failed" % " ".join(cmd))
         kw = dict(ekw)
         if sys.version>='3':
             output = output.decode('utf-8')
@@ -322,7 +322,9 @@ else:
                 XORG_BIN = xorg
                 break
         xorg_conf = "etc/xpra/Xvfb/xpra.conf"
-        if xdummy_ENABLED:
+        if not XPRA_LOCAL_SERVERS_SUPPORTED:
+            xorg_conf = "etc/xpra/client-only/xpra.conf"
+        elif xdummy_ENABLED:
             #enabled unconditionally via constant
             xorg_conf = "etc/xpra/Xdummy/xpra.conf"
         elif XORG_BIN:
@@ -366,12 +368,13 @@ else:
         description = "A window manager library, a window manager, and a 'screen for X' utility",
     )
 
-
-
 ext_modules = []
 cmdclass = {}
 def cython_version_check(min_version):
-    from Cython.Compiler.Version import version as cython_version
+    try:
+        from Cython.Compiler.Version import version as cython_version
+    except ImportError, e:
+        sys.exit("ERROR: Cannot find Cython: %s" % e)
     from distutils.version import LooseVersion
     if LooseVersion(cython_version) < LooseVersion(".".join([str(x) for x in min_version])):
         sys.exit("ERROR: Your version of Cython is too old to build this package\n"
@@ -386,7 +389,6 @@ def cython_add(extension, min_version=(0, 14, 0)):
     ext_modules.append(extension)
     cmdclass = {'build_ext': build_ext}
 
-
 if 'clean' in sys.argv or 'sdist' in sys.argv:
     #clean and sdist don't actually use cython,
     #so skip this (and avoid errors)
@@ -398,7 +400,7 @@ PYGTK_PACKAGES = ["pygobject-2.0", "gdk-x11-2.0", "gtk+-x11-2.0"]
 if sys.platform.startswith("darwin"):
     PYGTK_PACKAGES = [x.replace("-x11", "") for x in PYGTK_PACKAGES]
 X11_PACKAGES = ["xtst", "xfixes", "xcomposite", "xdamage", "xrandr"]
-from xpra.platform import XPRA_LOCAL_SERVERS_SUPPORTED
+
 if XPRA_LOCAL_SERVERS_SUPPORTED:
     base = os.path.join(os.getcwd(), "wimpiggy", "lowlevel", "constants")
     constants_file = "%s.txt" % base
