@@ -1,3 +1,8 @@
+xpra (0.5.0-2) UNRELEASED; urgency=low
+  * fix font size by setting a default DPI for Xdummy
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 22 Aug 2012 01:38:24 +0700
+
 xpra (0.5.0-1) UNRELEASED; urgency=low
   * new packet encoder written in C (much faster and data is now smaller too) 
   * read provided /etc/xpra/xpra.conf and user's own ~/.xpra/xpra.conf
