@@ -210,7 +210,7 @@ class DamageBatchConfig(object):
 
     def clone(self):
         c = DamageBatchConfig()
-        for x in ["enabled", "always", "min_delay", "max_delay", "delay", "last_delays"]:
+        for x in ["enabled", "always", "max_events", "max_pixels", "time_unit", "min_delay", "max_delay", "delay", "last_delays", "encoding"]:
             setattr(c, x, getattr(self, x))
         return c
 
