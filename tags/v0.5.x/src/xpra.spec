@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.5.0
+%define version 0.5.1
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -86,6 +86,15 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Sat Aug 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.1-1
+- avoid looping forever doing maths on 'infinity' value
+- damage data queue batch factor was being calculated but not used
+- ensure we update the data we use for calculations (was always using zero value)
+- ensure "send_bell" is initialized before use
+- add missing path string in warning message
+- fix test code compatibility with older xpra versions
+- statistics shown for 'damage_packet_queue_pixels' were incorrect
+
 * Mon Aug 20 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.0-1
 - new packet encoder written in C (much faster and data is now smaller too) 
 - read provided /etc/xpra/xpra.conf and user's own ~/.xpra/xpra.conf

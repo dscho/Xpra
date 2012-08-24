@@ -1,4 +1,15 @@
-v0.5.0 (2012-08-16)
+v0.5.1 (2012-08-25)
+======================
+	-- avoid looping forever doing maths on 'infinity' value
+	-- damage data queue batch factor was being calculated but not used
+	-- ensure we update the data we use for calculations (was always using zero value)
+	-- ensure "send_bell" is initialized before use
+	-- add missing path string in warning message
+	-- fix test code compatibility with older xpra versions
+	-- statistics shown for 'damage_packet_queue_pixels' were incorrect
+
+
+v0.5.0 (2012-08-20)
 ======================
 	-- new packet encoder written in C (much faster and data is now smaller too) 
 	-- read provided /etc/xpra/xpra.conf and user's own ~/.xpra/xpra.conf
