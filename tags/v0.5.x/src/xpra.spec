@@ -88,6 +88,7 @@ So basically it's screen for remote X apps.
 %changelog
 * Sat Aug 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.1-1
 - avoid looping forever doing maths on 'infinity' value
+- fix incomplete cloning of attributes causing default values to be used for batch configuration
 - damage data queue batch factor was being calculated but not used
 - ensure we update the data we use for calculations (was always using zero value)
 - ensure "send_bell" is initialized before use
