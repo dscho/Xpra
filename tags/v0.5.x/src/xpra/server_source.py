@@ -108,7 +108,7 @@ class DamageBatchConfig(object):
 
     def clone(self):
         c = DamageBatchConfig()
-        for x in ["enabled", "always", "min_delay", "max_delay", "delay", "last_delays"]:
+        for x in ["enabled", "always", "max_events", "max_pixels", "time_unit", "min_delay", "max_delay", "delay", "last_delays", "encoding"]:
             setattr(c, x, getattr(self, x))
         return c
 
@@ -320,7 +320,7 @@ class ServerSource(object):
 
     def get_batch_config(self, wid, create=True):
         """ Retrieves the DamageBatchConfig for the given window.
-            May clone the default is one does not exist yet and create flag is True.
+            May clone the default if one does not exist yet and create flag is True.
         """
         batch = self._batch_configs.get(wid)
         if not batch and create:
