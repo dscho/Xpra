@@ -1,3 +1,14 @@
+xpra (0.5.1-1) UNRELEASED; urgency=low
+  * avoid looping forever doing maths on 'infinity' value
+  * damage data queue batch factor was being calculated but not used
+  * ensure we update the data we use for calculations (was using zero value)
+  * ensure "send_bell" is initialized before use
+  * add missing path string in warning message
+  * fix test code compatibility with older xpra versions
+  * statistics shown for 'damage_packet_queue_pixels' were incorrect
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 25 Aug 2012 00:50:35 +0700
+
 xpra (0.5.0-2) UNRELEASED; urgency=low
   * fix font size by setting a default DPI for Xdummy
 
