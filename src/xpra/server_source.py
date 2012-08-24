@@ -434,7 +434,7 @@ class ServerSource(object):
         qpixels = [x[2] for x in list(self._damage_packet_queue)]
         if len(qpixels)>0:
             info["damage_packet_queue_pixels.current"] = qpixels[-1]
-        add_list_stats(info, "damage_packet_queue_pixels",  qsizes)
+        add_list_stats(info, "damage_packet_queue_pixels",  qpixels)
 
         batch_delays = []
         for wid in window_ids:
