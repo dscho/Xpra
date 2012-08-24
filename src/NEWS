@@ -1,3 +1,10 @@
+v0.4.3 (2012-08-25)
+======================
+	-- avoid looping forever doing maths on 'infinity' value
+	-- fix incomplete cloning of attributes causing default values to be used for batch configuration
+	-- statistics shown for 'damage_packet_queue_pixels' were incorrect
+
+
 v0.4.2 (2012-08-16)
 ======================
 	-- fix clipboard atom packing (was more noticeable with qt and Java applications)
