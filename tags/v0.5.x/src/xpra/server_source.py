@@ -609,9 +609,7 @@ class ServerSource(object):
         time_values = [(event_time, value) for event_time, dwid, value in list(self._damage_packet_qpixels) if dwid==wid]
         factors.append(queue_inspect("damage packet queue pixels:", time_values, div=low_limit, smoothing=sqrt))
         #damage data queue: (This is an important metric since each item will consume a fair amount of memory and each will later on go through the other queues.)
-        msg, factor, weight = queue_inspect("damage data queue:", self._damage_data_qsizes)
-        if factor>1.0:
-            weight += (factor-1.0)/2
+        factors.append(queue_inspect("damage data queue:", self._damage_data_qsizes))
         #packet and pixels backlog:
         last_packets_backlog, last_pixels_backlog = self._last_client_delta
         factors.append(calculate_for_target("client packets backlog:", 0, last_packets_backlog, packets_backlog, slope=1.0, smoothing=sqrt))
