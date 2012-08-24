@@ -1,3 +1,10 @@
+xpra (0.4.3-1) UNRELEASED; urgency=low
+  * avoid looping forever doing maths on 'infinity' value
+  * fix incomplete cloning of attributes causing default values to be used for batch configuration
+  * statistics shown for 'damage_packet_queue_pixels' were incorrect
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 25 Aug 2012 00:50:35 +0700
+
 xpra (0.4.2-1) UNRELEASED; urgency=low
   * fix clipboard atom packing (was more noticeable with qt and Java
     applications)

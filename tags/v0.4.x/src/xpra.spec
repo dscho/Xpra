@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.4.2
+%define version 0.4.3
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -86,6 +86,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Sat Aug 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.3-1
+- avoid looping forever doing maths on 'infinity' value
+- fix incomplete cloning of attributes causing default values to be used for batch configuration
+- statistics shown for 'damage_packet_queue_pixels' were incorrect
+
 * Thu Aug 16 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.2-1
 - fix clipboard atom packing (was more noticeable with qt and Java applications)
 - fix clipboard selection for non X11 clients: only 'multiple' codepath requires X11 bindings
