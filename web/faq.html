@@ -74,7 +74,7 @@
 	  	<li class="q">Why this fork?</li>
 	  	<li class="a">This fork started in order to provide features needed to work with <a href="http://winswitch.org/about/">winswitch</a> and grew from there</li>
 	  	<li class="q">Which version shall I be using?</li>
-	  	<li class="a">Please always used the latest released version, currently <code>0.1.x</code></li>
+	  	<li class="a">Please always used the latest released version, currently <code>0.5.x</code></li>
 	  </ul>
 	</div>
 
@@ -85,8 +85,8 @@
 	  	<li class="q">Pasting from the clipboard is slow</li>
 	  	<li class="a">Please make sure that you are not running a clipboard manager which may interfere with xpra's clipboard synchronization code (ie: <code>klipper</code> is known to cause such problems)</li>
 	  	<li class="q">I cannot click on menus</li>
-	  	<li class="a">If you are using Qt/KDE, please see &quot;can this KDE bug be fixed?&quot; in the <a href="#platforms">platforms</a> section below</li>
-	  	<li class="q">Cannot use Xpra with NFS home</li>
+	  	<li class="a">If you are using Qt/KDE, this is known bug which has been fixed so you will need up to date Qt/KDE libraries, see the <a href="#platforms">platforms</a> section below</li>
+	  	<li class="q">I cannot use Xpra with NFS home</li>
 	  	<li class="a">Use the <code>socket-dir</code> option to place Xpra's log files and sockets to a location that is not NFS mounted (ie: <code>/tmp/</code>)</li>
 	  </ul>
 	</div>
@@ -105,6 +105,10 @@
 	  	</li>
 	  	<li class="q">How do I enable OpenGL or other X11 extensions?</li>
 	  	<li class="a">Please see <a href="/Xdummy.html">Xdummy</a></li>
+	  	<li class="q">How do I theme my application?</li>
+	  	<li class="a">That depends on the application. GTK2 applications can be themed by setting the <code>GTK2_RC_FILES</code> environment variable, ie:
+	  		<pre><code>GTK2_RC_FILES=/path/to/gtkrc YourCommand</code></pre>
+	  	</li>
 	  </ul>
 	</div>
 
@@ -134,9 +138,9 @@
 	  		If you find a bug or missing feature, please do <a href="/index.html#help">let us know</a>.
 	  	</li>
 	  	<li class="q">Does this work with KDE?</li>
-	  	<li class="a">Not well, the default theme engine (called <code>oxygen</code>) causes various problems: older versions simply crashed, newer versions prevent clicks from propagating to xpra</li>
-	  	<li class="q">Can this KDE bug be fixed?</li>
-	  	<li class="a">Yes, the fix is now <a href="https://bugs.kde.org/show_bug.cgi?id=274485">in trunk</a></li>
+	  	<li class="a">There are problems with some versions of the <code>oxygen</code> theme engine (older versions simply crashed, some newer versions prevented clicks from propagating to xpra)</li>
+	  	<li class="q">Can this be fixed or worked around?</li>
+	  	<li class="a">Yes, the fix is now <a href="https://bugs.kde.org/show_bug.cgi?id=274485">in KDE trunk</a></li>
 	  </ul>
 
 	</div>
