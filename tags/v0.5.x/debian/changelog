@@ -1,4 +1,5 @@
 xpra (0.5.1-1) UNRELEASED; urgency=low
+  * fix DPI issue with Xdummy: set virtual screen to 96dpi by default
   * avoid looping forever doing maths on 'infinity' value
   * fix incomplete cloning of attributes causing default values to be used 
   * damage data queue batch factor was being calculated but not used
