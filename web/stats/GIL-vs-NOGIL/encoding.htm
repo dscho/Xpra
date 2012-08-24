@@ -1,0 +1,1219 @@
+<!--css_fils = [u"/home/antoine/Documents/sofastats/css/default.css"]-->
+
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'
+'http://www.w3.org/TR/html4/loose.dtd'>
+<html>
+<head>
+<meta http-equiv="P3P" content='CP="IDC DSP COR CURa ADMa OUR IND PHY ONL COM 
+STA"'>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<title>SOFA Statistics Report 2012-08-24_10:56:35</title>
+
+<link rel='stylesheet' type='text/css' 
+href="sofastats_report_extras/tundra.css" />
+<script src="sofastats_report_extras/dojo.xd.js"></script>
+<script src="sofastats_report_extras/sofastatsdojo_minified.js"></script>
+<script src="sofastats_report_extras/sofastats_charts.js"></script>
+<script type="text/javascript">
+get_ie_script = function(mysrc){
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = mysrc;
+    document.getElementsByTagName('head')[0].appendChild(script); 
+}
+if(dojo.isIE){
+    get_ie_script("sofastats_report_extras/arc.xd.js");
+    get_ie_script("sofastats_report_extras/gradient.xd.js");
+    get_ie_script("sofastats_report_extras/vml.xd.js");
+}
+makeObjects = function(){
+
+    //n_charts_start
+    var n_charts = 11;
+    //n_charts_end
+    for(var i=0;i<n_charts;i++){
+        try{
+            window["makechart" + String('00'+i).slice(-2)]();
+        } catch(exceptionObject) {
+            var keepGoing = true;
+        }
+    }
+};
+dojo.addOnLoad(makeObjects);
+
+var DEFAULT_SATURATION  = 100,
+DEFAULT_LUMINOSITY1 = 75,
+DEFAULT_LUMINOSITY2 = 50,
+
+c = dojox.color,
+
+cc = function(colour){
+    return function(){ return colour; };
+},
+
+hl = function(colour){
+
+    var a = new c.Color(colour),
+        x = a.toHsl();
+    if(x.s == 0){
+        x.l = x.l < 50 ? 100 : 0;
+    }else{
+        x.s = DEFAULT_SATURATION;
+        if(x.l < DEFAULT_LUMINOSITY2){
+            x.l = DEFAULT_LUMINOSITY1;
+        }else if(x.l > DEFAULT_LUMINOSITY1){
+            x.l = DEFAULT_LUMINOSITY2;
+        }else{
+            x.l = x.l - DEFAULT_LUMINOSITY2 > DEFAULT_LUMINOSITY1 - x.l 
+                ? DEFAULT_LUMINOSITY2 : DEFAULT_LUMINOSITY1;
+        }
+    }
+    return c.fromHsl(x);
+}
+
+getfainthex = function(hexcolour){
+    var a = new c.Color(hexcolour)
+    x = a.toHsl();
+    x.s = x.s * 1.5;
+    x.l = x.l * 1.25;
+    return c.fromHsl(x);
+}
+
+makefaint = function(colour){
+    var fainthex = getfainthex(colour.toHex());
+    return new dojox.color.Color(fainthex);
+}
+
+var labelLineBreak = (dojo.isIE) ? "\n" : "<br>";
+
+</script>
+
+<style type="text/css">
+<!--
+    .dojoxLegendNode {
+        border: 1px solid #ccc; 
+        margin: 5px 10px 5px 10px; 
+        padding: 3px
+    }
+    .dojoxLegendText {
+        vertical-align: text-top; 
+        padding-right: 10px
+    }
+    @media print {
+        .screen-float-only{
+        float: none;
+        }
+    }
+    
+    @media screen {
+        .screen-float-only{
+        float: left;
+        }
+    }
+-->
+</style>
+<style type="text/css">
+<!--
+
+body {
+    background-color: #ffffff;
+}
+td, th {
+    background-color: white;
+}
+/*
+dojo_style_start
+outer_bg = u"white"
+inner_bg = u"#f2f1f0" # u"#e0d9d5"
+axis_label_font_colour = u"#423126"
+major_gridline_colour = u"#b8a49e"
+gridline_width = 1
+stroke_width = 3
+tooltip_border_colour = u"#736354"
+colour_mappings = [(u"#e95f29", u"#ef7d44"),
+    (u"#f4cb3a", u"#f7d858"),
+    (u"#4495c3", u"#62add2"),
+    (u"#44953a", u"#62ad58"),
+    (u"#f43a3a", u"#f75858"),
+    ]
+connector_style = u"defbrown"
+dojo_style_end
+*/
+    body{
+        font-size: 12px;
+        font-family: Ubuntu, Helvetica, sans-serif;
+    }
+    h1, h2{
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+    }
+    h1{
+        font-size: 18px;
+    }
+    h2{
+        font-size: 16px;
+    }
+    .gui-msg-medium, gui-msg-small{
+        color: #29221c;
+        font-family: arial;
+    }
+    .gui-msg-medium{
+        font-size: 16px;
+    }
+    *html .gui-msg-medium{
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .gui-msg-small{
+        font-size: 13px;
+        line-height: 150%;
+    }
+    .gui-note{
+        background-color: #e95829;
+        color: white;
+        font-weight: bold;
+        padding: 2px;
+    }
+    tr, td, th{
+        margin: 0;
+    }
+
+    .tbltitle0, .tblsubtitle0{
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .tbltitle0{ /*spans*/
+        padding: 0;
+        font-size: 18px;
+    }
+    .tblsubtitle0{
+        padding: 12px 0px 0px 0px;
+        font-size: 14px;
+    }
+    .tblcelltitle0{ /*th*/
+        text-align: left;
+        border: none;
+        padding: 0px 0px 12px 0px;
+        margin: 0;
+    }
+
+    th, .rowvar0, .rowval0, .datacell0, .firstdatacell0 {
+        border: solid 1px #A1A1A1;
+    }
+    th{
+        margin: 0;
+        padding: 0px 6px;
+    }
+    td{
+        padding: 2px 6px;
+        border: solid 1px #c0c0c0;
+        font-size: 13px;
+    }
+    .rowval0{
+        margin: 0;
+    }
+    .datacell0, .firstdatacell0{
+        text-align: right;
+        margin: 0;
+    }
+    .firstcolvar0, .firstrowvar0, .spaceholder0 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        color: white;
+    }
+    .firstcolvar0, .firstrowvar0{
+        background-color: #333435;
+    }
+    .firstrowvar0{
+        border-left: solid 1px #333435;
+        border-bottom:  solid 1px #333435;
+    }
+    .topline0{
+        border-top: 2px solid #c0c0c0;
+    }
+    .spaceholder0 {
+        background-color: #CCD9D7;
+    }
+    .firstcolvar0{
+        padding: 9px 6px;
+        vertical-align: top;
+    }
+    .rowvar0, .colvar0{
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        color: #333435;
+        background-color: white;
+    }
+    .colvar0{
+        padding: 6px 0px;            
+    } 
+    .colval0, .measure0{
+        font-size: 12px;
+        vertical-align: top;
+    }
+    table {
+        border-collapse: collapse;
+    }
+    tr.total-row0 td{
+        font-weight: bold;
+        border-top: solid 2px black;
+        border-bottom: double 3px black;
+    }
+    .page-break-before0{
+        page-break-before: always;
+        border-bottom: none; /*3px dotted #AFAFAF;*/
+        width: auto;
+        height: 18px;
+    }
+    td.lbl0{
+        text-align: left;
+        background-color: #F5F5F5;
+    }
+    td.right0{
+        text-align: right;
+    }
+    .ftnote-line{
+        /* for hr http://www.w3schools.com/TAGS/att_hr_align.asp*/
+        width: 300px;
+        text-align: left; /* IE and Opera*/
+        margin-left: 0; /* Firefox, Chrome, Safari */
+    }
+    .tbl-header-ftnote0{
+        color: white;
+    }
+    .ftnote{
+        color: black;
+    }
+    /* Tool tip connector arrows */
+    .dijitTooltipBelow-defbrown {
+	
+	    padding-top: 13px;
+    }
+    .dijitTooltipAbove-defbrown {
+	
+	    padding-bottom: 13px;
+    }
+    .tundra .dijitTooltipBelow-defbrown .dijitTooltipConnector {
+	
+	    top: 0px;
+	    left: 3px;
+	    background: url("sofastats_report_extras/tooltipConnectorUp-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipBelow-defbrown .dijitTooltipConnector {
+	
+	    background-image: url("sofastats_report_extras/tooltipConnectorUp-defbrown.gif") !important;
+    }
+    .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	
+	    bottom: 0px;
+	    left: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorDown-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorDown-defbrown.gif") !important;
+    }
+    .dj_ie6 .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	    bottom: -3px;
+    }
+    .tundra .dijitTooltipLeft-defbrown {
+	    padding-right: 14px;
+    }
+    .dj_ie6 .tundra .dijitTooltipLeft-defbrown {
+	    padding-left: 15px;
+    }
+    .tundra .dijitTooltipLeft-defbrown .dijitTooltipConnector {
+	
+	    right: 0px;
+	    bottom: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorRight-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipLeft-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorRight-defbrown.gif") !important;
+    }
+    .tundra .dijitTooltipRight-defbrown {
+	    padding-left: 14px;
+    }
+    .tundra .dijitTooltipRight-defbrown .dijitTooltipConnector {
+	
+	    left: 0px;
+	    bottom: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorLeft-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipRight-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorLeft-defbrown.gif") !important;
+    }
+
+-->
+</style>
+</head>
+<body class="tundra">
+
+
+
+
+
+<br><br>
+<hr style="clear: both; ">
+
+<p>From sofa_db.gil_vs_nogil 
+# on 24/08/2012 at 10:56 AM</p>
+<p>All data in table included - no filtering</p>
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+</span>
+<span class='tblsubtitle0'>
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl00 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart00 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [13920233.0, 9631267.25];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['13920233.0', '9631267.25']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [15197174.0, 18727769.5];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['15197174.0', '18727769.5']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl00;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart00", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: deluxe</b></p>
+<div id="mychart00" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart00">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: d--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl01 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart01 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [12252161.75, 9433878.5];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['12252161.75', '9433878.5']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [18111825.5, 12754697.0];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['18111825.5', '12754697.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl01;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart01", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: eruption</b></p>
+<div id="mychart01" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart01">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: e--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl02 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart02 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [14864935.75, 10213260.0];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['14864935.75', '10213260.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [17197865.0, 9336022.0];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['17197865.0', '9336022.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl02;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart02", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: glxgears</b></p>
+<div id="mychart02" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart02">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: g--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl03 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart03 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [17094530.25, 10155282.0];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['17094530.25', '10155282.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [20692994.0, 10557978.0];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['20692994.0', '10557978.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl03;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart03", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: glxspheres64</b></p>
+<div id="mychart03" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart03">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: g--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl04 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart04 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [10183109.67, 6373729.67];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['10183109.67', '6373729.67']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [12027801.0, 8035974.0];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['12027801.0', '8035974.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl04;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart04", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: gtkperf</b></p>
+<div id="mychart04" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart04">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: g--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl05 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart05 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [19309898.0, 10898321.5];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['19309898.0', '10898321.5']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [24467589.5, 15740007.0];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['24467589.5', '15740007.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl05;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart05", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: memscroller</b></p>
+<div id="mychart05" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart05">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: m--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl06 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart06 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [11310077.25, 8247614.25];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['11310077.25', '8247614.25']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [16204718.5, 14398502.0];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['16204718.5', '14398502.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl06;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart06", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: moebiusgears</b></p>
+<div id="mychart06" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart06">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: m--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl07 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart07 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [11657028.5, 7856209.75];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['11657028.5', '7856209.75']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [15579444.0, 12475367.0];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['15579444.0', '12475367.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl07;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart07", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: polytopes</b></p>
+<div id="mychart07" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart07">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: p--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl08 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart08 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [18921912.5, 8384061.25];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['18921912.5', '8384061.25']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [24438022.0, 7334654.0];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['24438022.0', '7334654.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl08;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart08", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: rss-glx-lattice</b></p>
+<div id="mychart08" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart08">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: r--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl09 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart09 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [17468940.75, 9291008.0];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['17468940.75', '9291008.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [25776774.5, 11202076.0];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['25776774.5', '11202076.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl09;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart09", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: rss-glx-plasma</b></p>
+<div id="mychart09" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart09">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: r--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl10 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart10 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "GIL-video";
+    series0["yVals"] = [17800030.5, 7979159.75];
+    series0["options"] = {stroke: {color: "white", width: "3px"}, fill: "#e95f29", yLbls: ['17800030.5', '7979159.75']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NOGIL";
+    series1["yVals"] = [20382522.5, 8266629.0];
+    series1["options"] = {stroke: {color: "white", width: "3px"}, fill: "#f4cb3a", yLbls: ['20382522.5', '8266629.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "vpx"},
+            {value: 2, text: "x264"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl10;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Encoding";
+    chartconf["axisLabelDrop"] = 10;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["leftAxisLabelShift"] = 40;
+    chartconf["yTitle"] = "Mean Encoding_Pixels/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 28354451.95;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart10", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Test_Command: xterm</b></p>
+<div id="mychart10" 
+    style="width: 320.0px; height: 320px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart10">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Encoding_Pixels/S By Encoding B_Test_Command: x--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+</body></html>
