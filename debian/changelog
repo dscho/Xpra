@@ -1,5 +1,6 @@
 xpra (0.5.1-1) UNRELEASED; urgency=low
   * avoid looping forever doing maths on 'infinity' value
+  * fix incomplete cloning of attributes causing default values to be used 
   * damage data queue batch factor was being calculated but not used
   * ensure we update the data we use for calculations (was using zero value)
   * ensure "send_bell" is initialized before use
