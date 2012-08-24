@@ -86,6 +86,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Sat Aug 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.1-2
+- fix xpra_launcher
+
 * Sat Aug 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.1-1
 - fix DPI issue with Xdummy: set virtual screen to 96dpi by default
 - avoid looping forever doing maths on 'infinity' value
