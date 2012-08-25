@@ -80,6 +80,9 @@ elif sys.platform.startswith("darwin"):
 		if i>0:
 			APP_DIR = rsc[:i+len(CONTENTS)]
 		ICONS_DIR = os.path.join(rsc, "icons")
+else:
+	#/usr/share/xpra
+	APP_DIR = os.path.join(sys.exec_prefix, "share", "xpra")
 if not ICONS_DIR or not os.path.exists(ICONS_DIR):
 	if not valid_dir(APP_DIR):
 		APP_DIR = os.path.dirname(inspect.getfile(sys._getframe(1)))
