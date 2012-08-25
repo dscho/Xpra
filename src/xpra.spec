@@ -35,7 +35,7 @@ Packager: Antoine Martin <antoine@nagafix.co.uk>
 URL: http://xpra.org/
 Source: parti-all-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
-%if %{defined fedora}
+%if %{defined Fedora}
 BuildRequires: python, setuptool
 %endif
 
