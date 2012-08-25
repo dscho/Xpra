@@ -1,6 +1,6 @@
 xpra (0.4.3-1) UNRELEASED; urgency=low
   * avoid looping forever doing maths on 'infinity' value
-  * fix incomplete cloning of attributes causing default values to be used for batch configuration
+  * fix incomplete cloning of batch config attributes
   * statistics shown for 'damage_packet_queue_pixels' were incorrect
 
  -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 25 Aug 2012 00:50:35 +0700
