@@ -13,7 +13,7 @@
 
 %define requires pygtk2, xorg-x11-server-utils, xorg-x11-server-Xvfb, python-imaging, dbus-python
 %define requires_extra , libvpx, libx264
-%if %{defined fedora}
+%if %{defined Fedora}
 %define requires_extra , libvpx, x264-libs
 %endif
 %if 0%{?static_video_libs}
