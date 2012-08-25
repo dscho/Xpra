@@ -1,0 +1,1527 @@
+<!--css_fils = [u"/home/antoine/Documents/sofastats/css/default.css"]-->
+
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'
+'http://www.w3.org/TR/html4/loose.dtd'>
+<html>
+<head>
+<meta http-equiv="P3P" content='CP="IDC DSP COR CURa ADMa OUR IND PHY ONL COM 
+STA"'>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<title>SOFA Statistics Report 2012-08-26_00:11:29</title>
+
+<link rel='stylesheet' type='text/css' 
+href="sofastats_report_extras/tundra.css" />
+<script src="sofastats_report_extras/dojo.xd.js"></script>
+<script src="sofastats_report_extras/sofastatsdojo_minified.js"></script>
+<script src="sofastats_report_extras/sofastats_charts.js"></script>
+<script type="text/javascript">
+get_ie_script = function(mysrc){
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = mysrc;
+    document.getElementsByTagName('head')[0].appendChild(script); 
+}
+if(dojo.isIE){
+    get_ie_script("sofastats_report_extras/arc.xd.js");
+    get_ie_script("sofastats_report_extras/gradient.xd.js");
+    get_ie_script("sofastats_report_extras/vml.xd.js");
+}
+makeObjects = function(){
+
+    //n_charts_start
+    var n_charts = 22;
+    //n_charts_end
+    for(var i=0;i<n_charts;i++){
+        try{
+            window["makechart" + String('00'+i).slice(-2)]();
+        } catch(exceptionObject) {
+            var keepGoing = true;
+        }
+    }
+};
+dojo.addOnLoad(makeObjects);
+
+var DEFAULT_SATURATION  = 100,
+DEFAULT_LUMINOSITY1 = 75,
+DEFAULT_LUMINOSITY2 = 50,
+
+c = dojox.color,
+
+cc = function(colour){
+    return function(){ return colour; };
+},
+
+hl = function(colour){
+
+    var a = new c.Color(colour),
+        x = a.toHsl();
+    if(x.s == 0){
+        x.l = x.l < 50 ? 100 : 0;
+    }else{
+        x.s = DEFAULT_SATURATION;
+        if(x.l < DEFAULT_LUMINOSITY2){
+            x.l = DEFAULT_LUMINOSITY1;
+        }else if(x.l > DEFAULT_LUMINOSITY1){
+            x.l = DEFAULT_LUMINOSITY2;
+        }else{
+            x.l = x.l - DEFAULT_LUMINOSITY2 > DEFAULT_LUMINOSITY1 - x.l 
+                ? DEFAULT_LUMINOSITY2 : DEFAULT_LUMINOSITY1;
+        }
+    }
+    return c.fromHsl(x);
+}
+
+getfainthex = function(hexcolour){
+    var a = new c.Color(hexcolour)
+    x = a.toHsl();
+    x.s = x.s * 1.5;
+    x.l = x.l * 1.25;
+    return c.fromHsl(x);
+}
+
+makefaint = function(colour){
+    var fainthex = getfainthex(colour.toHex());
+    return new dojox.color.Color(fainthex);
+}
+
+var labelLineBreak = (dojo.isIE) ? "\n" : "<br>";
+
+</script>
+
+<style type="text/css">
+<!--
+    .dojoxLegendNode {
+        border: 1px solid #ccc; 
+        margin: 5px 10px 5px 10px; 
+        padding: 3px
+    }
+    .dojoxLegendText {
+        vertical-align: text-top; 
+        padding-right: 10px
+    }
+    @media print {
+        .screen-float-only{
+        float: none;
+        }
+    }
+    
+    @media screen {
+        .screen-float-only{
+        float: left;
+        }
+    }
+-->
+</style>
+<style type="text/css">
+<!--
+
+body {
+    background-color: #ffffff;
+}
+td, th {
+    background-color: white;
+}
+/*
+dojo_style_start
+outer_bg = u"white"
+inner_bg = u"#f2f1f0" # u"#e0d9d5"
+axis_label_font_colour = u"#423126"
+major_gridline_colour = u"#b8a49e"
+gridline_width = 1
+stroke_width = 3
+tooltip_border_colour = u"#736354"
+colour_mappings = [(u"#e95f29", u"#ef7d44"),
+    (u"#f4cb3a", u"#f7d858"),
+    (u"#4495c3", u"#62add2"),
+    (u"#44953a", u"#62ad58"),
+    (u"#f43a3a", u"#f75858"),
+    ]
+connector_style = u"defbrown"
+dojo_style_end
+*/
+    body{
+        font-size: 12px;
+        font-family: Ubuntu, Helvetica, sans-serif;
+    }
+    h1, h2{
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+    }
+    h1{
+        font-size: 18px;
+    }
+    h2{
+        font-size: 16px;
+    }
+    .gui-msg-medium, gui-msg-small{
+        color: #29221c;
+        font-family: arial;
+    }
+    .gui-msg-medium{
+        font-size: 16px;
+    }
+    *html .gui-msg-medium{
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .gui-msg-small{
+        font-size: 13px;
+        line-height: 150%;
+    }
+    .gui-note{
+        background-color: #e95829;
+        color: white;
+        font-weight: bold;
+        padding: 2px;
+    }
+    tr, td, th{
+        margin: 0;
+    }
+
+    .tbltitle0, .tblsubtitle0{
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .tbltitle0{ /*spans*/
+        padding: 0;
+        font-size: 18px;
+    }
+    .tblsubtitle0{
+        padding: 12px 0px 0px 0px;
+        font-size: 14px;
+    }
+    .tblcelltitle0{ /*th*/
+        text-align: left;
+        border: none;
+        padding: 0px 0px 12px 0px;
+        margin: 0;
+    }
+
+    th, .rowvar0, .rowval0, .datacell0, .firstdatacell0 {
+        border: solid 1px #A1A1A1;
+    }
+    th{
+        margin: 0;
+        padding: 0px 6px;
+    }
+    td{
+        padding: 2px 6px;
+        border: solid 1px #c0c0c0;
+        font-size: 13px;
+    }
+    .rowval0{
+        margin: 0;
+    }
+    .datacell0, .firstdatacell0{
+        text-align: right;
+        margin: 0;
+    }
+    .firstcolvar0, .firstrowvar0, .spaceholder0 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        color: white;
+    }
+    .firstcolvar0, .firstrowvar0{
+        background-color: #333435;
+    }
+    .firstrowvar0{
+        border-left: solid 1px #333435;
+        border-bottom:  solid 1px #333435;
+    }
+    .topline0{
+        border-top: 2px solid #c0c0c0;
+    }
+    .spaceholder0 {
+        background-color: #CCD9D7;
+    }
+    .firstcolvar0{
+        padding: 9px 6px;
+        vertical-align: top;
+    }
+    .rowvar0, .colvar0{
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        color: #333435;
+        background-color: white;
+    }
+    .colvar0{
+        padding: 6px 0px;            
+    } 
+    .colval0, .measure0{
+        font-size: 12px;
+        vertical-align: top;
+    }
+    table {
+        border-collapse: collapse;
+    }
+    tr.total-row0 td{
+        font-weight: bold;
+        border-top: solid 2px black;
+        border-bottom: double 3px black;
+    }
+    .page-break-before0{
+        page-break-before: always;
+        border-bottom: none; /*3px dotted #AFAFAF;*/
+        width: auto;
+        height: 18px;
+    }
+    td.lbl0{
+        text-align: left;
+        background-color: #F5F5F5;
+    }
+    td.right0{
+        text-align: right;
+    }
+    .ftnote-line{
+        /* for hr http://www.w3schools.com/TAGS/att_hr_align.asp*/
+        width: 300px;
+        text-align: left; /* IE and Opera*/
+        margin-left: 0; /* Firefox, Chrome, Safari */
+    }
+    .tbl-header-ftnote0{
+        color: white;
+    }
+    .ftnote{
+        color: black;
+    }
+    /* Tool tip connector arrows */
+    .dijitTooltipBelow-defbrown {
+	
+	    padding-top: 13px;
+    }
+    .dijitTooltipAbove-defbrown {
+	
+	    padding-bottom: 13px;
+    }
+    .tundra .dijitTooltipBelow-defbrown .dijitTooltipConnector {
+	
+	    top: 0px;
+	    left: 3px;
+	    background: url("sofastats_report_extras/tooltipConnectorUp-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipBelow-defbrown .dijitTooltipConnector {
+	
+	    background-image: url("sofastats_report_extras/tooltipConnectorUp-defbrown.gif") !important;
+    }
+    .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	
+	    bottom: 0px;
+	    left: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorDown-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorDown-defbrown.gif") !important;
+    }
+    .dj_ie6 .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	    bottom: -3px;
+    }
+    .tundra .dijitTooltipLeft-defbrown {
+	    padding-right: 14px;
+    }
+    .dj_ie6 .tundra .dijitTooltipLeft-defbrown {
+	    padding-left: 15px;
+    }
+    .tundra .dijitTooltipLeft-defbrown .dijitTooltipConnector {
+	
+	    right: 0px;
+	    bottom: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorRight-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipLeft-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorRight-defbrown.gif") !important;
+    }
+    .tundra .dijitTooltipRight-defbrown {
+	    padding-left: 14px;
+    }
+    .tundra .dijitTooltipRight-defbrown .dijitTooltipConnector {
+	
+	    left: 0px;
+	    bottom: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorLeft-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipRight-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorLeft-defbrown.gif") !important;
+    }
+
+-->
+</style>
+</head>
+<body class="tundra">
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both; ">
+
+<p>From sofa_db.yield_vs_noyield 
+# on 26/08/2012 at 12:11 AM</p>
+<p>Data filtered by: `download_limit_(KB)` = 0.0</p>
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+</span>
+<span class='tblsubtitle0'>
+</span>
+</th></tr></thead></table>
+    <script type="text/javascript">
+    
+    makechart00 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [8371810.0, 8494295.0, 8282628.0, 8223925.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['8371810.0', '8494295.0', '8282628.0', '8223925.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [7353035.0, 7388821.0, 7477989.0, 7457386.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['7353035.0', '7388821.0', '7477989.0', '7457386.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart00", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: deluxe</b></p>
+    <div id="mychart00" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart00">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: d--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart01 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [5778371.0, 5333279.0, 5475677.0, 5612323.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['5778371.0', '5333279.0', '5475677.0', '5612323.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [6458423.0, 6529868.0, 7973619.0, 6128596.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['6458423.0', '6529868.0', '7973619.0', '6128596.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart01", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; page-break-after: always;">
+    <p><b>Test_Command: eruption</b></p>
+    <div id="mychart01" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart01">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: e--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart02 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [5777424.0, 5673808.0, 5856930.0, 5701513.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['5777424.0', '5673808.0', '5856930.0', '5701513.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [6009794.0, 5580043.0, 6684338.0, 9342070.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['6009794.0', '5580043.0', '6684338.0', '9342070.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart02", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: glxgears</b></p>
+    <div id="mychart02" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart02">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: g--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart03 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [136824.0, 140446.0, 167525.0, 149191.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['136824.0', '140446.0', '167525.0', '149191.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [6908739.0, 7560021.0, 6279316.0, 5742371.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['6908739.0', '7560021.0', '6279316.0', '5742371.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart03", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; page-break-after: always;">
+    <p><b>Test_Command: glxspheres64</b></p>
+    <div id="mychart03" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart03">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: g--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart04 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [335197.0, 414034.0, 0.0, 390179.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['335197.0', '414034.0', '0.0', '390179.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [855463.0, 918923.0, 945316.0, 889208.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['855463.0', '918923.0', '945316.0', '889208.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart04", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: gtkperf</b></p>
+    <div id="mychart04" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart04">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: g--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart05 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [6096173.0, 5840739.0, 6103638.0, 5855833.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['6096173.0', '5840739.0', '6103638.0', '5855833.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [8325495.0, 8592777.0, 7634960.0, 8199840.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['8325495.0', '8592777.0', '7634960.0', '8199840.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart05", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; page-break-after: always;">
+    <p><b>Test_Command: memscroller</b></p>
+    <div id="mychart05" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart05">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: m--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart06 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [5408118.0, 5484681.0, 5491027.0, 5350994.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['5408118.0', '5484681.0', '5491027.0', '5350994.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [6026847.0, 5440783.0, 5648967.0, 5579823.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['6026847.0', '5440783.0', '5648967.0', '5579823.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart06", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: moebiusgears</b></p>
+    <div id="mychart06" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart06">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: m--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart07 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [9228594.0, 4801585.0, 4968772.0, 8566472.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['9228594.0', '4801585.0', '4968772.0', '8566472.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [4969547.0, 6777100.0, 7163064.0, 6922788.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['4969547.0', '6777100.0', '7163064.0', '6922788.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart07", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; page-break-after: always;">
+    <p><b>Test_Command: polytopes</b></p>
+    <div id="mychart07" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart07">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: p--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart08 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [1406038.0, 805813.0, 869850.0, 409038.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['1406038.0', '805813.0', '869850.0', '409038.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [5389847.0, 6087812.0, 4801927.0, 6056480.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['5389847.0', '6087812.0', '4801927.0', '6056480.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart08", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: rss-glx-lattice</b></p>
+    <div id="mychart08" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart08">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: r--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart09 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [988400.0, 1410004.0, 665565.0, 1188430.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['988400.0', '1410004.0', '665565.0', '1188430.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [7358238.0, 6703026.0, 6329504.0, 6621136.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['7358238.0', '6703026.0', '6329504.0', '6621136.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart09", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; page-break-after: always;">
+    <p><b>Test_Command: rss-glx-plasma</b></p>
+    <div id="mychart09" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart09">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: r--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart10 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [515499.0, 539997.0, 541238.0, 582396.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['515499.0', '539997.0', '541238.0', '582396.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [641023.0, 642660.0, 640132.0, 591559.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['641023.0', '642660.0', '640132.0', '591559.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 10276277.0;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart10", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: xterm</b></p>
+    <div id="mychart10" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart10">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: x--><!--SOFASTATS_ITEM_DIVIDER-->
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<p>From sofa_db.yield_vs_noyield 
+# on 26/08/2012 at 12:11 AM</p>
+<p>Data filtered by: `download_limit_(KB)` != 0.0</p>
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+</span>
+<span class='tblsubtitle0'>
+</span>
+</th></tr></thead></table>
+    <script type="text/javascript">
+    
+    makechart11 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [4483766.0, 4703572.0, 3857446.0, 3171068.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['4483766.0', '4703572.0', '3857446.0', '3171068.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [3616075.0, 3408533.0, 60780.0, 3190477.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['3616075.0', '3408533.0', '60780.0', '3190477.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart11", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: deluxe</b></p>
+    <div id="mychart11" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart11">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: d--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart12 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [32083.0, 32502.0, 31110.0, 32400.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['32083.0', '32502.0', '31110.0', '32400.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [33273.0, 1924885.0, 3789115.0, 38800.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['33273.0', '1924885.0', '3789115.0', '38800.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart12", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; page-break-after: always;">
+    <p><b>Test_Command: eruption</b></p>
+    <div id="mychart12" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart12">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: e--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart13 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [126306.0, 115948.0, 152900.0, 119214.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['126306.0', '115948.0', '152900.0', '119214.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [105060.0, 106837.0, 130388.0, 113932.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['105060.0', '106837.0', '130388.0', '113932.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart13", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: glxgears</b></p>
+    <div id="mychart13" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart13">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: g--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart14 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [388589.0, 354731.0, 393429.0, 392646.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['388589.0', '354731.0', '393429.0', '392646.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [673668.0, 720632.0, 560405.0, 722595.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['673668.0', '720632.0', '560405.0', '722595.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart14", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; page-break-after: always;">
+    <p><b>Test_Command: glxspheres64</b></p>
+    <div id="mychart14" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart14">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: g--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart15 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [0.0, 180634.0, 173964.0, 207271.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['0.0', '180634.0', '173964.0', '207271.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [673254.0, 908210.0, 875268.0, 833287.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['673254.0', '908210.0', '875268.0', '833287.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart15", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: gtkperf</b></p>
+    <div id="mychart15" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart15">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: g--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart16 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [1240909.0, 4293393.0, 1186249.0, 4270945.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['1240909.0', '4293393.0', '1186249.0', '4270945.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [7866828.0, 8519325.0, 8184831.0, 7679160.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['7866828.0', '8519325.0', '8184831.0', '7679160.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart16", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; page-break-after: always;">
+    <p><b>Test_Command: memscroller</b></p>
+    <div id="mychart16" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart16">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: m--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart17 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [29602.0, 30636.0, 33340.0, 30262.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['29602.0', '30636.0', '33340.0', '30262.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [3085504.0, 4428198.0, 3305113.0, 3405703.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['3085504.0', '4428198.0', '3305113.0', '3405703.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart17", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: moebiusgears</b></p>
+    <div id="mychart17" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart17">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: m--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart18 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [8548306.0, 8940131.0, 259565.0, 5239511.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['8548306.0', '8940131.0', '259565.0', '5239511.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [26167.0, 4830979.0, 24233.0, 3659873.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['26167.0', '4830979.0', '24233.0', '3659873.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart18", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; page-break-after: always;">
+    <p><b>Test_Command: polytopes</b></p>
+    <div id="mychart18" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart18">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: p--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart19 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [233050.0, 824087.0, 187523.0, 119921.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['233050.0', '824087.0', '187523.0', '119921.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [303207.0, 178040.0, 268698.0, 341447.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['303207.0', '178040.0', '268698.0', '341447.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart19", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: rss-glx-lattice</b></p>
+    <div id="mychart19" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart19">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: r--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart20 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [633482.0, 523898.0, 564409.0, 830936.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['633482.0', '523898.0', '564409.0', '830936.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [747366.0, 1399465.0, 613788.0, 478317.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['747366.0', '1399465.0', '613788.0', '478317.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart20", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; page-break-after: always;">
+    <p><b>Test_Command: rss-glx-plasma</b></p>
+    <div id="mychart20" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart20">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: r--><!--SOFASTATS_ITEM_DIVIDER-->
+    <script type="text/javascript">
+    
+    makechart21 = function(){
+        var series0 = new Array();
+    series0["seriesLabel"] = "png";
+    series0["yVals"] = [565785.0, 566773.0, 565816.0, 569773.0];
+    series0["options"] = {stroke: {color: '#e95f29', width: '6px'}, yLbls: ['565785.0', '566773.0', '565816.0', '569773.0'] };
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "x264";
+    series1["yVals"] = [590953.0, 592984.0, 565419.0, 108126.0];
+    series1["options"] = {stroke: {color: '#f4cb3a', width: '6px'}, yLbls: ['590953.0', '592984.0', '565419.0', '108126.0'] };
+    
+    var series = new Array(series0, series1);
+        var chartconf = new Array();
+        chartconf["xaxisLabels"] = [{value: 1, text: "ENCODEYIELD"},
+            {value: 2, text: "NETYIELD"},
+            {value: 3, text: "NOYIELD"},
+            {value: 4, text: "YIELD"}];
+        chartconf["xfontsize"] = 8.0;
+        chartconf["gridlineWidth"] = 1;
+        chartconf["gridBg"] = "#f2f1f0";
+        chartconf["minorTicks"] = false;
+        chartconf["microTicks"] = false;
+        chartconf["axisLabelFontColour"] = "#423126";
+        chartconf["majorGridlineColour"] = "#b8a49e";
+        chartconf["xTitle"] = "Custom_Params";
+        chartconf["axisLabelDrop"] = 10;
+        chartconf["axisLabelRotate"] = 0;
+        chartconf["leftAxisLabelShift"] = 5.7;
+        chartconf["yTitle"] = "Mean Pixels/S_Sent";
+        chartconf["ymax"] = 9834144.1;
+        chartconf["tooltipBorderColour"] = "#736354";
+        chartconf["connectorStyle"] = "defbrown";
+        makeLineChart("mychart21", series, chartconf);
+    }
+    </script>
+        
+    <div class="screen-float-only" style="margin-right: 10px; ">
+    <p><b>Test_Command: xterm</b></p>
+    <div id="mychart21" style="width: 440.0px; 
+            height: 320px;">
+        </div>
+    
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Encoding:
+        </p>
+        <div id="legendMychart21">
+            </div>
+    </div><!--ITEM_TITLE_START--><!--Line Chart_Avg Pixels/S_Sent By Custom_Params _Test_Command: x--><!--SOFASTATS_ITEM_DIVIDER-->
+
+
+
+</body></html>
