@@ -77,6 +77,7 @@ Patch1: disable-x264.patch
 Patch2: disable-vpx.patch
 Patch3: use-static-x264lib.patch
 Patch4: use-static-vpxlib.patch
+Patch5: x264-limited-csc.patch
 
 
 %description
@@ -86,8 +87,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Sat Aug 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.1-2
+* Mon Aug 27 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.1-6
 - fix xpra_launcher
+- build against rpmfusion repository, with build fix for Fedora 16
 
 * Sat Aug 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.1-1
 - fix DPI issue with Xdummy: set virtual screen to 96dpi by default
@@ -427,6 +429,9 @@ cd parti-all-%{version}
 %endif
 %if 0%{?static_vpx}
 %patch4 -p1
+%endif
+%if 0%{?limited_csc}
+%patch5 -p1
 %endif
 
 %build
