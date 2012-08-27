@@ -62,7 +62,7 @@ from wimpiggy.log import Logger
 log = Logger()
 
 from xpra.deque import maxdeque
-from xpra.protocol import Compressible
+from xpra.protocol import zlib_compress, Compressed
 from xpra.scripts.main import ENCODINGS
 from xpra.pixbuf_to_rgb import get_rgb_rawdata
 from xpra.maths import dec1, dec2, add_list_stats, logp, \
@@ -1056,7 +1056,7 @@ class ServerSource(object):
             * 'mmap' will use 'mmap_send' - always if available, otherwise:
             * 'jpeg' and 'png' are handled by 'PIL_encode'.
             * 'x264' and 'vpx' use 'video_encode'
-            * 'rgb24' uses the Compressible wrapper to let the network layer zlib it,
+            * 'rgb24' uses the 'Compressed' wrapper to tell the network layer it is already zlibbed
         """
         if self.is_cancelled(wid, sequence):
             log("make_data_packet: dropping data packet for window %s with sequence=%s", wid, sequence)
@@ -1082,8 +1082,8 @@ class ServerSource(object):
         elif coding=="vpx":
             data, client_options = self.video_encode(wid, x, y, w, h, coding, data, rowstride, options)
         elif coding=="rgb24":
-            #use wrapper so network code will compress it with zlib:
-            data = Compressible(coding, data)
+            #compress here and return a wrapper so network code knows it is already zlib compressed:
+            data = zlib_compress(coding, data)
         elif coding=="mmap":
             pass        #already handled via mmap_send
         else:
@@ -1119,7 +1119,7 @@ class ServerSource(object):
             im.save(buf, coding.upper())
         data = buf.getvalue()
         buf.close()
-        return data, client_options
+        return Compressed(coding, data), client_options
 
     def video_encoders(self, coding):
         assert coding in ENCODINGS
@@ -1182,7 +1182,7 @@ class ServerSource(object):
             if DEBUG_DELAY:
                 self.add_DEBUG_DELAY_MESSAGE(msg)
             log(*msg)
-            return data, client_options
+            return Compressed(coding, data), client_options
         finally:
             self._video_encoder_lock.release()
 
