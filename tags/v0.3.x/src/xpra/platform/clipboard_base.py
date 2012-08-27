@@ -21,6 +21,7 @@ debug = log.debug
 class ClipboardProtocolHelperBase(object):
     def __init__(self, send_packet_cb, clipboards=["CLIPBOARD"]):
         self.send = send_packet_cb
+        self.max_clipboard_packet_size = 32*1024 - 1024
         self._clipboard_proxies = {}
         for clipboard in clipboards:
             proxy = ClipboardProxy(clipboard)
@@ -143,6 +144,10 @@ class ClipboardProtocolHelperBase(object):
                 (wire_encoding, wire_data) = munged
                 log("clipboard raw -> wire: %r -> %r", (type, format, data), munged)
                 if wire_encoding is None:
+                    no_contents()
+                    return
+                if len(wire_encoding)>self.max_clipboard_packet_size:
+                    log.warn("clipboard contents are too big and have not been sent: %s bytes dropped" % len(wire_encoding))
                     no_contents()
                     return
                 self.send(["clipboard-contents", request_id, selection,
