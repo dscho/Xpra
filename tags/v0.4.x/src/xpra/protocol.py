@@ -270,7 +270,7 @@ class Protocol(object):
                         level = self._compression_level
                         if self._compressor is None:
                             self._compressor = zlib.compressobj(level)
-                        data = self._compressor.compress(data)+self._compressor.flush(zlib.Z_SYNC_FLUSH)
+                        data = zlib.compress(data, level)
                     else:
                         level = 0
                     l = len(data)
@@ -454,7 +454,7 @@ class Protocol(object):
                     raw_string = read_buffer[:current_packet_size]
                     read_buffer = read_buffer[current_packet_size:]
                 if compression_level>0:
-                    raw_string = self._decompressor.decompress(raw_string)
+                    raw_string = zlib.decompress(raw_string)
                 if sys.version>='3':
                     raw_string = raw_string.decode("latin1")
 
