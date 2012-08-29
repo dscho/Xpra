@@ -1,3 +1,10 @@
+v0.4.4 (2012-08-29)
+======================
+	-- fix xpra launcher icon lookup on *nix
+	-- fix big clipboard packets causing disconnection: just drop them instead
+	-- fix zlib compression in raw packet mode: ensure we always flush the buffer for each chunk
+
+
 v0.4.3 (2012-08-25)
 ======================
 	-- avoid looping forever doing maths on 'infinity' value

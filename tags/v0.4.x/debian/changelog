@@ -1,3 +1,10 @@
+xpra (0.4.4-1) UNRELEASED; urgency=low
+  * fix xpra launcher icon lookup on *nix
+  * fix big clipboard packets causing disconnection: just drop them instead
+  * fix zlib compression in raw packet mode: ensure we always flush the buffer for each chunk
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 29 Aug 2012 10:31:27 +0700
+
 xpra (0.4.3-1) UNRELEASED; urgency=low
   * avoid looping forever doing maths on 'infinity' value
   * fix incomplete cloning of batch config attributes
