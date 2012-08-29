@@ -90,6 +90,7 @@ So basically it's screen for remote X apps.
 - fix xpra launcher icon lookup on *nix
 - fix big clipboard packets causing disconnection: just drop them instead
 - fix zlib compression in raw packet mode: ensure we always flush the buffer for each chunk
+- fix window refresh: do not skip all windows after a hidden one!
 
 * Sat Aug 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.3-1
 - avoid looping forever doing maths on 'infinity' value

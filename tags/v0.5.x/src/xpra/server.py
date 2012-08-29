@@ -1709,7 +1709,7 @@ class XpraServer(gobject.GObject):
             else:
                 if not self._desktop_manager._models[window].shown:
                     log("window is no longer shown, ignoring buffer refresh which would fail")
-                    return
+                    continue
                 w, h = window.get_property("actual-size")
             self._damage(window, 0, 0, w, h, opts)
 
