@@ -3,6 +3,7 @@ v0.5.2 (2012-08-29)
 	-- fix xpra launcher icon lookup on *nix
 	-- fix big clipboard packets causing disconnection: just drop them instead
 	-- fix zlib compression in raw packet mode: ensure we always flush the buffer for each chunk
+	-- fix window refresh: do not skip all windows after a hidden one!
 	-- Fedora 16 freshrpms spec file fix: build against rpmfusion despite more limited csc features
 
 
