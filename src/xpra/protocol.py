@@ -355,6 +355,13 @@ class Protocol(object):
         return False
 
     def _read_parse_thread_loop(self):
+        try:
+            self.do_read_parse_thread_loop()
+        except Exception, e:
+            log.error("error in read parse loop", exc_info=True)
+            self._call_connection_lost("error in network packet reading/parsing: %s" % e)
+
+    def do_read_parse_thread_loop(self):
         """
             Process the individual network packets placed in _read_queue.
             We concatenate them, then decompress them (old protocol only),
