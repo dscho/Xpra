@@ -269,7 +269,7 @@ class Protocol(object):
                         level = self._compression_level
                         if self._compressor is None:
                             self._compressor = zlib.compressobj(level)
-                        data = zlib.compress(data, level)
+                        data = self._compressor.compress(data)+self._compressor.flush(zlib.Z_SYNC_FLUSH)
                     else:
                         level = 0
                     l = len(data)
@@ -373,7 +373,7 @@ class Protocol(object):
             read_buffer = None
             current_packet_size = -1
             packet_index = 0
-            compression_level = False
+            compression_level = 0
             raw_packets = {}
             while not self._closed:
                 buf = self._read_queue.get()
@@ -381,9 +381,6 @@ class Protocol(object):
                     log("read thread: empty marker, exiting")
                     gobject.idle_add(self.close)
                     return
-                #this is the old/unconditional compression code (to be removed):
-                if not self.raw_packets and self._compression_level>0:
-                    buf = self._decompressor.decompress(buf)
                 if read_buffer:
                     read_buffer = read_buffer + buf
                 else:
@@ -439,7 +436,7 @@ class Protocol(object):
                         raw_string = read_buffer[:current_packet_size]
                         read_buffer = read_buffer[current_packet_size:]
                     if compression_level>0:
-                        raw_string = zlib.decompress(raw_string)
+                        raw_string = self._decompressor.decompress(raw_string) 
                     if sys.version>='3':
                         raw_string = raw_string.decode("latin1")
 
