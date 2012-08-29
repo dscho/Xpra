@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.3.6
+%define version 0.3.7
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -61,6 +61,12 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Wed Aug 29 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.7-1
+- fix zlib compression in raw packet mode: always flush the buffer
+- fix big clipboard packets causing disconnection: just drop them instead
+- support compressed cursors
+- fix incomplete cloning of attributes causing default values to be used 
+
 * Thu Aug 16 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.6-1
 - fix clipboard atom packing (was more noticeable with qt and Java applications)
 - fix clipboard selection for non X11 clients: only 'multiple' codepath requires X11 bindings

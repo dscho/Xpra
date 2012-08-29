@@ -1,3 +1,11 @@
+xpra (0.3.7-1) UNRELEASED; urgency=low
+  * fix zlib compression in raw packet mode: always flush the buffer
+  * fix big clipboard packets causing disconnection: just drop them instead
+  * support compressed cursors
+  * fix incomplete cloning of attributes causing default values to be used 
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 29 Aug 2012 10:31:27 +0700
+
 xpra (0.3.6-1) UNRELEASED; urgency=low
   * fix clipboard atom packing (was more noticeable with qt and Java
     applications)
