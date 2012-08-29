@@ -91,6 +91,7 @@ So basically it's screen for remote X apps.
 - fix xpra launcher icon lookup on *nix
 - fix big clipboard packets causing disconnection: just drop them instead
 - fix zlib compression in raw packet mode: ensure we always flush the buffer for each chunk
+- force disconnection after irrecoverable network parsing error
 - fix window refresh: do not skip all windows after a hidden one!
 
 * Mon Aug 27 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.1-6
