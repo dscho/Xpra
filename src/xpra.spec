@@ -66,6 +66,7 @@ So basically it's screen for remote X apps.
 - fix big clipboard packets causing disconnection: just drop them instead
 - support compressed cursors
 - fix incomplete cloning of attributes causing default values to be used 
+- fix window refresh: do not skip all windows after a hidden one!
 
 * Thu Aug 16 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.6-1
 - fix clipboard atom packing (was more noticeable with qt and Java applications)

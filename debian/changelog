@@ -3,6 +3,7 @@ xpra (0.3.7-1) UNRELEASED; urgency=low
   * fix big clipboard packets causing disconnection: just drop them instead
   * support compressed cursors
   * fix incomplete cloning of attributes causing default values to be used 
+  * fix window refresh: do not skip all windows after a hidden one!
 
  -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 29 Aug 2012 10:31:27 +0700
 
