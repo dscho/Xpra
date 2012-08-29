@@ -86,6 +86,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Wed Aug 29 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.4-1
+- fix xpra launcher icon lookup on *nix
+- fix big clipboard packets causing disconnection: just drop them instead
+- fix zlib compression in raw packet mode: ensure we always flush the buffer for each chunk
+
 * Sat Aug 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.3-1
 - avoid looping forever doing maths on 'infinity' value
 - fix incomplete cloning of attributes causing default values to be used for batch configuration
