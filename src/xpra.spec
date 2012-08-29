@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.5.1
+%define version 0.5.2
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -87,6 +87,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Wed Aug 29 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.2-1
+- fix xpra launcher icon lookup on *nix
+- fix big clipboard packets causing disconnection: just drop them instead
+- fix zlib compression in raw packet mode: ensure we always flush the buffer for each chunk
+
 * Mon Aug 27 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.1-6
 - fix xpra_launcher
 - build against rpmfusion repository, with build fix for Fedora 16
