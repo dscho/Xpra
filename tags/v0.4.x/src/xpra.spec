@@ -89,6 +89,7 @@ So basically it's screen for remote X apps.
 * Wed Aug 29 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.4-1
 - fix xpra launcher icon lookup on *nix
 - fix big clipboard packets causing disconnection: just drop them instead
+- force disconnection after irrecoverable network parsing error
 - fix zlib compression in raw packet mode: ensure we always flush the buffer for each chunk
 - fix window refresh: do not skip all windows after a hidden one!
 

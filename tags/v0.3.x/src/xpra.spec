@@ -64,6 +64,7 @@ So basically it's screen for remote X apps.
 * Wed Aug 29 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.7-1
 - fix zlib compression in raw packet mode: always flush the buffer
 - fix big clipboard packets causing disconnection: just drop them instead
+- force disconnection after irrecoverable network parsing error
 - support compressed cursors
 - fix incomplete cloning of attributes causing default values to be used 
 - fix window refresh: do not skip all windows after a hidden one!
