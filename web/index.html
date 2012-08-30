@@ -89,35 +89,42 @@
 	<a id="features"></a>
 	<div class="box">
 		<h2><img src="/icons/features.png" alt="features" /> Enhancements</h2>
-		This fork adds the following enhancements over the original version:
+		This fork adds the following enhancements over the <a class="ext" href="http://partiwm.googlecode.com">original version</a>:
 		<ul>
-			<li>Better platform support: Mac OS X, Microsoft Windows (standalone installer provided <a href="http://winswitch.org/dists/windows/Xpra_Setup.exe">here</a>),
-			<a class="ext" href="http://www.jmcp.homeunix.com/blog/?s=xpra">Solaris</a>,
-			<a class="ext" href="http://www.freshports.org/x11/xpra">FreeBSD</a>,
-			OpenBSD and Android (beta APK <a href="/dists/Android/Xpra.apk">here</a>)</li>
-			<li>Up to date binary packages for most Linux platforms and distributions <span class="smallnote">(ie: Debian/Ubuntu <a href="http://winswitch.org/downloads/debian-repository.html">repository</a>)</span></li>
-			<li>Zero-copy and much lower CPU overhead in network code</li>
+			<li>Better platform support: Mac OS X, <a href="/dists/windows/Xpra_Setup.exe">Microsoft Windows </a>,
+				<a class="ext" href="http://www.jmcp.homeunix.com/blog/?s=xpra">Solaris</a>,
+				<a class="ext" href="http://www.freshports.org/x11/xpra">FreeBSD</a>,
+				OpenBSD and <a href="/dists/Android/Xpra.apk">Android APK</a> (beta)</li>
+			<li>Up to date binary packages for most Linux distributions:
+				<a href="https://winswitch.org/downloads/debian-repository.html">Debian/Ubuntu</a>
+				and <a href="https://winswitch.org/downloads/rpm-repository.html">Fedora/CentOS</a> repositories,
+				and <a href="/dists/">more</a></li>
+			<li>Concurrent multi-client connections <span class="smallnote">(experimental)</span></li>
+			<li>GUI launcher</li>
+			<li>Supports global configuration file <span class="smallnote">(<code>/etc/xpra/xpra.conf</code>)</span>
+				and per-user overrides <span class="smallnote">(<code>~.xpra/xpra.conf</code>)</span></li>
+			<li>Zero-copy and much lower CPU overhead in network code, faster packet encoder</li>
 			<li>System tray menu for easy disconnection, access to options and statistics</li>
 			<li>Memory-mapped data transfers for local connections - extremelly fast!</li>
 			<li><a class="ext" href="http://www.videolan.org/developers/x264.html">x264</a>,
 				<a class="ext" href="http://www.webmproject.org/tools/vp8-sdk/group__vp8__encoder.html">VPX</a>,
-				JPEG and PNG image compression (all optional, but recommended)</li>
-			<li>non-US keyboard layout support</li>
+				JPEG and PNG image compression <span class="smallnote">(all optional, but highly recommended)</span></li>
+			<li>Better client keyboard layout support</li>
 			<li>Handles screen update storms and fast screen refresh rates</li>
 			<li>Support for password protection option for securing plain TCP connections</li>
 			<li>Forwarding of system bell and custom application cursors</li>
 			<li>Forwarding of application notifications <span class="smallnote">(requires its own dbus daemon)</span></li>
 			<li>Support for <a href="./Xdummy.html">Xdummy</a> and the RandR extension
 				which fixes a number of otherwise unfixable display bugs <span class="smallnote">(ie: <a href="/trac/ticket/1">#1</a>, <a href="/trac/ticket/2">#2</a>)</span></li>
-			<li>Ability to disable pulseaudio and clipboard synchronization</li>
+			<li>Ability to disable pulseaudio and clipboard synchronization, change dpi setting, etc</li>
 			<li>Clean client disconnection</li>
-			<li>Lots of small fixes</li>
+			<li>Lots of small bug fixes, security fixes and portability fixes (IPv6, endianness, platforms, etc)</li>
 		</ul>
 	</div>
 
 	<a id="winswitch"></a>
 	<div class="box">
-	  <h2><a href="http://winswitch.org/about/"><img src="/icons/winswitch-logo.png" alt="winswitch logo" /> Front End and Packages</a></h2>
+	  <h2><a href="http://winswitch.org/about/"><img src="/icons/winswitch-logo.png" alt="winswitch logo" /> Front End and Binary Packages</a></h2>
   		There is a front-end for xpra, available <a href="http://winswitch.org/downloads/">here</a>.
   		<br />
   		The installer packages and repositories already contain xpra, amongst other things,
@@ -176,14 +183,6 @@ DISPLAY=:100 xterm
 	  For simply browsing the source, the <a href="https://xpra.org/trac/browser/trunk/src">trac source browser</a> is more convenient.
 	  <br />
 	  In between releases, you may find beta builds <a href="/beta/">here</a>.
-	</div>
-
-	<a id="upstream"></a>
-	<div class="box">
-	  <h2><img src="/icons/extlink.png" alt="external link" />  Origial upstream</h2>
-	  	The original version of xpra can be found <a href="http://code.google.com/p/partiwm/wiki/xpra">here</a>.
-	  	<br />
-	  	Note that it is now well out of date and is very rarely getting updated (no new official releases in 2 years), there is very little point in using that version.
 	</div>
   </div>
 
