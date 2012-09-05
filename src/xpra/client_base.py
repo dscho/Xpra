@@ -119,6 +119,7 @@ class XpraClientBase(gobject.GObject):
             capabilities["jpeg"] = self.jpegquality
         capabilities["platform"] = sys.platform
         capabilities["raw_packets"] = True
+        capabilities["chunked_compression"] = True
         capabilities["rencode"] = has_rencode
         capabilities["server-window-resize"] = True
         try:
@@ -193,6 +194,7 @@ class XpraClientBase(gobject.GObject):
             return False
         if capabilities.get("rencode") and has_rencode:
             self._protocol.enable_rencode()
+        self._protocol.chunked_compression = bool(capabilities.get("chunked_compression", False))
         return True
 
     def _process_set_deflate(self, packet):
