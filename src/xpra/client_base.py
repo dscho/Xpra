@@ -173,6 +173,7 @@ class XpraClientBase(gobject.GObject):
 
     def parse_server_capabilities(self, capabilities):
         self._protocol.raw_packets = bool(capabilities.get("raw_packets", False))
+        self._protocol.chunked_compression = bool(capabilities.get("chunked_compression", False))
         self._remote_version = capabilities.get("version") or capabilities.get("__prerelease_version")
         if not is_compatible_with(self._remote_version):
             self.quit(4)
