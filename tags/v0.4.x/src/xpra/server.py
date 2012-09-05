@@ -1108,6 +1108,7 @@ class XpraServer(gobject.GObject):
         #max packet size from client (the biggest we can get are clipboard packets)
         self._protocol.max_packet_size = 1024*1024  #1MB
         self._protocol.raw_packets = bool(capabilities.get("raw_packets", False))
+        self._protocol.chunked_compression = bool(capabilities.get("chunked_compression", False))
         batch_config = DamageBatchConfig()
         batch_config.enabled = bool(capabilities.get("batch.enabled", DamageBatchConfig.ENABLED))
         batch_config.always = bool(capabilities.get("batch.always", False))

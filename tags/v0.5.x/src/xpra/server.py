@@ -1122,6 +1122,7 @@ class XpraServer(gobject.GObject):
         self._protocol = proto
         #max packet size from client (the biggest we can get are clipboard packets)
         self._protocol.max_packet_size = 1024*1024  #1MB
+        self._protocol.chunked_compression = bool(capabilities.get("chunked_compression", False))
         batch_config = DamageBatchConfig()
         batch_config.enabled = bool(capabilities.get("batch.enabled", DamageBatchConfig.ENABLED))
         batch_config.always = bool(capabilities.get("batch.always", False))
@@ -1240,6 +1241,7 @@ class XpraServer(gobject.GObject):
         if "key_repeat" in client_capabilities:
             capabilities["key_repeat_modifiers"] = True
         capabilities["raw_packets"] = True
+        capabilities["chunked_compression"] = True
         capabilities["rencode"] = has_rencode
         capabilities["window_configure"] = True
         capabilities["xsettings-tuple"] = True
