@@ -1,5 +1,5 @@
 xpra (0.5.3-1) UNRELEASED; urgency=low
-  * zlib compatibility fix: use chunked decompression when supported (newer versions)
+  * zlib compatibility fix: use chunked decompression when supported
 
  -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 05 Sep 2012 12:17:25 +0700
 
