@@ -62,6 +62,9 @@ cdef class Decoder(xcoder):
         self.init(width, height)
         self.context = init_decoder(width, height)
 
+    def get_type(self):
+        return  "vpx"
+
     def clean(self):
         if self.context!=NULL:
             clean_decoder(self.context)
@@ -123,6 +126,9 @@ cdef class Encoder(xcoder):
     def init_context(self, width, height, supports_options):
         self.init(width, height)
         self.context = init_encoder(width, height)
+
+    def get_type(self):
+        return  "vpx"
 
     def clean(self):
         if self.context!=NULL:

@@ -1148,15 +1148,21 @@ class ServerSource(object):
         try:
             self._video_encoder_lock.acquire()
             encoder = encoders.get(wid)
-            if encoder and (encoder.get_width()!=w or encoder.get_height()!=h):
-                log("%s: window dimensions have changed from %sx%s to %sx%s", coding, encoder.get_width(), encoder.get_height(), w, h)
-                encoder.clean()
-                encoder.init_context(w, h, self._encoding_client_options)
-                #if we had an encoding speed set, restore it:
-                encoding_speeds = self._video_encoder_speed.get(wid)
-                if encoding_speeds:
-                    _, recent_speed = calculate_time_weighted_average(list(encoding_speeds))
-                    encoder.set_encoding_speed(recent_speed)
+            if encoder:
+                if encoder.get_type()!=coding:
+                    log("video_encode: switching from %s to %s", encoder.get_type(), coding)
+                    self.video_encoder_cleanup()
+                elif encoder.get_width()!=w or encoder.get_height()!=h:
+                    log("%s: window dimensions have changed from %sx%s to %sx%s", coding, encoder.get_width(), encoder.get_height(), w, h)
+                    old_pc = encoder.get_width() * encoder.get_height()
+                    encoder.clean()
+                    encoder.init_context(w, h, self.encoding_client_options)
+                    #if we had an encoding speed set, restore it (also scaled):
+                    if len(self._video_encoder_speed):
+                        _, recent_speed = calculate_time_weighted_average(list(self._video_encoder_speed))
+                        new_pc = w * h
+                        new_speed = max(0, min(100, recent_speed*new_pc/old_pc))
+                        encoder.set_encoding_speed(new_speed)
             if encoder is None:
                 #we could have an old encoder if we were using a different encoding
                 #if so, clean it up:
