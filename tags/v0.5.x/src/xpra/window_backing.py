@@ -75,18 +75,25 @@ class Backing(object):
     def paint_with_video_decoder(self, decoders, factory, coding, img_data, x, y, width, height, rowstride, options):
         assert x==0 and y==0
         decoder = decoders.get(self.wid)
-        if decoder and (decoder.get_width()!=width or decoder.get_height()!=height):
-            log("paint_with_video_decoder: window dimensions have changed from %s to %s", (decoder.get_width(), decoder.get_height()), (width, height))
-            decoder.clean()
-            decoder.init_context(width, height, options)
+        if decoder:
+            if decoder.get_type()!=coding:
+                log("paint_with_video_decoder: switching to %s decoder", coding)
+                decoder.clean()
+                decoder = None
+                del decoders[self.wid]
+            elif decoder.get_width()!=width or decoder.get_height()!=height:
+                log("paint_with_video_decoder: window dimensions have changed from %s to %s", (decoder.get_width(), decoder.get_height()), (width, height))
+                decoder.clean()
+                decoder.init_context(width, height, options)
         if decoder is None:
             decoder = factory()
             decoder.init_context(width, height, options)
             decoders[self.wid] = decoder
             def close_decoder():
                 log("closing %s decoder for window %s", coding, self.wid)
-                decoder.clean()
-                del decoders[self.wid]
+                if self.wid in decoders:
+                    decoder.clean()
+                    del decoders[self.wid]
             self._on_close.append(close_decoder)
         log("paint_with_video_decoder: options=%s", options)
         err, outstride, data = decoder.decompress_image_to_rgb(img_data, options)

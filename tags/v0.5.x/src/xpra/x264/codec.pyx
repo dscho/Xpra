@@ -80,6 +80,9 @@ cdef class Decoder(xcoder):
         csc_fmt = options.get("csc_pixel_format", -1)
         self.context = init_decoder(width, height, csc_fmt)
 
+    def get_type(self):
+        return  "x264"
+
     def clean(self):
         if self.context!=NULL:
             clean_decoder(self.context)
@@ -166,6 +169,9 @@ cdef class Encoder(xcoder):
         self.init(width, height)
         self.supports_options = supports_options
         self.context = init_encoder(width, height, 70, int(supports_options))
+
+    def get_type(self):
+        return  "x264"
 
     def clean(self):
         if self.context!=NULL:
