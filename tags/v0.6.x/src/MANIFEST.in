@@ -1,0 +1,17 @@
+include COPYING NEWS README*
+include do-build parti/try-parti
+include install.sh
+include wimpiggy/lowlevel/constants.pxi
+include xpra/x264/*.h
+include xpra/vpx/*.h
+include *.desktop
+include *.png
+include *.1
+recursive-include patches *
+recursive-include etc *
+recursive-include icons *
+global-include *.py *.txt
+global-exclude *~ #*
+prune build
+prune dist
+prune install
