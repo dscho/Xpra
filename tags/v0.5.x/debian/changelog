@@ -1,3 +1,12 @@
+xpra (0.5.4-1) UNRELEASED; urgency=low
+  * fix man page typo
+  * fix non bash login shell compatibility
+  * fix xpra screenshot argument parsing error handling
+  * fix video encoding mismatch when switching encoding
+  * fix ssh mode on OpenBSD
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 08 Sep 2012 11:07:55 +0700
+
 xpra (0.5.3-1) UNRELEASED; urgency=low
   * zlib compatibility fix: use chunked decompression when supported
 

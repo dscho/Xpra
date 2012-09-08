@@ -1,3 +1,10 @@
+v0.4.5 (2012-09-08)
+======================
+	-- fix man page typo
+	-- fix non bash login shell compatibility
+	-- fix xpra screenshot argument parsing error handling
+
+
 v0.4.5 (2012-09-05)
 ======================
 	-- zlib compatibility fix: use chunked decompression when supported (newer versions)

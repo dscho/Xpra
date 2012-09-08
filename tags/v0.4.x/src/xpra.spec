@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.4.5
+%define version 0.4.6
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -86,6 +86,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Sat Sep 08 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.6-1
+- fix man page typo
+- fix non bash login shell compatibility
+- fix xpra screenshot argument parsing error handling
+
 * Wed Sep 05 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.5-1
 - zlib compatibility fix: use chunked decompression when supported (newer versions)
 
