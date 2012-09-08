@@ -1,4 +1,13 @@
-v0.5.2 (2012-09-05)
+v0.5.4 (2012-09-08)
+======================
+	-- fix man page typo
+	-- fix non bash login shell compatibility
+	-- fix xpra screenshot argument parsing error handling
+	-- fix video encoding mismatch when switching encoding
+	-- fix ssh mode on OpenBSD
+
+
+v0.5.3 (2012-09-05)
 ======================
 	-- zlib compatibility fix: use chunked decompression when supported (newer versions)
 
