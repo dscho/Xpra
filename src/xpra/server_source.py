@@ -1152,6 +1152,7 @@ class ServerSource(object):
                 if encoder.get_type()!=coding:
                     log("video_encode: switching from %s to %s", encoder.get_type(), coding)
                     self.video_encoder_cleanup()
+                    encoder = None
                 elif encoder.get_width()!=w or encoder.get_height()!=h:
                     log("%s: window dimensions have changed from %sx%s to %sx%s", coding, encoder.get_width(), encoder.get_height(), w, h)
                     old_pc = encoder.get_width() * encoder.get_height()
