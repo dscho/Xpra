@@ -123,8 +123,9 @@ class XpraClientBase(gobject.GObject):
         capabilities["chunked_compression"] = True
         capabilities["rencode"] = has_rencode
         capabilities["server-window-resize"] = True
-        uuid_src = "%s/%s/%s" % (get_machine_id(), os.getuid(), os.getgid())
-        capabilities["uuid"] = sha.new(uuid_src).hexdigest()
+        uuid_src = str(get_machine_id())
+        if os.name=="posix":
+            uuid_src += "/%s/%s" % (os.getuid(), os.getgid())
         try:
             from wimpiggy.prop import set_xsettings_format
             assert set_xsettings_format
