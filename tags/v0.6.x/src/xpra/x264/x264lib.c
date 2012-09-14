@@ -349,7 +349,7 @@ int csc_image_yuv2rgb(struct x264lib_ctx *ctx, uint8_t *in[3], const int stride[
 	if (!ctx->yuv2rgb)
 		return 1;
 
-	avpicture_fill(&pic, malloc(ctx->height * ctx->width * 3), PIX_FMT_RGB24, ctx->width, ctx->height);
+	avpicture_fill(&pic, xmemalign(ctx->height * ctx->width * 3), PIX_FMT_RGB24, ctx->width, ctx->height);
 
 	sws_scale(ctx->yuv2rgb, (const uint8_t * const*) in, stride, 0, ctx->height, pic.data, pic.linesize);
 
