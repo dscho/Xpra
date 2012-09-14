@@ -1,3 +1,10 @@
+xpra (0.6.1-1) UNRELEASED; urgency=low
+  * fix compress clipboard data (previous fix was ineffectual)
+  * fix missing damage data queue statistics (was causing latency issues)
+  * use memory aligned allocations for colourspace conversion
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 14 Sep 2012 22:19:45 +0700
+
 xpra (0.6.0-5) UNRELEASED; urgency=low
   * fix launcher: don't block the UI whilst connecting, and use a lower timeout,
   	fix icon lookup on *nix
