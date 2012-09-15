@@ -1190,7 +1190,7 @@ class ServerSource(object):
             coding = self.find_common_lossless_encoder(current_encoding)
             log("temporarily switching to %s encoder for %s pixels", coding, pixel_count)
             return  coding
-        if current_encoding=="x264" and (ww==1 or wh==1):
+        if ww==1 or wh==1:
             return  switch()
         if pixel_count>512 or pixel_count>=(ww*wh):
             #too many pixels, use current video encoder
