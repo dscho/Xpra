@@ -641,6 +641,8 @@ class ServerSource(object):
         elif coding=="vpx":
             assert coding in ENCODINGS
             assert x==0 and y==0
+            if w==1 or h==1:
+                return None
             from xpra.vpx.codec import ENCODERS as vpx_encoders, Encoder as vpxEncoder      #@UnresolvedImport
             data = self.video_encode(vpx_encoders, vpxEncoder, wid, x, y, w, h, coding, data, rowstride)
         elif coding=="rgb24":
