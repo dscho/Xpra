@@ -13,6 +13,7 @@ import cairo
 from wimpiggy.log import Logger
 log = Logger()
 
+from threading import Lock
 from xpra.scripts.main import ENCODINGS
 
 PREFER_CAIRO = False        #just for testing the CairoBacking with gtk2
@@ -22,17 +23,31 @@ Generic superclass for Backing code,
 see CairoBacking and PixmapBacking for implementations
 """
 class Backing(object):
-    def __init__(self, wid, mmap_enabled, mmap):
+    def __init__(self, wid, old_backing, mmap_enabled, mmap):
         self.wid = wid
         self.mmap_enabled = mmap_enabled
         self.mmap = mmap
         self._backing = None
-        self._video_decoder = None
+        #keep the same video decoder for now
+        #it will be updated once we start receiving frames
+        #with the new dimensions
+        if old_backing:
+            self._video_decoder = old_backing._video_decoder
+            self._video_decoder_lock = old_backing._video_decoder_lock
+            #make sure we don't close it via the old one:
+            old_backing._video_decoder = None
+        else:
+            self._video_decoder = None
+            self._video_decoder_lock = Lock()
 
     def close(self):
         if self._video_decoder:
-            self._video_decoder.clean()
-            self._video_decoder = None
+            try:
+                self._video_decoder_lock.acquire()
+                self._video_decoder.clean()
+                self._video_decoder = None
+            finally:
+                self._video_decoder_lock.release()
 
     def jpegimage(self, img_data, width, height):
         import Image
@@ -70,31 +85,35 @@ class Backing(object):
 
     def paint_with_video_decoder(self, factory, coding, img_data, x, y, width, height, rowstride, options):
         assert x==0 and y==0
-        if self._video_decoder:
-            if self._video_decoder.get_type()!=coding:
-                self._video_decoder.clean()
-                self._video_decoder = None
-            elif self._video_decoder.get_width()!=width or self._video_decoder.get_height()!=height:
-                log("paint_with_video_decoder: window dimensions have changed from %s to %s", (self._video_decoder.get_width(), self._video_decoder.get_height()), (width, height))
-                self._video_decoder.clean()
-                self._video_decoder.init_context(width, height, options)
-        if self._video_decoder is None:
-            self._video_decoder = factory()
-            self._video_decoder.init_context(width, height, options)
-        log("paint_with_video_decoder: options=%s", options)
-        err, outstride, data = self._video_decoder.decompress_image_to_rgb(img_data, options)
-        if err!=0:
-            log.error("paint_with_video_decoder: ouch, decompression error %s", err)
-            return  False
-        if not data:
-            log.error("paint_with_video_decoder: ouch, no data from %s decoder", coding)
-            return  False
         try:
-            log("paint_with_video_decoder: decompressed %s to %s bytes (%s%%) of rgb24 (%s*%s*3=%s) (outstride: %s)", len(img_data), len(data), int(100*len(img_data)/len(data)),width, height, width*height*3, outstride)
-            self.paint_rgb24(data, x, y, width, height, outstride)
-            return  True
+            self._video_decoder_lock.acquire()
+            if self._video_decoder:
+                if self._video_decoder.get_type()!=coding:
+                    self._video_decoder.clean()
+                    self._video_decoder = None
+                elif self._video_decoder.get_width()!=width or self._video_decoder.get_height()!=height:
+                    log("paint_with_video_decoder: window dimensions have changed from %s to %s", (self._video_decoder.get_width(), self._video_decoder.get_height()), (width, height))
+                    self._video_decoder.clean()
+                    self._video_decoder.init_context(width, height, options)
+            if self._video_decoder is None:
+                self._video_decoder = factory()
+                self._video_decoder.init_context(width, height, options)
+            log("paint_with_video_decoder: options=%s", options)
+            err, outstride, data = self._video_decoder.decompress_image_to_rgb(img_data, options)
+            if err!=0:
+                log.error("paint_with_video_decoder: ouch, decompression error %s", err)
+                return  False
+            if not data:
+                log.error("paint_with_video_decoder: ouch, no data from %s decoder", coding)
+                return  False
+            try:
+                log("paint_with_video_decoder: decompressed %s to %s bytes (%s%%) of rgb24 (%s*%s*3=%s) (outstride: %s)", len(img_data), len(data), int(100*len(img_data)/len(data)),width, height, width*height*3, outstride)
+                self.paint_rgb24(data, x, y, width, height, outstride)
+                return  True
+            finally:
+                self._video_decoder.free_image()
         finally:
-            self._video_decoder.free_image()
+            self._video_decoder_lock.release()
 
 
 """
@@ -109,7 +128,7 @@ This is a complete waste of CPU! Please complain to pycairo.
 """
 class CairoBacking(Backing):
     def __init__(self, wid, w, h, old_backing, mmap_enabled, mmap):
-        Backing.__init__(self, wid, mmap_enabled, mmap)
+        Backing.__init__(self, wid, old_backing, mmap_enabled, mmap)
         self._backing = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
         cr = cairo.Context(self._backing)
         if old_backing is not None and old_backing._backing is not None:
@@ -236,7 +255,7 @@ Works much better than gtk3!
 class PixmapBacking(Backing):
 
     def __init__(self, wid, w, h, old_backing, mmap_enabled, mmap):
-        Backing.__init__(self, wid, mmap_enabled, mmap)
+        Backing.__init__(self, wid, old_backing, mmap_enabled, mmap)
         self._backing = gdk.Pixmap(gdk.get_default_root_window(), w, h)
         cr = self._backing.cairo_create()
         if old_backing is not None and old_backing._backing is not None:
@@ -326,10 +345,15 @@ class PixmapBacking(Backing):
 
 
 def new_backing(wid, w, h, old_backing, mmap_enabled, mmap):
-    if is_gtk3() or PREFER_CAIRO:
-        b = CairoBacking(wid, w, h, old_backing, mmap_enabled, mmap)
-    else:
-        b = PixmapBacking(wid, w, h, old_backing, mmap_enabled, mmap)
-    if old_backing:
-        old_backing.close()
+    try:
+        if old_backing:
+            old_backing._video_decoder_lock.acquire()
+        if is_gtk3() or PREFER_CAIRO:
+            b = CairoBacking(wid, w, h, old_backing, mmap_enabled, mmap)
+        else:
+            b = PixmapBacking(wid, w, h, old_backing, mmap_enabled, mmap)
+    finally:
+        if old_backing:
+            old_backing._video_decoder_lock.release()        
+            old_backing.close()
     return b
