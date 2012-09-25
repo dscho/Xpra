@@ -329,6 +329,8 @@ class ServerSource(object):
             if self._damage_cancelled.get(wid, 0)==sequence:
                 del self._damage_cancelled[wid]
         gobject.timeout_add(30*1000, clear_cancel, self._sequence)
+        #ensure we get a new key frame:
+        self.clean_video_encoder(wid)
 
     def clear_stats(self, wid):
         for d in [self._damage_last_events, self.client_decode_time, self.batch_configs]:
@@ -338,6 +340,9 @@ class ServerSource(object):
     def remove_window(self, wid):
         self.cancel_damage(wid)
         self.clear_stats(wid)
+        self.clean_video_encoder(wid)
+
+    def clean_video_encoder(self, wid):
         try:
             self._video_encoder_lock.acquire()
             encoder_cleanup = self._video_encoder_cleanup.get(wid)
