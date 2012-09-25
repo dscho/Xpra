@@ -6,7 +6,7 @@ v0.4.7 (2012-09-25)
 	-- fix latency: ensure we never record zero or even negative decode time
 
 
-v0.4.5 (2012-09-08)
+v0.4.6 (2012-09-08)
 ======================
 	-- fix man page typo
 	-- fix non bash login shell compatibility
