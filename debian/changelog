@@ -1,3 +1,19 @@
+xpra (0.6.2-1) UNRELEASED; urgency=low
+  * fix missing key frames with x264/vpx: always reset the video encoder when
+    we skip some frames (forces a new key frame)
+  * fix server crash on invalid keycodes (zero or negative)
+  * fix latency: isolate per-window latency statistics from each other
+  * fix latency: ensure we never record zero or even negative decode time
+  * fix refresh: server error was causing refresh requests to be ignored
+  * fix window options handling: using it for more than one value would fail
+  * fix video encoder/windows dimensions mismatch causing missing key frames
+  * fix damage options merge code (options were being squashed)
+  * ensure that small lossless regions do not cancel the auto-refresh timer
+  * restore protocol main packet compression and single chunk sending
+  * drop unnecessary OpenGL dependencies from some deb/rpm packages
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 26 Sep 2012 00:09:55 +0700
+
 xpra (0.6.1-1) UNRELEASED; urgency=low
   * fix compress clipboard data (previous fix was ineffectual)
   * fix missing damage data queue statistics (was causing latency issues)
