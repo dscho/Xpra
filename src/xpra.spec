@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.5.4
+%define version 0.5.5
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -87,6 +87,15 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Tue Sep 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.5-1
+- fix missing key frames with x264/vpx: always reset the video encoder when we skip some frames (forces a new key frame)
+- fix server crash on invalid keycodes (zero or negative)
+- fix latency: isolate per-window latency statistics from each other
+- fix latency: ensure we never record zero or even negative decode time
+- fix clipboard compression: compress clipboard data not encoding description!
+- ensure that small lossless regions do not cancel the auto-refresh timer
+- restore protocol main packet compression and single chunk sending
+
 * Sat Sep 08 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.4-1
 - fix man page typo
 - fix non bash login shell compatibility
