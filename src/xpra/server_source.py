@@ -1287,7 +1287,7 @@ class ServerSource(object):
             and the "client latency".
         """
         log("packet decoding for window %s %sx%s took %s µs", wid, width, height, decode_time)
-        if decode_time:
+        if decode_time>0:
             client_decode_list = self._client_decode_time.setdefault(wid, maxdeque(maxlen=NRECS))
             client_decode_list.append((time.time(), width*height, decode_time))
         ack_pending = self._damage_ack_pending.get(wid)
@@ -1299,7 +1299,7 @@ class ServerSource(object):
             log("cannot find sent time for sequence %s", damage_packet_sequence)
             return
         del ack_pending[damage_packet_sequence]
-        if decode_time:
+        if decode_time>0:
             sent_at, pixels = pending
             now = time.time()
             diff = now-sent_at
