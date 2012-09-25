@@ -502,7 +502,7 @@ class WindowSource(object):
             log("cannot find sent time for sequence %s", damage_packet_sequence)
             return
         del self.statistics.damage_ack_pending[damage_packet_sequence]
-        if decode_time:
+        if decode_time>0:
             sent_at, pixels = pending
             now = time.time()
             diff = now-sent_at
