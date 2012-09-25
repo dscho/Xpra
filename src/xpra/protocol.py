@@ -123,7 +123,7 @@ class Protocol(object):
         self.output_raw_packetcount = 0
         #initial value which may get increased by client/server after handshake:
         self.max_packet_size = 32*1024
-        self.raw_packets = False
+        self.raw_packets = True
         self.chunked_compression = False
         self._closed = False
         self._compressor = None
