@@ -36,9 +36,7 @@ Depends: ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}
         ,python-gtk2
         ,x11-xserver-utils
         ,xvfb | xserver-xorg-video-dummy
-Recommends: python-gtkglext1
-           ,python-imaging
-           ,python-opengl
+Recommends: python-imaging
 # keyboard-configuration (>= 1.82) is workaround for #180 to fix keypad keys forwarding.
            ,keyboard-configuration (>= 1.82)
            ,xserver-xorg-video-dummy
