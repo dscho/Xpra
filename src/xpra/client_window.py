@@ -163,6 +163,7 @@ class ClientWindow(gtk.Window):
         self._override_redirect = override_redirect
         self._client_properties = client_properties
         self._refresh_timer = None
+        self._refresh_min_pixels = -1
         self._refresh_ignore_sequence = -1
         # used for only sending focus events *after* the window is mapped:
         self._been_mapped = False
@@ -385,7 +386,7 @@ class ClientWindow(gtk.Window):
         if success:
             queue_draw(self, x, y, width, height)
         #clear the auto refresh if enough pixels were sent (arbitrary limit..)
-        if success and self._refresh_timer and width*height>16*16:
+        if success and self._refresh_timer and width*height>self._refresh_min_pixels:
             gobject.source_remove(self._refresh_timer)
             self._refresh_timer = None
         #if we need to set a refresh timer, do it:
@@ -395,6 +396,9 @@ class ClientWindow(gtk.Window):
             #make sure our own refresh does not make us fire again
             #FIXME: this should be per-window!
             if self._refresh_ignore_sequence<packet_sequence:
+                #NOTE: for x264 and vpx, we always get full frames (whole window refresh) 
+                #this is not the case with jpeg but since jpeg does not switch the encoding on the fly, we're ok 
+                self._refresh_min_pixels = width*height 
                 self._refresh_ignore_sequence = packet_sequence+1
                 self._refresh_timer = gobject.timeout_add(int(1000 * self._client.auto_refresh_delay), self.refresh_window)
         return success
