@@ -1,3 +1,13 @@
+xpra (0.4.7-1) UNRELEASED; urgency=low
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+  * fix missing key frames with x264/vpx: always reset the video encoder when
+    we skip some frames (forces a new key frame)
+  * fix server crash on invalid keycodes (zero or negative)
+  * fix latency: isolate per-window latency statistics from each other
+  * fix latency: ensure we never record zero or even negative decode time
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 25 Sep 2012 23:54:58 +0700
+
 xpra (0.4.6-1) UNRELEASED; urgency=low
   * fix man page typo
   * fix non bash login shell compatibility

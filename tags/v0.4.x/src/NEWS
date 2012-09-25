@@ -1,3 +1,11 @@
+v0.4.7 (2012-09-25)
+======================
+	-- fix missing key frames with x264/vpx: always reset the video encoder when we skip some frames (forces a new key frame)
+	-- fix server crash on invalid keycodes (zero or negative)
+	-- fix latency: isolate per-window latency statistics from each other
+	-- fix latency: ensure we never record zero or even negative decode time
+
+
 v0.4.5 (2012-09-08)
 ======================
 	-- fix man page typo

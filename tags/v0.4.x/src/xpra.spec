@@ -86,6 +86,12 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Tue Sep 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.7-1
+- fix missing key frames with x264/vpx: always reset the video encoder when we skip some frames (forces a new key frame)
+- fix server crash on invalid keycodes (zero or negative)
+- fix latency: isolate per-window latency statistics from each other
+- fix latency: ensure we never record zero or even negative decode time
+
 * Sat Sep 08 2012 Antoine Martin <antoine@nagafix.co.uk> 0.4.6-1
 - fix man page typo
 - fix non bash login shell compatibility
