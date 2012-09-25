@@ -1,5 +1,4 @@
 xpra (0.4.7-1) UNRELEASED; urgency=low
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
   * fix missing key frames with x264/vpx: always reset the video encoder when
     we skip some frames (forces a new key frame)
   * fix server crash on invalid keycodes (zero or negative)
