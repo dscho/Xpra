@@ -294,6 +294,8 @@ xpra_opts.dpi = default_int("dpi", 96)
 xpra_opts.cursors = default_bool("cursors", True)
 xpra_opts.bell = default_bool("bell", True)
 xpra_opts.notifications = default_bool("notifications", True)
+xpra_opts.sharing = default_bool("sharing", False) 
+xpra_opts.delay_tray = default_bool("delay-tray", False) 
 #these would need testing/work:
 xpra_opts.auto_refresh_delay = 0.0
 xpra_opts.max_bandwidth = 0.0
@@ -549,6 +551,8 @@ class ApplicationWindow:
 		opts.cursors = xpra_opts.cursors
 		opts.bell = xpra_opts.bell
 		opts.notifications = xpra_opts.notifications
+		opts.delay_tray = xpra_opts.delay_tray
+		opts.sharing = xpra_opts.sharing
 		import logging
 		logging.root.setLevel(logging.INFO)
 		logging.root.addHandler(logging.StreamHandler(sys.stderr))
