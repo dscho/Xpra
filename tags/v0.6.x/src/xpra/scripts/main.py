@@ -258,7 +258,7 @@ def main(script_file, cmdline):
                           dest="max_bandwidth", type="float", default=0.0, metavar="BANDWIDTH (kB/s)",
                           help="Specify the link's maximal receive speed to auto-adjust JPEG quality, 0.0 disables. (default: disabled)")
     group.add_option("--auto-refresh-delay", action="store",
-                      dest="auto_refresh_delay", type="float", default=0.0,
+                      dest="auto_refresh_delay", type="float", default=1.0,
                       metavar="DELAY",
                       help="Idle delay in seconds before doing automatic lossless refresh."
                       + " 0.0 to disable."
