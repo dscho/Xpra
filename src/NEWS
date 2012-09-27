@@ -1,3 +1,11 @@
+v0.6.3 (2012-09-27)
+======================
+	-- fix memory leak in server after client disconnection
+	-- fix launcher: clear socket timeout once connected and add missing options
+	-- fix potential bug in network code (prevent disconnection)
+	-- enable auto-refresh by default since we now use a lossy encoder by default
+
+
 v0.6.2 (2012-09-25)
 ======================
 	-- fix missing key frames with x264/vpx: always reset the video encoder when we skip some frames (forces a new key frame)
