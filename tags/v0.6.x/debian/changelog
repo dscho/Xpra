@@ -1,3 +1,11 @@
+xpra (0.6.3-1) UNRELEASED; urgency=low
+  * fix memory leak in server after client disconnection
+  * fix launcher: clear socket timeout once connected and add missing options
+  * fix potential bug in network code (prevent disconnection)
+  * enable auto-refresh by default since we now use a lossy encoder by default
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 27 Sep 2012 21:40:40 +0700
+
 xpra (0.6.2-1) UNRELEASED; urgency=low
   * fix missing key frames with x264/vpx: always reset the video encoder when
     we skip some frames (forces a new key frame)
