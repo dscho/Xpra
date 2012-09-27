@@ -514,6 +514,13 @@ class Protocol(object):
             except:
                 log.error("error closing %s", self._conn, exc_info=True)
         self.terminate_io_threads()
+        self.source = None
+        #clear all references to ensure we can get garbage collected quickly:
+        self._encoder = None
+        self._write_thread = None
+        self._read_thread = None
+        self._read_parser_thread = None
+        self._process_packet_cb = None
 
     def terminate_io_threads(self):
         #make the threads exit by adding the empty marker:
