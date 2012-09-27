@@ -1144,9 +1144,6 @@ class XpraServer(gobject.GObject):
     def send_hello(self, client_capabilities, server_source):
         capabilities = {}
         capabilities["version"] = xpra.__version__
-        capabilities["root_window_size"] = gtk.gdk.get_default_root_window().get_size()
-        capabilities["desktop_size"] = self._get_desktop_size_capability(server_source)
-        capabilities["max_desktop_size"] = self.get_max_screen_size()
         capabilities["platform"] = sys.platform
         capabilities["encodings"] = ENCODINGS
         capabilities["resize_screen"] = self.randr
@@ -1175,6 +1172,9 @@ class XpraServer(gobject.GObject):
         #so we must give the gtk event loop a chance to run before we query
         #for the actual root window size!
         def do_send_hello():
+	    capabilities["root_window_size"] = gtk.gdk.get_default_root_window().get_size()
+	    capabilities["desktop_size"] = self._get_desktop_size_capability(server_source)
+	    capabilities["max_desktop_size"] = self.get_max_screen_size()
             capabilities["actual_desktop_size"] = gtk.gdk.get_default_root_window().get_size()
             server_source.hello(capabilities)
         gobject.idle_add(do_send_hello)
