@@ -348,3 +348,5 @@ def new_backing(wid, w, h, old_backing, mmap_enabled, mmap):
     if old_backing:
         old_backing.close()
     return b
+    w = max(1, w)
+    h = max(1, h)
