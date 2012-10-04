@@ -1,3 +1,9 @@
+v0.3.11 (2012-10-04)
+======================
+	-- fix bencoder to properly handle dicts with non-string keys
+	-- take shortcut if there is nothing to send
+
+
 v0.3.10 (2012-09-25)
 ======================
 	-- fix missing key frames with x264/vpx: always reset the video encoder when we skip some frames (forces a new key frame)
