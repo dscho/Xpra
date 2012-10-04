@@ -188,6 +188,8 @@ class ClientWindow(gtk.Window):
         self._pos = (-1, -1)
         self._size = (1, 1)
         self._backing = None
+        w = max(1, w)
+        h = max(1, h)
         self.new_backing(w, h)
         self._metadata = {}
         self._override_redirect = override_redirect
@@ -343,6 +345,8 @@ class ClientWindow(gtk.Window):
         gtk.Window.do_map_event(self, event)
         if not self._override_redirect:
             x, y, w, h = get_window_geometry(self)
+            w = max(1, w)
+            h = max(1, h)
             self._client.send(["map-window", self._id, x, y, w, h])
             self._pos = (x, y)
             self._size = (w, h)
@@ -354,6 +358,8 @@ class ClientWindow(gtk.Window):
         gtk.Window.do_configure_event(self, event)
         if not self._override_redirect:
             x, y, w, h = get_window_geometry(self)
+            w = max(1, w)
+            h = max(1, h)
             ox, oy = self._pos
             dx, dy = x-ox, y-oy
             self._pos = (x, y)
@@ -377,6 +383,8 @@ class ClientWindow(gtk.Window):
 
     def move_resize(self, x, y, w, h):
         assert self._override_redirect
+        w = max(1, w)
+        h = max(1, h)
         self.window.move_resize(x, y, w, h)
         self.new_backing(w, h)
 
