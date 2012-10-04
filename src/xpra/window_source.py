@@ -291,6 +291,8 @@ class WindowSource(object):
             the options may get quashed! So, specify a "batching"=False
             option to ensure no batching will occur for this request.
         """
+        if w==0 or h==0:
+            return
         now = time.time()
         coding = self.encoding
         def damage_now(reason):
@@ -453,6 +455,8 @@ class WindowSource(object):
             Called by 'damage_now' or 'send_delayed_regions' to process a damage region,
             we extract the rgb data from the pixmap and place it on the damage queue.
         """
+        if w==0 or h==0:
+            return
         process_damage_time = time.time()
         data = get_rgb_rawdata(damage_time, process_damage_time, self.wid, pixmap, x, y, w, h, coding, sequence, options)
         if data:
