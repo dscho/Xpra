@@ -13,7 +13,7 @@ import cairo
 from wimpiggy.log import Logger
 log = Logger()
 
-from threading import Lock
+from threading import RLock
 from xpra.scripts.main import ENCODINGS
 
 PREFER_CAIRO = False        #just for testing the CairoBacking with gtk2
@@ -38,7 +38,7 @@ class Backing(object):
             old_backing._video_decoder = None
         else:
             self._video_decoder = None
-            self._video_decoder_lock = Lock()
+            self._video_decoder_lock = RLock()
 
     def close(self):
         if self._video_decoder:
@@ -356,6 +356,6 @@ def new_backing(wid, w, h, old_backing, mmap_enabled, mmap):
             b = PixmapBacking(wid, w, h, old_backing, mmap_enabled, mmap)
     finally:
         if old_backing:
-            old_backing._video_decoder_lock.release()        
             old_backing.close()
+            old_backing._video_decoder_lock.release()        
     return b
