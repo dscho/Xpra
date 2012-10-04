@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.6.3
+%define version 0.6.4
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -87,6 +87,15 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Thu Oct 04 2012 Antoine Martin <antoine@nagafix.co.uk> 0.6.4-1
+- fix bencoder to properly handle dicts with non-string keys
+- fix swscale bug with windows that are too small by switch encoding
+- fix locking of video encoder resizing leading to missing video frames
+- fix crash with compression turned off: fix unicode encoding
+- fix lack of locking sometimes causing errors with "xpra info"
+- prevent races during setup and cleanup of network connections
+- take shortcut if there is nothing to send
+
 * Thu Sep 27 2012 Antoine Martin <antoine@nagafix.co.uk> 0.6.3-1
 - fix memory leak in server after client disconnection
 - fix launcher: clear socket timeout once connected and add missing options
