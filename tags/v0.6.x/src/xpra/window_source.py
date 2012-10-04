@@ -233,11 +233,14 @@ class WindowSource(object):
             batch_delays = [x for _,x in self.batch_config.last_delays]
             add_list_stats(info, "batch_delay"+suffix, batch_delays)
         if self._video_encoder is not None:
-            quality_list = [x for _, x in self._video_encoder_quality]
-            add_list_stats(info, self._video_encoder.get_type()+"_quality"+suffix, quality_list, show_percentile=False)
-            speed_list = [x for _, x in self._video_encoder_speed]
-            add_list_stats(info, self._video_encoder.get_type()+"_speed"+suffix, speed_list, show_percentile=False)
-
+            try:
+                self._video_encoder_lock.acquire()
+                quality_list = [x for _, x in self._video_encoder_quality]
+                add_list_stats(info, self._video_encoder.get_type()+"_quality"+suffix, quality_list, show_percentile=False)
+                speed_list = [x for _, x in self._video_encoder_speed]
+                add_list_stats(info, self._video_encoder.get_type()+"_speed"+suffix, speed_list, show_percentile=False)
+            finally:
+                self._video_encoder_lock.release()
 
     def may_calculate_batch_delay(self, window):
         """
