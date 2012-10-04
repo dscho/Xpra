@@ -345,6 +345,8 @@ class PixmapBacking(Backing):
 
 
 def new_backing(wid, w, h, old_backing, mmap_enabled, mmap):
+    w = max(1, w)
+    h = max(1, h)
     try:
         if old_backing:
             old_backing._video_decoder_lock.acquire()
