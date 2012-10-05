@@ -61,8 +61,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Thu Oct 04 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.11-1
+* Fri Oct 05 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.11-1
 - fix bencoder to properly handle dicts with non-string keys
+- fix password file handling: exceptions and ignore carriage returns
 - take shortcut if there is nothing to send
 
 * Tue Sep 25 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.10-1

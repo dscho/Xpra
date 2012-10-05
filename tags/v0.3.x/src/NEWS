@@ -1,7 +1,8 @@
-v0.3.11 (2012-10-04)
+v0.3.11 (2012-10-05)
 ======================
 	-- fix bencoder to properly handle dicts with non-string keys
 	-- take shortcut if there is nothing to send
+	-- fix password file handling: exceptions and ignore carriage returns
 
 
 v0.3.10 (2012-09-25)
