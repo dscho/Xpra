@@ -561,7 +561,7 @@ class ServerSource(object):
             time.sleep(0)
 
     def _process_damage_regions(self, wid, window, ww, wh, regions, coding, sequence, options):
-        if w==0 or h==0:
+        if ww==0 or wh==0:
             return
         if self._damage_cancelled.get(wid, 0)>=sequence:
             log("process_damage_regions: dropping damage request with sequence=%s", sequence)
