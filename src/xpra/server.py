@@ -2228,13 +2228,22 @@ class XpraServer(gobject.GObject):
                 xtest_fake_key(gtk.gdk.display_get_default(), keycode, True)
         self._key_repeat(wid, True, keyname, keyval, keycode, modifiers, self.key_repeat_interval)
 
+    def _process_mouse_common(self, proto, wid, pointer, modifiers):
+        self._make_keymask_match(modifiers, self.xkbmap_mod_pointermissing)
+        window = self._id_to_window.get(wid)
+        if not window:
+            log("_process_mouse_common() invalid window id: %s", wid)
+            return
+        def raise_and_move():
+            self._desktop_manager.raise_window(window)
+            self._move_pointer(pointer)
+        trap.call(raise_and_move)
+
     def _process_button_action(self, proto, packet):
-        (wid, button, pressed, pointer, modifiers) = packet[1:6]
-        self._make_keymask_match(modifiers, ignored_modifier_keynames=self.xkbmap_mod_pointermissing)
-        self._desktop_manager.raise_window(self._id_to_window[wid])
-        self._move_pointer(pointer)
+        wid, button, pressed, pointer, modifiers = packet[1:6]
+        self._process_mouse_common(proto, wid, pointer, modifiers)
         try:
-            trap.call_unsynced(xtest_fake_button,
+            trap.call_synced(xtest_fake_button,
                                gtk.gdk.display_get_default(),
                                button, pressed)
         except XError:
@@ -2243,13 +2252,8 @@ class XpraServer(gobject.GObject):
                      button)
 
     def _process_pointer_position(self, proto, packet):
-        (wid, pointer, modifiers) = packet[1:4]
-        self._make_keymask_match(modifiers, ignored_modifier_keynames=self.xkbmap_mod_pointermissing)
-        if wid in self._id_to_window:
-            self._desktop_manager.raise_window(self._id_to_window[wid])
-            self._move_pointer(pointer)
-        else:
-            log("_process_pointer_position() invalid window id: %s", wid)
+        wid, pointer, modifiers = packet[1:4]
+        self._process_mouse_common(proto, wid, pointer, modifiers)
 
     def _process_close_window(self, proto, packet):
         wid = packet[1]
