@@ -148,7 +148,6 @@ class Protocol(object):
         self._maybe_queue_more_writes()
 
     def source_has_more(self):
-        assert self.source is not None
         self._source_has_more = True
         self._maybe_queue_more_writes()
 
