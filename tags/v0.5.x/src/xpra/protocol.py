@@ -111,7 +111,6 @@ class Protocol(object):
         self._maybe_queue_more_writes()
 
     def source_has_more(self):
-        assert self.source is not None
         self._source_has_more = True
         if self._write_queue.empty():
             self._flush_one_packet_into_buffer()
