@@ -712,8 +712,9 @@ class XpraClient(XpraClientBase):
         self.send_now(["damage-sequence", packet_sequence, wid, width, height, decode_time])
 
     def _process_cursor(self, packet):
-        (_, new_cursor) = packet
-        set_windows_cursor(self._id_to_window.values(), new_cursor)
+        if len(packet)==2:
+            new_cursor = packet[1]
+            set_windows_cursor(self._id_to_window.values(), new_cursor)
 
     def _process_bell(self, packet):
         if not self.bell_enabled:
