@@ -325,7 +325,7 @@ def run_server(parser, opts, mode, xpra_file, extra_args):
         xvfb_executable = xvfb_cmd[0]
         xvfb_cmd[0] = "%s-for-Xpra-%s" % (xvfb_executable, display_name)
         try:
-            xvfb = subprocess.Popen(xvfb_cmd+[display_name], executable=xvfb_executable)
+            xvfb = subprocess.Popen(xvfb_cmd+[display_name], executable=xvfb_executable, close_fds=True)
         except OSError, e:
             sys.stderr.write("Error starting Xvfb: %s\n" % (e,))
             return  1
@@ -410,7 +410,7 @@ def run_server(parser, opts, mode, xpra_file, extra_args):
         children_pids = set()
         for child_cmd in opts.children:
             try:
-                children_pids.add(subprocess.Popen(child_cmd, shell=True).pid)
+                children_pids.add(subprocess.Popen(child_cmd, shell=True, close_fds=True).pid)
             except OSError, e:
                 sys.stderr.write("Error spawning child '%s': %s\n"
                                  % (child_cmd, e))
