@@ -1,0 +1,15 @@
+Description: For disabling the rencode packet encoder (in Cython).
+ Author: Antoine Martin <antoine@nagafix.co.uk>
+ Forwarded: not-needed
+ 
+--- a/setup.py
++++ b/setup.py
+@@ -52,7 +52,7 @@
+ 
+ 
+ 
+-rencode_ENABLED = True
++rencode_ENABLED = False
+ 
+ 
+ 
