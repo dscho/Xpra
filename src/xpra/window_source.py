@@ -8,8 +8,13 @@
 
 import os
 MAX_NONVIDEO_PIXELS = 512
+MAX_NONVIDEO_OR_INITIAL_PIXELS = 1024*64
 try:
     MAX_NONVIDEO_PIXELS = int(os.environ.get("XPRA_MAX_NONVIDEO_PIXELS", 2048))
+except:
+    pass
+try:
+    MAX_NONVIDEO_OR_INITIAL_PIXELS = int(os.environ.get("MAX_NONVIDEO_OR_INITIAL_PIXELS", 1024*64))
 except:
     pass
 
@@ -42,7 +47,7 @@ from xpra.deque import maxdeque
 from xpra.protocol import zlib_compress, Compressed
 from xpra.scripts.main import ENCODINGS
 from xpra.pixbuf_to_rgb import get_rgb_rawdata
-from xpra.maths import dec1, add_list_stats, add_weighted_list_stats, calculate_time_weighted_average
+from xpra.maths import dec1, add_list_stats, add_weighted_list_stats, calculate_time_weighted_average, calculate_timesize_weighted_average
 from xpra.batch_delay_calculator import calculate_batch_delay
 
 
@@ -102,6 +107,7 @@ class WindowPerformanceStatistics(object):
         self.damage_ack_pending = {}                    #records when damage packets are sent
                                                         #so we can calculate the "client_latency" when the client sends
                                                         #the corresponding ack ("damage-sequence" packet - see "client_ack_damage")
+        self.encoding_totals = {}                       #for each encoding, how many frames we sent and how many pixels in total
 
     def add_stats(self, info, suffix=""):
         #encoding stats:
@@ -132,16 +138,25 @@ class WindowPerformanceStatistics(object):
         add_list_stats(info, "damage_in_latency",  latencies)
         latencies = [x*1000 for _, _, _, x in list(self.damage_out_latency)]
         add_list_stats(info, "damage_out_latency",  latencies)
+        #per encoding totals:
+        for encoding, totals in self.encoding_totals.items():
+            info["total_frames%s[%s]" % (suffix, encoding)] = totals[0] 
+            info["total_pixels%s[%s]" % (suffix, encoding)] = totals[1] 
 
-    def get_target_client_latency(self, min_client_latency, avg_client_latency, abs_min=0.005):
+    def get_target_client_latency(self, min_client_latency, avg_client_latency, abs_min=0.010):
         """ geometric mean of the minimum (+20%) and average latency
-            but not higher than 60% above the minimum,
+            but not higher than twice more than the minimum,
             and not lower than abs_min.
+            Then we add the average decoding latency.
             """
+        decoding_latency = 0.010
+        if len(self.client_decode_time)>0:
+            decoding_latency, _ = calculate_timesize_weighted_average(list(self.client_decode_time))
+            decoding_latency /= 1000.0
         min_latency = (min_client_latency or abs_min)*1.2
         avg_latency = avg_client_latency or abs_min
-        max_latency = 1.6*min_latency
-        return max(abs_min, min(max_latency, sqrt(min_latency*avg_latency)))
+        max_latency = 2.0*min_latency
+        return max(abs_min, min(max_latency, sqrt(min_latency*avg_latency))) + decoding_latency
 
     def get_backlog(self, latency):
         packets_backlog, pixels_backlog, bytes_backlog = 0, 0, 0
@@ -183,7 +198,7 @@ class WindowSource(object):
                     wid, batch_config, auto_refresh_delay,
                     encoding, encodings,
                     default_damage_options,
-                    encoding_client_options, supports_rgb24zlib,
+                    encoding_client_options, supports_rgb24zlib, uses_swscale,
                     mmap, mmap_size):
         self.queue_damage = queue_damage                #callback to add damage data which is ready to compress to the damage processing queue
         self.queue_packet = queue_packet                #callback to add a network packet to the outgoing queue
@@ -196,10 +211,12 @@ class WindowSource(object):
                                                         #may change at runtime (ie: see ServerSource.set_quality)
         self.encoding_client_options = encoding_client_options  #does the client support encoding options?
         self.supports_rgb24zlib = supports_rgb24zlib    #supports rgb24 compression outside network layer (unwrapped)
+        self.uses_swscale = uses_swscale                #client uses uses_swscale (has extra limits on sizes)
         self.batch_config = batch_config
         #auto-refresh:
         self.auto_refresh_delay = auto_refresh_delay
         self.refresh_timer = None
+        self.timeout_timer = None
 
         # mmap:
         self._mmap = mmap
@@ -218,25 +235,32 @@ class WindowSource(object):
         self._damage_delayed_expired = False            #when this is True, the region should have expired
                                                         #but it is now waiting for the backlog to clear
         self._sequence = 1                              #increase with every region we process or delay
+        self._last_sequence_queued = 0                  #the latest sequence we queued for sending (after encoding it)
         self._damage_cancelled = 0                      #stores the highest _sequence cancelled
         self._damage_packet_sequence = 1                #increase with every damage packet created
 
     def cleanup(self):
         self.cancel_damage()
+        self.video_encoder_cleanup()
+        self._damage_cancelled = float("inf")
+        log("encoding_totals for wid=%s with primary encoding=%s : %s", self.wid, self.encoding, self.statistics.encoding_totals)
 
     def video_encoder_cleanup(self):
         """ Video encoders (x264 and vpx) require us to run
             cleanup code to free the memory they use.
         """
-        try:
-            self._video_encoder_lock.acquire()
-            if self._video_encoder:
-                self._video_encoder.clean()
-                self._video_encoder = None
-                self._video_encoder_speed = maxdeque(NRECS)
-                self._video_encoder_quality = maxdeque(NRECS)
-        finally:
-            self._video_encoder_lock.release()
+        if self._video_encoder:
+            try:
+                self._video_encoder_lock.acquire()
+                self.do_video_encoder_cleanup()
+            finally:
+                self._video_encoder_lock.release()
+
+    def do_video_encoder_cleanup(self):
+        self._video_encoder.clean()
+        self._video_encoder = None
+        self._video_encoder_speed = maxdeque(NRECS)
+        self._video_encoder_quality = maxdeque(NRECS)
 
     def set_new_encoding(self, encoding):
         """ Changes the encoder for the given 'window_ids',
@@ -255,15 +279,35 @@ class WindowSource(object):
         Damage methods will check this value via 'is_cancelled(sequence)'.
         """
         log("cancel_damage() wid=%s, dropping delayed region %s and all sequences up to %s", self.wid, self._damage_delayed, self._sequence)
-        #we must clean the video encoder to ensure
-        #we will resend key frames
-        self.video_encoder_cleanup()
+        #for those in flight, being processed in separate threads, drop by sequence:
+        self._damage_cancelled = self._sequence
+        self.cancel_expire_timer()
+        self.cancel_refresh_timer()
+        self.cancel_timeout_timer()
         #if a region was delayed, we can just drop it now:
         self._damage_delayed = None
         self._damage_delayed_expired = False
-        #for those in flight, being processed in separate threads, drop by sequence:
-        self._damage_cancelled = self._sequence
-        self.cancel_refresh_timer()
+        if self._last_sequence_queued<self._sequence:
+            #we must clean the video encoder to ensure
+            #we will resend a key frame because it looks like we will
+            #drop a frame which is being processed
+            self.video_encoder_cleanup()
+
+    def cancel_expire_timer(self):
+        if self.expire_timer:
+            gobject.source_remove(self.expire_timer)
+            self.expire_timer = None
+
+    def cancel_refresh_timer(self):
+        if self.refresh_timer:
+            gobject.source_remove(self.refresh_timer)
+            self.refresh_timer = None
+
+    def cancel_timeout_timer(self):
+        if self.timeout_timer:
+            gobject.source_remove(self.timeout_timer)
+            self.timeout_timer = None
+
 
     def is_cancelled(self, sequence):
         """ See cancel_damage(wid) """
@@ -281,10 +325,14 @@ class WindowSource(object):
             batch_delays = [x for _,x in list(self.batch_config.last_delays)]
             add_list_stats(info, "batch_delay"+suffix, batch_delays)
         if self._video_encoder is not None:
-            quality_list = [x for _, x in list(self._video_encoder_quality)]
-            add_list_stats(info, self._video_encoder.get_type()+"_quality"+suffix, quality_list, show_percentile=False)
-            speed_list = [x for _, x in list(self._video_encoder_speed)]
-            add_list_stats(info, self._video_encoder.get_type()+"_speed"+suffix, speed_list, show_percentile=False)
+            try:
+                self._video_encoder_lock.acquire()
+                quality_list = [x for _, x in list(self._video_encoder_quality)]
+                add_list_stats(info, self._video_encoder.get_type()+"_quality"+suffix, quality_list, show_percentile=False)
+                speed_list = [x for _, x in list(self._video_encoder_speed)]
+                add_list_stats(info, self._video_encoder.get_type()+"_speed"+suffix, speed_list, show_percentile=False)
+            finally:
+                self._video_encoder_lock.release()
 
 
     def may_calculate_batch_delay(self, window):
@@ -311,19 +359,6 @@ class WindowSource(object):
             #force batching: set it just above min_delay
             self.batch_config.delay = max(self.batch_config.min_delay+0.01, self.batch_config.delay)
 
-    def get_window_pixmap(self, window, sequence):
-        """ Grabs the window's context (pixels) as a pixmap """
-        # It's important to acknowledge changes *before* we extract them,
-        # to avoid a race condition.
-        window.acknowledge_changes()
-        if self.is_cancelled(sequence):
-            log("get_window_pixmap: dropping damage request with sequence=%s", sequence)
-            return  None
-        pixmap = window.get_property("client-contents")
-        if pixmap is None and not self.is_cancelled(sequence):
-            log.error("get_window_pixmap: wtf, pixmap is None for window %s, wid=%s", window, self.wid)
-        return pixmap
-
     def get_packets_backlog(self):
         target_latency = self.statistics.get_target_client_latency(self.global_statistics.min_client_latency, self.global_statistics.avg_client_latency)
         packets_backlog, _, _ = self.statistics.get_backlog(target_latency)
@@ -343,6 +378,10 @@ class WindowSource(object):
             otherwise they are only merged.
         """
         self.may_calculate_batch_delay(window)
+        if w==0 or h==0:
+            #we may fire damage ourselves,
+            #in which case the dimensions may be zero (if so configured by the client)
+            return
 
         if self._damage_delayed:
             #use existing delayed region:
@@ -363,7 +402,11 @@ class WindowSource(object):
         if packets_backlog==0 and not self.batch_config.always and self.batch_config.delay<=self.batch_config.min_delay:
             #send without batching:
             log("damage(%s, %s, %s, %s, %s) wid=%s, sending now with sequence %s", x, y, w, h, options, self.wid, self._sequence)
-            self.process_damage_region(now, window, x, y, w, h, self.encoding, options)
+            actual_encoding = self.get_best_encoding(window.is_OR(), w*h, w, h, self.encoding)
+            if actual_encoding in ("x264", "vpx"):
+                w, h = window.get_dimensions()
+                x, y = 0, 0
+            self.process_damage_region(now, window, x, y, w, h, actual_encoding, options)
             self.batch_config.last_delays.append((now, 0))
             self.batch_config.last_actual_delays.append((now, 0))
             return
@@ -375,12 +418,13 @@ class WindowSource(object):
         self._damage_delayed = now, window, region, self.encoding, options or {}
         log("damage(%s, %s, %s, %s, %s) wid=%s, scheduling batching expiry for sequence %s in %s ms", x, y, w, h, options, self.wid, self._sequence, dec1(self.batch_config.delay))
         self.batch_config.last_delays.append((now, self.batch_config.delay))
-        gobject.timeout_add(int(self.batch_config.delay), self.expire_delayed_region)
+        self.expire_timer = gobject.timeout_add(int(self.batch_config.delay), self.expire_delayed_region)
 
     def expire_delayed_region(self):
         """ mark the region as expired so damage_packet_acked can send it later,
             and try to send it now.
         """
+        self.expire_timer = None
         self._damage_delayed_expired = True
         self.may_send_delayed()
         if self._damage_delayed:
@@ -389,15 +433,17 @@ class WindowSource(object):
             #when we eventually receive the pending ACKs
             #but if somehow they go missing... try with a timer:
             delayed_region_time = self._damage_delayed[0]
-            def delayed_region_timeout():
-                if self._damage_delayed:
-                    region_time = self._damage_delayed[0]
-                    if region_time==delayed_region_time:
-                        #same region!
-                        log.warn("delayed_region_timeout: sending now - something is wrong!")
-                        self.do_send_delayed_region()
-                return False
-            gobject.timeout_add(self.batch_config.max_delay, delayed_region_timeout)
+            self.timeout_timer = gobject.timeout_add(self.batch_config.max_delay, self.delayed_region_timeout, delayed_region_time)
+
+    def delayed_region_timeout(self, delayed_region_time):
+        self.timeout_timer = None
+        if self._damage_delayed:
+            region_time = self._damage_delayed[0]
+            if region_time==delayed_region_time:
+                #same region!
+                log.warn("delayed_region_timeout: sending now - something is wrong!")
+                self.do_send_delayed_region()
+        return False
 
     def may_send_delayed(self):
         """ send the delayed region for processing if there is no client backlog """
@@ -423,6 +469,7 @@ class WindowSource(object):
         return False
     
     def do_send_delayed_region(self):
+        self.cancel_timeout_timer()
         delayed = self._damage_delayed
         self._damage_delayed = None
         self.send_delayed_regions(*delayed)
@@ -437,7 +484,8 @@ class WindowSource(object):
         regions = []
         ww,wh = window.get_dimensions()
         def send_full_screen_update(actual_encoding):
-            log("send_delayed_regions: using full screen update")
+            actual_encoding = self.get_best_encoding(window.is_OR(), pixel_count, ww, wh, coding)
+            log("send_delayed_regions: using full screen update with %s", actual_encoding)
             self.process_damage_region(damage_time, window, 0, 0, ww, wh, actual_encoding, options)
 
         try:
@@ -466,35 +514,44 @@ class WindowSource(object):
                     break
             log("send_delayed_regions: to regions: %s items, %s pixels", len(regions), pixel_count)
         except Exception, e:
-            log.error("send_delayed_regions: error processing region %s: %s", damage, e)
+            log.error("send_delayed_regions: error processing region %s: %s", damage, e, exc_info=True)
             return
 
-        actual_encoding = self.get_best_encoding(pixel_count, ww, wh, coding)
+        actual_encoding = self.get_best_encoding(window.is_OR(), pixel_count, ww, wh, coding)
         if actual_encoding in ("x264", "vpx"):
-            send_full_screen_update(actual_encoding)
+            #use full screen dimensions:
+            self.process_damage_region(damage_time, window, 0, 0, ww, wh, actual_encoding, options)
             return
 
+        #we're processing a number of regions with a non video encoding:
         for region in regions:
             x, y, w, h = region
             self.process_damage_region(damage_time, window, x, y, w, h, actual_encoding, options)
 
-    def get_best_encoding(self, pixel_count, ww, wh, current_encoding):
-        #decide whether we send a full screen update
-        #using the video encoder or if small region(s) will do:
+    def get_best_encoding(self, is_OR, pixel_count, ww, wh, current_encoding):
+        """
+            decide whether we send a full screen update
+            using the video encoder or if a small lossless region(s) is a better choice
+        """
         if current_encoding not in ("x264", "vpx"):
             return current_encoding
         def switch():
-            coding = self.find_common_lossless_encoder(current_encoding)
+            coding = self.find_common_lossless_encoder(current_encoding, ww*wh)
             log("temporarily switching to %s encoder for %s pixels", coding, pixel_count)
             return  coding
-        if ww==1 or wh==1:
-            #x264 cannot handle 1 pixel wide/high areas
-            #(as dimensions are rounded to an even number)
-            #vpx can, but swscale has problems
-            return  switch()
+        if self._sequence==1 and is_OR and pixel_count<MAX_NONVIDEO_OR_INITIAL_PIXELS:
+            #first frame of a small-ish OR window, those are generally short lived
+            #so delay using a video encoder until the next frame:
+            return switch()
+        if current_encoding=="x264":
+            #x264 needs sizes divisible by 2:
+            ww = ww & 0xFFFE
+            wh = wh & 0xFFFE
+        if self.uses_swscale and (ww<8 or wh<=2):
+            return switch()
         if pixel_count<ww*wh*0.01:
             #less than one percent of total area
-            return  switch()
+            return switch()
         if pixel_count>MAX_NONVIDEO_PIXELS:
             #too many pixels, use current video encoder
             return current_encoding
@@ -503,8 +560,12 @@ class WindowSource(object):
             return current_encoding
         return switch()
 
-    def find_common_lossless_encoder(self, fallback):
-        for e in ("png", "rgb24"):
+    def find_common_lossless_encoder(self, fallback, pixel_count):
+        if pixel_count<512:
+            encs = "rgb24", "png"
+        else:
+            encs = "png", "rgb24"
+        for e in encs:
             if e in ENCODINGS and e in self.encodings:
                 return e
         return fallback
@@ -515,17 +576,26 @@ class WindowSource(object):
             we extract the rgb data from the pixmap and place it on the damage queue.
             This runs in the UI thread.
         """
-        self._sequence += 1
-        pixmap = self.get_window_pixmap(window, self._sequence)
-        if not pixmap:
+        if w==0 or h==0:
             return
-        ww, wh = window.get_dimensions()
-        actual_encoding = self.get_best_encoding(w*h, ww, wh, coding)
-        if actual_encoding in ("x264", "vpx"):
-            x, y = 0, 0
-            w, h = ww, wh
+        # It's important to acknowledge changes *before* we extract them,
+        # to avoid a race condition.
+        if not window.is_managed():
+            log.warn("the window %s is not composited!?", window)
+            return
+        window.acknowledge_changes()
+
+        self._sequence += 1
+        sequence = self._sequence
+        pixmap = window.get_property("client-contents")
+        if self.is_cancelled(sequence):
+            log("get_window_pixmap: dropping damage request with sequence=%s", sequence)
+            return  None
+        if pixmap is None:
+            log.error("get_window_pixmap: wtf, pixmap is None for window %s, wid=%s", window, self.wid)
+            return
         process_damage_time = time.time()
-        data = get_rgb_rawdata(damage_time, process_damage_time, self.wid, pixmap, x, y, w, h, actual_encoding, self._sequence, options)
+        data = get_rgb_rawdata(damage_time, process_damage_time, self.wid, pixmap, x, y, w, h, coding, sequence, options)
         if not data:
             return
         log("process_damage_regions: adding pixel data %s to queue, elapsed time: %s ms", data[:6], dec1(1000*(time.time()-damage_time)))
@@ -535,7 +605,7 @@ class WindowSource(object):
             if packet:
                 self.queue_damage_packet(pixmap, packet, damage_time, process_damage_time)
                 #auto-refresh:
-                if self.auto_refresh_delay>0:
+                if self.auto_refresh_delay>0 and not self.is_cancelled(sequence):
                     client_options = packet[10]     #info about this packet from the encoder
                     gobject.idle_add(self.schedule_auto_refresh, window, w, h, self.encoding, options, client_options)
         self.queue_damage(make_data_packet)
@@ -578,11 +648,6 @@ class WindowSource(object):
         delay = max(self.auto_refresh_delay, int(1000*self.batch_config.delay))
         log("schedule_auto_refresh: low quality (%s%%) with %s pixels, (re)scheduling auto refresh timer with delay %s", actual_quality, w*h, delay)
         self.refresh_timer = gobject.timeout_add(delay, full_quality_refresh)
-
-    def cancel_refresh_timer(self):
-        if self.refresh_timer:
-            gobject.source_remove(self.refresh_timer)
-            self.refresh_timer = None
 
     def queue_damage_packet(self, pixmap, packet, damage_time, process_damage_time):
         """
@@ -644,8 +709,9 @@ class WindowSource(object):
 
             * 'mmap' will use 'mmap_send' - always if available, otherwise:
             * 'jpeg' and 'png' are handled by 'PIL_encode'.
+            * 'webp' uses 'webp_encode'
             * 'x264' and 'vpx' use 'video_encode'
-            * 'rgb24' uses the 'Compressed' wrapper to tell the network layer it is already zlibbed
+            * 'rgb24' uses 'rgb24_encode' and the 'Compressed' wrapper to tell the network layer it is already zlibbed
         """
         if self.is_cancelled(sequence):
             log("make_data_packet: dropping data packet for window %s with sequence=%s", wid, sequence)
@@ -665,8 +731,7 @@ class WindowSource(object):
             #x264 needs sizes divisible by 2:
             w = w & 0xFFFE
             h = h & 0xFFFE
-            if w==0 or h==0:
-                return None
+            assert w>0 and h>0
             data, client_options = self.video_encode(wid, x, y, w, h, coding, data, rowstride, options)
         elif coding=="vpx":
             data, client_options = self.video_encode(wid, x, y, w, h, coding, data, rowstride, options)
@@ -688,6 +753,11 @@ class WindowSource(object):
         end = time.time()
         self._damage_packet_sequence += 1
         self.statistics.encoding_stats.append((coding, w*h, len(data), end-start))
+        #record number of frames and pixels:
+        totals = self.statistics.encoding_totals.setdefault(coding, [0, 0])
+        totals[0] = totals[0] + 1
+        totals[1] = totals[1] + w*h
+        self._last_sequence_queued = sequence
         return packet
 
     def webp_encode(self, w, h, data, rowstride, options):
@@ -757,7 +827,7 @@ class WindowSource(object):
             if self._video_encoder:
                 if self._video_encoder.get_type()!=coding:
                     log("video_encode: switching from %s to %s", self._video_encoder.get_type(), coding)
-                    self.video_encoder_cleanup()
+                    self.do_video_encoder_cleanup()
                 elif self._video_encoder.get_width()!=w or self._video_encoder.get_height()!=h:
                     log("%s: window dimensions have changed from %sx%s to %sx%s", coding, self._video_encoder.get_width(), self._video_encoder.get_height(), w, h)
                     old_pc = self._video_encoder.get_width() * self._video_encoder.get_height()

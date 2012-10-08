@@ -179,7 +179,14 @@ def main(script_file, cmdline):
         return parse_or_use_default(varname, default_value, int)
     def float_default(varname, default_value):
         return parse_or_use_default(varname, default_value, float)
-        
+    def string_list(varname, default_value):
+        v = defaults.get(varname)
+        if v is None:
+            return default_value
+        if type(v)==list:
+            return v
+        return [str(v)]
+
     if XPRA_LOCAL_SERVERS_SUPPORTED:
         start_str = "\t%prog start DISPLAY\n"
         list_str = "\t%prog list\n"
@@ -208,7 +215,7 @@ def main(script_file, cmdline):
         group = OptionGroup(parser, "Server Options",
                     "These options are only relevant on the server when using the 'start' or 'upgrade' mode.")
         group.add_option("--start-child", action="append",
-                          dest="children", metavar="CMD", default=defaults.get("start-child", ""),
+                          dest="children", metavar="CMD", default=string_list("start-child", [""]),
                           help="program to spawn in new server (may be repeated) (default: '%default')")
         group.add_option("--exit-with-children", action="store_true",
                           dest="exit_with_children", default=False,
@@ -305,6 +312,9 @@ def main(script_file, cmdline):
 
     group = OptionGroup(parser, "Client Features Options",
                 "These options control client features that affect the appearance or the keyboard.")
+    group.add_option("--no-windows", action="store_false",
+                      dest="windows_enabled", default=True,
+                      help="Tells the server not to send any window data, only notifications and bell events will be forwarded - if enabled.")
     group.add_option("--session-name", action="store",
                       dest="session_name", default=None,
                       help="The name of this session, which may be used in notifications, menus, etc. Default: Xpra")
@@ -336,7 +346,7 @@ def main(script_file, cmdline):
                       help="The file containing the password required to connect (useful to secure TCP mode)")
     group.add_option("--dpi", action="store",
                       dest="dpi", default=int_default("dpi", 96),
-                      help="The 'dots per inch' value that client applications should try to honour (default: %s)")
+                      help="The 'dots per inch' value that client applications should try to honour (default: %default)")
     default_socket_dir = defaults.get("socket-dir")
     default_socket_dir_str = default_socket_dir or "$XPRA_SOCKET_DIR or '~/.xpra'"
     group.add_option("--socket-dir", action="store",
@@ -487,7 +497,10 @@ def parse_display_name(parser, opts, display_name):
         desc["type"] = "tcp"
         desc["local"] = False
         parts = display_name.split(separator)
-        desc["port"] = int(parts[-1])
+        port = int(parts[-1])
+        if port<=0 or port>=65536:
+            parser.error("invalid port number: %s" % port)
+        desc["port"] = port
         desc["host"] = separator.join(parts[1:-1])
         if desc["host"] == "":
             desc["host"] = "127.0.0.1"
@@ -595,12 +608,13 @@ def run_client(parser, opts, extra_args, mode):
             sys.stdout.flush()
     app.connect("received-gibberish", got_gibberish_msg)
     def handshake_complete(*args):
+        from wimpiggy.log import Logger
+        log = Logger()
         if mode=="detach":
-            sys.stdout.write("handshake-complete: detaching")
+            log.info("handshake-complete: detaching")
             app.quit(0)
         elif mode=="attach":
-            sys.stdout.write("Attached to %s (press Control-C to detach)\n" % conn.target)
-            sys.stdout.flush()
+            log.info("Attached to %s (press Control-C to detach)\n" % conn.target)
     app.connect("handshake-complete", handshake_complete)
     def client_SIGINT(*args):
         print("received SIGINT, closing")

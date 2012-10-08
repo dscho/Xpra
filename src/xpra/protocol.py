@@ -119,13 +119,15 @@ class Protocol(object):
         info["output_raw_packetcount%s" % suffix] = self.output_raw_packetcount
 
     def start(self):
-        self._write_thread.start()
-        self._read_thread.start()
-        self._read_parser_thread.start()
-        self._maybe_queue_more_writes()
+        def do_start():
+            if not self._closed:
+                self._write_thread.start()
+                self._read_thread.start()
+                self._read_parser_thread.start()
+                self._maybe_queue_more_writes()
+        gobject.idle_add(do_start)
 
     def source_has_more(self):
-        assert self.source is not None
         self._source_has_more = True
         if self._write_queue.empty():
             self._flush_one_packet_into_buffer()
@@ -163,7 +165,7 @@ class Protocol(object):
                 self.do_verify_packet(new_tree("value for key='%s'" % str(k)), v)
 
     def _flush_one_packet_into_buffer(self):
-        if not self.source:
+        if not self.source or self._closed:
             return
         packet, start_send_cb, end_send_cb, self._source_has_more = self.source.next_packet()
         if packet is not None:
@@ -218,7 +220,8 @@ class Protocol(object):
         #now the main packet (or what is left of it):
         try:
             main_packet, proto_version = self._encoder(packet)
-        except KeyError or TypeError, e:
+        except (KeyError, TypeError), e:
+            log.error("failed to encode packet: %s", packet)
             import traceback
             traceback.print_exc()
             self.verify_packet(packet)
@@ -291,11 +294,11 @@ class Protocol(object):
                 except (OSError, IOError, socket.error), e:
                     self._call_connection_lost("Error writing to connection: %s" % e)
                     break
-                except TypeError:
+                except Exception, e:
                     #can happen during close(), in which case we just ignore:
                     if self._closed:
                         break
-                    raise
+                    raise e
                 if self._write_queue.empty() and not self._closed:
                     gobject.idle_add(self._maybe_queue_more_writes)
                 NOYIELD or time.sleep(0)
@@ -311,9 +314,10 @@ class Protocol(object):
                 except (ValueError, OSError, IOError, socket.error), e:
                     self._call_connection_lost("Error reading from connection: %s" % e)
                     return
-                except TypeError:
-                    assert self._closed
-                    return
+                except Exception, e:
+                    if self._closed:
+                        return
+                    raise e
                 #log("read thread: got data of size %s: %s", len(buf), repr_ellipsized(buf))
                 self._read_queue.put(buf)
                 if not buf:
@@ -495,8 +499,11 @@ class Protocol(object):
             except:
                 log.error("error closing %s", self._conn, exc_info=True)
         self.terminate_io_threads()
-        self.source = None
+        gobject.idle_add(self.clean)
+    
+    def clean(self):
         #clear all references to ensure we can get garbage collected quickly:
+        self.source = None
         self._encoder = None
         self._write_thread = None
         self._read_thread = None

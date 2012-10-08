@@ -34,7 +34,6 @@ from wimpiggy.util import (AdHocStruct,
 from wimpiggy.lowlevel import (xtest_fake_key,              #@UnresolvedImport
                                xtest_fake_button,           #@UnresolvedImport
                                set_key_repeat_rate,         #@UnresolvedImport
-                               ungrab_all_keys,             #@UnresolvedImport
                                unpress_all_keys,            #@UnresolvedImport
                                is_override_redirect,        #@UnresolvedImport
                                is_mapped,                   #@UnresolvedImport
@@ -45,11 +44,10 @@ from wimpiggy.lowlevel import (xtest_fake_key,              #@UnresolvedImport
                                set_screen_size,             #@UnresolvedImport
                                get_screen_size,             #@UnresolvedImport
                                init_x11_filter,             #@UnresolvedImport
-                               get_xatom                    #@UnresolvedImport
+                               get_xatom,                   #@UnresolvedImport
                                )
 from wimpiggy.prop import prop_set, set_xsettings_format
 from wimpiggy.window import OverrideRedirectWindowModel, Unmanageable
-from wimpiggy.keys import grok_modifier_map
 from wimpiggy.error import XError, trap
 
 from wimpiggy.log import Logger
@@ -60,9 +58,8 @@ from xpra.server_source import ServerSource
 from xpra.pixbuf_to_rgb import get_rgb_rawdata
 from xpra.bytestreams import SocketConnection
 from xpra.protocol import Protocol, zlib_compress, has_rencode
-from xpra.keys import mask_to_names, get_gtk_keymap, DEFAULT_MODIFIER_NUISANCE, ALL_X11_MODIFIERS
-from xpra.xkbhelper import do_set_keymap, set_all_keycodes, set_modifiers_from_meanings, clear_modifiers, set_modifiers_from_keycodes
 from xpra.platform.gdk_clipboard import GDKClipboardProtocolHelper
+from xpra.xkbhelper import clean_keyboard_state
 from xpra.xposix.xsettings import XSettingsManager
 from xpra.scripts.main import ENCODINGS
 from xpra.version_util import is_compatible_with, add_version_info, add_gtk_version_info
@@ -121,7 +118,7 @@ class DesktopManager(gtk.Widget):
         return self._models[model].shown
 
     def raise_window(self, model):
-        if isinstance(model, OverrideRedirectWindowModel):
+        if model.is_OR():
             model.get_property("client-window").raise_()
         else:
             window = self._models[model].window
@@ -228,15 +225,10 @@ class XpraServer(gobject.GObject):
                 self._add_new_or_window(window)
 
         ## These may get set by the client:
-        self.xkbmap_layout = None
-        self.xkbmap_variant = None
-        self.xkbmap_print = None
-        self.xkbmap_query = None
         self.xkbmap_mod_meanings = {}
-        self.xkbmap_mod_managed = None
-        self.keycode_translation = {}
-        self.keymap_changing = False
-        self.keyboard = True
+
+        self.keyboard_config = None
+        self.keymap_changing = False            #to ignore events when we know we are changing the configuration
         self.keyboard_sync = True
         self.key_repeat_delay = -1
         self.key_repeat_interval = -1
@@ -249,16 +241,10 @@ class XpraServer(gobject.GObject):
         self.keys_timedout = {}
         #timers for cancelling key repeat when we get jitter
         self.keys_repeat_timers = {}
-        ### Set up keymap:
-        self.xkbmap_initial = get_gtk_keymap()
-        self._keymap = gtk.gdk.keymap_get_default()
-        self._keymap.connect("keys-changed", self._keys_changed)
-        self._keys_changed()
-
-        self._keynames_for_mod = None
+        ### Set up keymap change notification:
+        gtk.gdk.keymap_get_default().connect("keys-changed", self._keys_changed)
         #clear all modifiers
-        self.clean_keyboard_state()
-        self._make_keymask_match([])
+        clean_keyboard_state()
 
         ### Clipboard handling:
         self._clipboard_helper = None
@@ -304,7 +290,11 @@ class XpraServer(gobject.GObject):
                 if self.notifications_forwarder:
                     log.info("using notification forwarder: %s", self.notifications_forwarder)
             except Exception, e:
-                log.error("error loading or registering our dbus notifications forwarder: %s", e)
+                log.error("error loading or registering our dbus notifications forwarder:")
+                log.error("  %s", e)
+                log.info("if you do not have a dedicated dbus session for this xpra instance,")
+                log.info("  you should use the '--no-notifications' flag")
+                log.info("")
 
         ### All right, we're ready to accept customers:
         for sock in sockets:
@@ -331,70 +321,6 @@ class XpraServer(gobject.GObject):
                           "_NET_WM_WINDOW_TYPE_NORMAL"
                           ]:
             get_xatom(atom_name)
-
-    def clean_keyboard_state(self):
-        try:
-            ungrab_all_keys(gtk.gdk.get_default_root_window())
-        except:
-            log.error("error ungrabbing keys", exc_info=True)
-        try:
-            unpress_all_keys(gtk.gdk.get_default_root_window())
-        except:
-            log.error("error unpressing keys", exc_info=True)
-
-    def set_keymap(self):
-        try:
-            #prevent _keys_changed() from firing:
-            #(using a flag instead of keymap.disconnect(handler) as this did not seem to work!)
-            self.keymap_changing = True
-            self.clean_keyboard_state()
-            try:
-                do_set_keymap(self.xkbmap_layout, self.xkbmap_variant,
-                              self.xkbmap_print, self.xkbmap_query)
-            except:
-                log.error("error setting new keymap", exc_info=True)
-            try:
-                #first clear all existing modifiers:
-                self.clean_keyboard_state()
-                modifiers = ALL_X11_MODIFIERS.keys()  #just clear all of them (set or not)
-                clear_modifiers(modifiers)
-
-                #now set all the keycodes:
-                self.clean_keyboard_state()
-                self.keycode_translation = {}
-                self._keynames_for_mod = None
-                if self.keyboard:
-                    assert self.xkbmap_keycodes and len(self.xkbmap_keycodes)>0, "client failed to provide xkbmap_keycodes!"
-                    #if the client does not provide a full keymap,
-                    #try to preserve the initial server keycodes
-                    #(used by non X11 clients like osx,win32 or Android)
-                    preserve_keycodes = {}
-                    if not self.xkbmap_print:
-                        preserve_keycodes = self.xkbmap_initial
-                    self.keycode_translation = set_all_keycodes(self.xkbmap_keycodes, preserve_keycodes)
-
-                    #now set the new modifier mappings:
-                    self.clean_keyboard_state()
-                    log("going to set modifiers, xkbmap_mod_meanings=%s, len(xkbmap_keycodes)=%s", self.xkbmap_mod_meanings, len(self.xkbmap_keycodes or []))
-                    if self.xkbmap_mod_meanings:
-                        #Unix-like OS provides modifier meanings:
-                        self._keynames_for_mod = set_modifiers_from_meanings(self.xkbmap_mod_meanings)
-                    elif self.xkbmap_keycodes:
-                        #non-Unix-like OS provides just keycodes for now:
-                        self._keynames_for_mod = set_modifiers_from_keycodes(self.xkbmap_keycodes)
-                    else:
-                        log.error("missing both xkbmap_mod_meanings and xkbmap_keycodes, modifiers will probably not work as expected!")
-                    log("keyname_for_mod=%s", self._keynames_for_mod)
-            except:
-                log.error("error setting xmodmap", exc_info=True)
-        finally:
-            # re-enable via idle_add to give all the pending
-            # events a chance to run first (and get ignored)
-            def reenable_keymap_changes(*args):
-                self.keymap_changing = False
-                self._keys_changed()
-            gobject.idle_add(reenable_keymap_changes)
-
 
     def add_listen_socket(self, sock):
         sock.listen(5)
@@ -433,7 +359,7 @@ class XpraServer(gobject.GObject):
             sock.close()
             return  True
         sc = SocketConnection(sock, sock.getsockname(), address, sock.getpeername())
-        log.info("New connection received: %s, peer=%s", sc, sc.target)
+        log.info("New connection received: %s", sc)
         protocol = Protocol(sc, self.process_packet)
         protocol.set_compression_level(self.compression_level)
         self._potential_protocols.append(protocol)
@@ -444,10 +370,6 @@ class XpraServer(gobject.GObject):
                 self.send_disconnect(protocol, "login timeout")
         gobject.timeout_add(10*1000, verify_connection_accepted, protocol)
         return True
-
-    def _keys_changed(self, *args):
-        if not self.keymap_changing:
-            self._modifier_map = grok_modifier_map(gtk.gdk.display_get_default(), self.xkbmap_mod_meanings)
 
     def _window_resized_signaled(self, wm, window):
         nw,nh = window.get_property("actual-size")
@@ -643,108 +565,26 @@ class XpraServer(gobject.GObject):
             return {"window-type" : wts}
         raise Exception("unhandled property name: %s" % propname)
 
-    def _make_keymask_match(self, modifier_list, ignored_modifier_keycode=None, ignored_modifier_keynames=None):
-        """
-            Given a list of modifiers that should be set, try to press the right keys
-            to make the server's modifier list match it.
-            Things to take into consideration:
-            * xkbmap_mod_managed is a list of modifiers which are "server-managed":
-                these never show up in the client's modifier list as it is not aware of them,
-                so we just always leave them as they are and rely on some client key event to toggle them.
-                ie: "num" on win32, which is toggled by the "Num_Lock" key presses.
-            * when called from '_handle_key', we ignore the modifier key which may be pressed
-                or released as it should be set by that key press event.
-            * when called from mouse position/click events we ignore 'xkbmap_mod_pointermissing'
-                which is set by the client to indicate modifiers which are missing from mouse events.
-                ie: on win32, "lock" is missing.
-            * if the modifier is a "nuisance" one ("lock", "num", "scroll") then we must
-                simulate a full keypress (down then up).
-            * some modifiers can be set by multiple keys ("shift" by both "Shift_L" and "Shift_R" for example)
-                so we try to find the matching modifier in the currently pressed keys (keys_pressed)
-                to make sure we unpress the right one.
-        """
-        if not self.keyboard:
-            return
-        if not self._keynames_for_mod:
-            log("make_keymask_match: ignored as keynames_for_mod not assigned yet")
-            return
 
-        def get_keycodes(keyname):
-            keyval = gtk.gdk.keyval_from_name(keyname)
-            if keyval==0:
-                log.error("no keyval found for %s", keyname)
-                return  []
-            entries = self._keymap.get_entries_for_keyval(keyval)
-            keycodes = []
-            if entries:
-                for _keycode,_group,_level in entries:
-                    keycodes.append(_keycode)
-            return  keycodes
+    def set_keymap(self, server_source):
+        try:
+            #prevent _keys_changed() from firing:
+            #(using a flag instead of keymap.disconnect(handler) as this did not seem to work!)
+            self.keymap_changing = True
 
-        def get_current_mask():
-            (_, _, current_mask) = gtk.gdk.get_default_root_window().get_pointer()
-            modifiers = mask_to_names(current_mask, self._modifier_map)
-            log("get_modifier_mask()=%s", modifiers)
-            return modifiers
-        current = set(get_current_mask())
-        wanted = set(modifier_list)
-        log("make_keymask_match(%s) current mask: %s, wanted: %s, ignoring=%s/%s, keys_pressed=%s", modifier_list, current, wanted, ignored_modifier_keycode, ignored_modifier_keynames, self.keys_pressed)
-        display = gtk.gdk.display_get_default()
+            self.keyboard_config = server_source.set_keymap(self.keyboard_config, self.keys_pressed)
+        finally:
+            # re-enable via idle_add to give all the pending
+            # events a chance to run first (and get ignored)
+            def reenable_keymap_changes(*args):
+                self.keymap_changing = False
+                self._keys_changed()
+            gobject.idle_add(reenable_keymap_changes)
 
-        def change_mask(modifiers, press, info):
-            for modifier in modifiers:
-                if self.xkbmap_mod_managed and modifier in self.xkbmap_mod_managed:
-                    log("modifier is server managed: %s", modifier)
-                    continue
-                keynames = self._keynames_for_mod.get(modifier)
-                if not keynames:
-                    log.error("unknown modifier: %s", modifier)
-                    continue
-                if ignored_modifier_keynames:
-                    for imk in ignored_modifier_keynames:
-                        if imk in keynames:
-                            log("modifier %s ignored (ignored keyname=%s)", modifier, imk)
-                            continue
-                keycodes = []
-                #log.info("keynames(%s)=%s", modifier, keynames)
-                for keyname in keynames:
-                    if keyname in self.keys_pressed.values():
-                        #found the key which was pressed to set this modifier
-                        for keycode, name in self.keys_pressed.items():
-                            if name==keyname:
-                                log("found the key pressed for %s: %s", modifier, name)
-                                keycodes.insert(0, keycode)
-                    kcs = get_keycodes(keyname)
-                    for kc in kcs:
-                        if kc not in keycodes:
-                            keycodes.append(kc)
-                if ignored_modifier_keycode is not None and ignored_modifier_keycode in keycodes:
-                    log("modifier %s ignored (ignored keycode=%s)", modifier, ignored_modifier_keycode)
-                    continue
-                #nuisance keys (lock, num, scroll) are toggled by a
-                #full key press + key release (so act accordingly in the loop below)
-                nuisance = modifier in DEFAULT_MODIFIER_NUISANCE
-                log("keynames(%s)=%s, keycodes=%s, nuisance=%s", modifier, keynames, keycodes, nuisance)
-                for keycode in keycodes:
-                    if nuisance:
-                        xtest_fake_key(display, keycode, True)
-                        xtest_fake_key(display, keycode, False)
-                    else:
-                        xtest_fake_key(display, keycode, press)
-                    new_mask = get_current_mask()
-                    #log("make_keymask_match(%s) %s modifier %s using %s: %s", info, modifier_list, modifier, keycode, (modifier not in new_mask))
-                    if (modifier in new_mask)==press:
-                        break
-                    elif not nuisance:
-                        log("%s %s with keycode %s did not work - trying to undo it!", info, modifier, keycode)
-                        xtest_fake_key(display, keycode, not press)
-                        new_mask = get_current_mask()
-                        #maybe doing the full keypress (down+up or u+down) worked:
-                        if (modifier in new_mask)==press:
-                            break
-
-        change_mask(current.difference(wanted), False, "remove")
-        change_mask(wanted.difference(current), True, "add")
+    def _keys_changed(self, *args):
+        if not self.keymap_changing:
+            for ss in self._server_sources.values():
+                ss.keys_changed()
 
     def _clear_keys_pressed(self):
         #make sure the timers don't fire and interfere:
@@ -762,7 +602,7 @@ class XpraServer(gobject.GObject):
         #(there should not be any - but we want to be certain)
         unpress_all_keys(gtk.gdk.display_get_default())
 
-    def _focus(self, wid, modifiers):
+    def _focus(self, server_source, wid, modifiers):
         log("_focus(%s,%s) has_focus=%s", wid, modifiers, self._has_focus)
         if self._has_focus != wid:
             def reset_focus():
@@ -782,8 +622,8 @@ class XpraServer(gobject.GObject):
                 window.give_client_focus()
                 return False
             gobject.idle_add(give_focus)
-            if modifiers is not None:
-                self._make_keymask_match(modifiers, self.xkbmap_mod_pointermissing)
+            if server_source and modifiers is not None:
+                server_source.make_keymask_match(modifiers)
             self._has_focus = wid
 
     def _move_pointer(self, pos):
@@ -836,8 +676,7 @@ class XpraServer(gobject.GObject):
             ss.remove_window(wid)
 
     def _contents_changed(self, window, event):
-        if (isinstance(window, OverrideRedirectWindowModel)
-            or self._desktop_manager.visible(window)):
+        if window.is_OR() or self._desktop_manager.visible(window):
             self._damage(window, event.x, event.y, event.width, event.height)
 
     def _screen_size_changed(self, *args):
@@ -957,6 +796,8 @@ class XpraServer(gobject.GObject):
         proto._add_packet_to_queue(packet)
 
     def send_disconnect(self, proto, reason):
+        if proto._closed:
+            return
         def force_disconnect(*args):
             proto.close()
         proto._add_packet_to_queue(["disconnect", reason])
@@ -965,11 +806,15 @@ class XpraServer(gobject.GObject):
     def _verify_password(self, proto, client_hash):
         try:
             passwordFile = open(self.password_file, "rU")
+            password  = passwordFile.read()
+            passwordFile.close()
+            while password.endswith("\n") or password.endswith("\r"):
+                password = password[:-1]
         except IOError, e:
             log.error("cannot open password file %s: %s", self.password_file, e)
             self.send_disconnect(proto, "invalid password file specified on server")
             return
-        password  = passwordFile.read()
+        log("password from file %s is %s", self.password_file, password)
         password_hash = hmac.HMAC(password, self.salt)
         if client_hash != password_hash.hexdigest():
             def login_failed(*args):
@@ -1003,7 +848,6 @@ class XpraServer(gobject.GObject):
         info["clients"] = len([p for p in self._server_sources.keys() if p!=proto])
         info["potential_clients"] = len([p for p in self._potential_protocols if ((p is not proto) and (p not in self._server_sources.keys()))])
         info["keyboard_sync"] = self.keyboard_sync
-        info["keyboard"] = self.keyboard
         info["key_repeat_delay"] = self.key_repeat_delay
         info["key_repeat_interval"] = self.key_repeat_interval
         #find the source to report on:
@@ -1107,17 +951,14 @@ class XpraServer(gobject.GObject):
         #take the clipboard if no-one else has yet:
         if ss.clipboard_enabled and (self._clipboard_client is None or self._clipboard_client.closed):
             self._clipboard_client = ss
-        self.send_hello(capabilities, ss, root_w, root_h)
-        #send_hello will take care of sending the current and max screen resolutions,
         #so only activate this feature afterwards:
-        self.keyboard = bool(capabilities.get("keyboard", True))
-        self.keyboard_sync = self.keyboard and bool(capabilities.get("keyboard_sync", True))
+        self.keyboard_sync = bool(capabilities.get("keyboard_sync", True))
         key_repeat = capabilities.get("key_repeat", None)
         if key_repeat:
             self.key_repeat_delay, self.key_repeat_interval = key_repeat
             if self.key_repeat_delay>0 and self.key_repeat_interval>0:
                 set_key_repeat_rate(self.key_repeat_delay, self.key_repeat_interval)
-                log.info("setting key repeat rate from client: %s / %s", self.key_repeat_delay, self.key_repeat_interval)
+                log.info("setting key repeat rate from client: %sms delay / %sms interval", self.key_repeat_delay, self.key_repeat_interval)
         else:
             #dont do any jitter compensation:
             self.key_repeat_delay = -1
@@ -1127,16 +968,16 @@ class XpraServer(gobject.GObject):
         #parse keyboard related options:
         self.xkbmap_layout = capabilities.get("xkbmap_layout")
         self.xkbmap_variant = capabilities.get("xkbmap_variant")
-        self.assign_keymap_options(capabilities)
         #always clear modifiers before setting a new keymap
-        self._make_keymask_match([])
-        self.set_keymap()
+        self.set_keymap(ss)
+        ss.make_keymask_match(capabilities.get("modifiers", []))
 
+        #send_hello will take care of sending the current and max screen resolutions
+        self.send_hello(capabilities, ss, root_w, root_h)
+
+        #old clients used a network unsafe binary format..
         set_xsettings_format(use_tuple=capabilities.get("xsettings-tuple", False))
         # now we can set the modifiers to match the client
-        modifiers = capabilities.get("modifiers", [])
-        log("setting modifiers to %s", modifiers)
-        self._make_keymask_match(modifiers)
         ss.ping()
         self.send_windows_and_cursors(ss)
 
@@ -1148,7 +989,7 @@ class XpraServer(gobject.GObject):
         # about this kind of correctness at all, but hey, doesn't hurt.)
         for wid in sorted(self._id_to_window.keys()):
             window = self._id_to_window[wid]
-            if isinstance(window, OverrideRedirectWindowModel):
+            if window.is_OR():
                 self._send_new_or_window_packet(window)
             else:
                 self._desktop_manager.hide_window(window)
@@ -1274,6 +1115,7 @@ class XpraServer(gobject.GObject):
         self._server_sources.get(proto).set_deflate(level)
 
     def disconnect(self, protocol, reason):
+        ss = None
         if protocol:
             log.info("Disconnecting existing client %s, reason is: %s", protocol, reason)
             # send message asking client to disconnect (politely):
@@ -1290,7 +1132,7 @@ class XpraServer(gobject.GObject):
             self._clear_keys_pressed()
         except:
             pass
-        self._focus(0, [])
+        self._focus(ss, 0, [])
         log.info("Connection lost")
 
 
@@ -1366,19 +1208,18 @@ class XpraServer(gobject.GObject):
         if not window:
             log("cannot map window %s: already removed!", wid)
             return
-        assert not isinstance(window, OverrideRedirectWindowModel)
+        assert not window.is_OR()
         self._desktop_manager.configure_window(window, x, y, width, height)
         self._desktop_manager.show_window(window)
         self._damage(window, 0, 0, width, height)
         if len(packet)>=7:
             self._set_client_properties(proto, packet[6])
-    
+
     def _set_client_properties(self, proto, new_client_properties):
         ss = self._server_sources.get(proto)
         client_properties = self.client_properties.setdefault(ss.uuid, {})
-        for k,v in new_client_properties.items():
-            log("update_client_properties setting %s=%s", k, v)
-            client_properties[k] = v
+        log("set_client_properties updating %s with %s", client_properties, new_client_properties)
+        client_properties.update(new_client_properties)
 
     def _process_unmap_window(self, proto, packet):
         wid = packet[1]
@@ -1386,7 +1227,7 @@ class XpraServer(gobject.GObject):
         if not window:
             log("cannot map window %s: already removed!", wid)
             return
-        assert not isinstance(window, OverrideRedirectWindowModel)
+        assert not window.is_OR()
         self._cancel_damage(wid)
         self._desktop_manager.hide_window(window)
 
@@ -1396,7 +1237,7 @@ class XpraServer(gobject.GObject):
         if not window:
             log("cannot map window %s: already removed!", wid)
             return
-        assert not isinstance(window, OverrideRedirectWindowModel)
+        assert not window.is_OR()
         owx, owy, oww, owh = self._desktop_manager.window_geometry(window)
         log("_process_configure_window(%s) old window geometry: %s", packet[1:], (owx, owy, oww, owh))
         self._desktop_manager.configure_window(window, x, y, w, h)
@@ -1412,7 +1253,7 @@ class XpraServer(gobject.GObject):
         if not window:
             log("cannot move window %s: already removed!", wid)
             return
-        assert not isinstance(window, OverrideRedirectWindowModel)
+        assert not window.is_OR()
         _, _, w, h = self._desktop_manager.window_geometry(window)
         self._desktop_manager.configure_window(window, x, y, w, h)
 
@@ -1423,7 +1264,7 @@ class XpraServer(gobject.GObject):
         if not window:
             log("cannot resize window %s: already removed!", wid)
             return
-        assert not isinstance(window, OverrideRedirectWindowModel)
+        assert not window.is_OR()
         self._cancel_damage(wid)
         x, y, _, _ = self._desktop_manager.window_geometry(window)
         self._desktop_manager.configure_window(window, x, y, w, h)
@@ -1439,44 +1280,38 @@ class XpraServer(gobject.GObject):
             modifiers = packet[2]
         else:
             modifiers = None
-        self._focus(wid, modifiers)
+        ss = self._server_sources.get(proto)
+        self._focus(ss, wid, modifiers)
 
     def _process_layout(self, proto, packet):
-        (layout, variant) = packet[1:3]
-        if layout!=self.xkbmap_layout or variant!=self.xkbmap_variant:
-            self.xkbmap_layout = layout
-            self.xkbmap_variant = variant
-            self.set_keymap()
-
-    def assign_keymap_options(self, props):
-        """ used by both process_hello and process_keymap
-            to set the keyboard attributes """
-        for x in ["xkbmap_print", "xkbmap_query", "xkbmap_mod_meanings",
-                  "xkbmap_mod_managed", "xkbmap_mod_pointermissing", "xkbmap_keycodes"]:
-            setattr(self, x, props.get(x))
+        layout, variant = packet[1:3]
+        ss = self._server_sources.get(proto)
+        ss.set_layout(layout, variant)
+        self.set_keymap(ss)
 
     def _process_keymap(self, proto, packet):
         props = packet[1]
-        self.assign_keymap_options(props)
+        ss = self._server_sources.get(proto)
+        ss.assign_keymap_options(props)
         modifiers = props.get("modifiers")
-        self._make_keymask_match([])
-        self.set_keymap()
-        self._make_keymask_match(modifiers)
-
+        self.set_keymap(ss)
+        ss.make_keymask_match(modifiers)
 
     def _process_key_action(self, proto, packet):
-        if not self.keyboard:
-            log.info("ignoring key action packet since keyboard is turned off")
-            return
-        (wid, keyname, pressed, modifiers, keyval, _, client_keycode) = packet[1:8]
-        keycode = self.keycode_translation.get(client_keycode, client_keycode)
+        wid, keyname, pressed, modifiers, keyval, _, client_keycode = packet[1:8]
+        ss = self._server_sources.get(proto)
+        keycode = ss.get_keycode(client_keycode, keyname, modifiers)
+        log("process_key_action(%s) server keycode=%s", packet, keycode)
         #currently unused: (group, is_modifier) = packet[8:10]
-        self._focus(wid, None)
-        self._make_keymask_match(modifiers, keycode, ignored_modifier_keynames=[keyname])
+        self._focus(ss, wid, None)
+        ss.make_keymask_match(modifiers, keycode, ignored_modifier_keynames=[keyname])
         #negative keycodes are used for key events without a real keypress/unpress
         #for example, used by win32 to send Caps_Lock/Num_Lock changes
         if keycode>=0:
             self._handle_key(wid, pressed, keyname, keyval, keycode, modifiers)
+
+    def fake_key(self, keycode, press):
+        trap.call(xtest_fake_key, gtk.gdk.display_get_default(), keycode, press)
 
     def _handle_key(self, wid, pressed, name, keyval, keycode, modifiers):
         """
@@ -1496,12 +1331,12 @@ class XpraServer(gobject.GObject):
             log("handle keycode pressing %s: key %s", keycode, name)
             if self.keyboard_sync:
                 self.keys_pressed[keycode] = name
-            xtest_fake_key(gtk.gdk.display_get_default(), keycode, True)
+            self.fake_key(keycode, True)
         def unpress():
             log("handle keycode unpressing %s: key %s", keycode, name)
             if self.keyboard_sync:
                 del self.keys_pressed[keycode]
-            xtest_fake_key(gtk.gdk.display_get_default(), keycode, False)
+            self.fake_key(keycode, False)
         if pressed:
             if keycode not in self.keys_pressed:
                 press()
@@ -1537,13 +1372,11 @@ class XpraServer(gobject.GObject):
             self.keys_repeat_timers[keycode] = gobject.timeout_add(delay_ms, _key_repeat_timeout, now)
 
     def _process_key_repeat(self, proto, packet):
-        if not self.keyboard:
-            log.info("ignoring key repeat packet since keyboard is turned off")
-            return
         wid, keyname, keyval, client_keycode, modifiers = packet[1:6]
-        keycode = self.keycode_translation.get(client_keycode, client_keycode)
+        ss = self._server_sources.get(proto)
+        keycode = ss.get_keycode(client_keycode, keyname, modifiers)
         #key repeat uses modifiers from a pointer event, so ignore mod_pointermissing:
-        self._make_keymask_match(modifiers, ignored_modifier_keynames=self.xkbmap_mod_pointermissing)
+        ss.make_keymask_match(modifiers)
         if not self.keyboard_sync:
             #this check should be redundant: clients should not send key-repeat without
             #having keyboard_sync enabled
@@ -1558,20 +1391,26 @@ class XpraServer(gobject.GObject):
                 #not so long ago, just re-press it now:
                 log("key %s/%s, had timed out, re-pressing it", keycode, keyname)
                 self.keys_pressed[keycode] = keyname
-                xtest_fake_key(gtk.gdk.display_get_default(), keycode, True)
+                self.fake_key(keycode, True)
         self._key_repeat(wid, True, keyname, keyval, keycode, modifiers, self.key_repeat_interval)
 
-    def _process_button_action(self, proto, packet):
-        (wid, button, pressed, pointer, modifiers) = packet[1:6]
-        self._make_keymask_match(modifiers, ignored_modifier_keynames=self.xkbmap_mod_pointermissing)
+    def _process_mouse_common(self, proto, wid, pointer, modifiers):
+        ss = self._server_sources.get(proto)
+        ss.make_keymask_match(modifiers)
         window = self._id_to_window.get(wid)
         if not window:
-            log("_process_button_action() invalid window id: %s", wid)
+            log("_process_mouse_common() invalid window id: %s", wid)
             return
-        self._desktop_manager.raise_window(window)
-        self._move_pointer(pointer)
+        def raise_and_move():
+            self._desktop_manager.raise_window(window)
+            self._move_pointer(pointer)
+        trap.swallow(raise_and_move)
+
+    def _process_button_action(self, proto, packet):
+        wid, button, pressed, pointer, modifiers = packet[1:6]
+        self._process_mouse_common(proto, wid, pointer, modifiers)
         try:
-            trap.call_unsynced(xtest_fake_button,
+            trap.call_synced(xtest_fake_button,
                                gtk.gdk.display_get_default(),
                                button, pressed)
         except XError:
@@ -1580,14 +1419,8 @@ class XpraServer(gobject.GObject):
                      button)
 
     def _process_pointer_position(self, proto, packet):
-        (wid, pointer, modifiers) = packet[1:4]
-        self._make_keymask_match(modifiers, ignored_modifier_keynames=self.xkbmap_mod_pointermissing)
-        window = self._id_to_window.get(wid)
-        if not window:
-            log("_process_pointer_position() invalid window id: %s", wid)
-            return
-        self._desktop_manager.raise_window(window)
-        self._move_pointer(pointer)
+        wid, pointer, modifiers = packet[1:4]
+        self._process_mouse_common(proto, wid, pointer, modifiers)
 
     def _process_close_window(self, proto, packet):
         wid = packet[1]
@@ -1630,7 +1463,7 @@ class XpraServer(gobject.GObject):
         for wid, window in wid_windows.items():
             if window is None:
                 continue
-            if not isinstance(window, OverrideRedirectWindowModel):
+            if not window.is_OR():
                 if not self._desktop_manager._models[window].shown:
                     log("window is no longer shown, ignoring buffer refresh which would fail")
                     continue
@@ -1655,7 +1488,7 @@ class XpraServer(gobject.GObject):
             log.info("xpra client disconnected.")
         if len(self._server_sources)==0:
             self._clear_keys_pressed()
-            self._focus(0, [])
+            self._focus(source, 0, [])
         sys.stdout.flush()
 
     def _process_gibberish(self, proto, packet):

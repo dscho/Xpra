@@ -11,8 +11,20 @@
 %define is_suse %(test -e /etc/SuSE-release && echo 1 || echo 0)
 %define include_egg 1
 
-%define requires pygtk2, xorg-x11-server-utils, xorg-x11-server-Xvfb, python-imaging, dbus-python
+#if building a generic rpm: exclude anything that requires cython modules:
+%if 0%{?generic}
+%define no_server 1
+%define no_webp 1
+%define no_video 1
+%endif
+
+#python and gtk bits:
+%define requires_python_gtk ,pygtk2, python-imaging, dbus-python
+#Vfb (Xvfb or Xdummy):
+%define requires_xorg , xorg-x11-server-utils, xorg-x11-server-Xvfb
+#OpenGL bits:
 %define requires_opengl %{nil}
+#Anything extra (distro specific):
 %define requires_extra %{nil}
 %define requires_vpx , libvpx
 %define requires_x264 , libx264
@@ -21,6 +33,7 @@
 # distro-specific creative land of wonderness
 %if %{defined Fedora}
 %define requires_x264 , x264-libs
+%define requires_xorg , xorg-x11-server-utils, xorg-x11-drv-dummy, xorg-x11-drv-void
 %if 0%{?opengl}
 %define requires_opengl , PyOpenGL, pygtkglext, python-numeric
 %endif
@@ -54,7 +67,8 @@
 %endif
 
 %if %is_suse
-%define requires python-gtk, xorg-x11-server, xorg-x11-server-extra, libpng12-0, dbus-1-python
+%define requires_python_gtk , python-gtk, xorg-x11-server, xorg-x11-server-extra, libpng12-0, dbus-1-python
+%define requires_xorg , xorg-x11-server-utils, xf86-video-dummy, xf86-input-void
 %define requires_extra %{nil}
 %endif
 
@@ -69,7 +83,7 @@ Name: xpra
 Version: %{version}
 Release: %{build_no}%{dist}
 License: GPL
-Requires: %{requires} %{requires_extra} %{requires_vpx} %{requires_x264} %{requires_webp} %{requires_opengl}
+Requires: %{requires_python_gtk} %{requires_xorg} %{requires_extra} %{requires_vpx} %{requires_x264} %{requires_webp} %{requires_opengl}
 Group: Networking
 Packager: Antoine Martin <antoine@nagafix.co.uk>
 URL: http://xpra.org/
@@ -80,7 +94,6 @@ BuildRequires: python, setuptool
 %endif
 
 ### Patches ###
-# if building a generic rpm (without .so) which works as client only
 Patch0: disable-posix-server.patch
 Patch1: disable-x264.patch
 Patch2: disable-vpx.patch
@@ -98,18 +111,38 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Thu Sep 27 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.0-1
+* Mon Oct 08 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.0-1
+- fix "AltGr" key handling with MS Windows clients (and others)
+- fix crash with x264 encoding
+- fix crash with fast disappearing tooltip windows
+- avoid storing password in a file when using the launcher (except on MS Windows) 
 - many latency fixes and improvements: lower latency, better line congestion handling, etc
 - lower client latency: decompress pictures in a dedicated thread (including rgb24+zlib)
+- better launcher command feedback
+- better automatic compression heuristics
 - support for Xdummy on platforms with only a suid binary installed
 - support for 'webp' lossy picture encoding (better and faster than jpeg)
 - support fixed picture quality with x264, webp and jpeg (via command line and tray menu)
+- support for multiple "start-child" options in config files or command line
 - more reliable auto-refresh
+- performance optimizations: caching results, avoid unnecessary video encoder re-initialization
+- faster re-connection (skip keyboard re-configuration)
+- better isolation of the virtual display process and child processes
 - show performance statistics graphs on session info dialog (click to save)
 - start with compression enabled, even for initial packet
 - show more version and client information in logs and via "xpra info"
 - client launcher improvements: prevent logging conflict, add version info
-- large source layout cleanup
+- large source layout cleanup, compilation warnings fixed
+
+* Fri Oct 05 2012 Antoine Martin <antoine@nagafix.co.uk> 0.6.4-1
+- fix bencoder to properly handle dicts with non-string keys
+- fix swscale bug with windows that are too small by switch encoding
+- fix locking of video encoder resizing leading to missing video frames
+- fix crash with compression turned off: fix unicode encoding
+- fix lack of locking sometimes causing errors with "xpra info"
+- fix password file handling: exceptions and ignore carriage returns
+- prevent races during setup and cleanup of network connections
+- take shortcut if there is nothing to send
 
 * Thu Sep 27 2012 Antoine Martin <antoine@nagafix.co.uk> 0.6.3-1
 - fix memory leak in server after client disconnection
@@ -492,7 +525,7 @@ So basically it's screen for remote X apps.
 rm -rf $RPM_BUILD_DIR/parti-all-%{version}
 zcat $RPM_SOURCE_DIR/parti-all-%{version}.tar.gz | tar -xvf -
 cd parti-all-%{version}
-%if %{defined generic_rpm}
+%if 0%{?no_server}
 %patch0 -p1
 %endif
 %if 0%{?no_video}
@@ -521,11 +554,24 @@ CFLAGS=-O2 python setup.py build
 rm -rf $RPM_BUILD_ROOT
 cd parti-all-%{version}
 %{__python} setup.py install -O1  --prefix /usr --skip-build --root %{buildroot}
-%if %{defined generic_rpm}
-# remove .so (not suitable for a generic RPM)
-rm -f "${RPM_BUILD_ROOT}/usr/lib/python2.6/site-packages/gdk/gdk_atoms.so"
-rm -f "${RPM_BUILD_ROOT}/usr/lib/python2.6/site-packages/wimpiggy/bindings.so"
-rm -f "${RPM_BUILD_ROOT}/usr/lib/python2.6/site-packages/xpra/wait_for_x_server.so"
+%if 0%{?generic}
+# remove anything relying on dynamic libraries (not suitable for a generic RPM)
+# unless they're statically linked and enabled (static_vpx / static_x264):
+rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/gdk/gdk_atoms.so
+rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/wimpiggy/bindings.so
+rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/wait_for_x_server.so
+rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/rencode
+%if 0%{?static_x264}
+echo "Note: static x264 included in generic rpm"
+%else
+rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/x264
+%endif
+%if 0%{?static_vpx}
+echo "Note: static vpx included in generic rpm"
+%else
+rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/vpx
+%endif
+rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/webm
 %else
 %ifarch x86_64
 mv -f "${RPM_BUILD_ROOT}/usr/lib64" "${RPM_BUILD_ROOT}/usr/lib"

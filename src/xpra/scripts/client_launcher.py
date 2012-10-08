@@ -304,6 +304,7 @@ xpra_opts.no_tray = default_bool("debug", False)
 xpra_opts.dock_icon = default_str("dock-icon", "")
 xpra_opts.tray_icon = default_str("tray-icon", "")
 xpra_opts.window_icon = default_str("window-icon", "")
+xpra_opts.password = default_str("password", "")
 xpra_opts.password_file = default_str("password-file", "")
 xpra_opts.clipboard = default_bool("clipboard", True)
 xpra_opts.pulseaudio = default_bool("pulseaudio", True)
@@ -319,6 +320,7 @@ xpra_opts.bell = default_bool("bell", True)
 xpra_opts.notifications = default_bool("notifications", True)
 xpra_opts.sharing = default_bool("sharing", False)
 xpra_opts.delay_tray = default_bool("delay-tray", False)
+xpra_opts.windows_enabled = default_bool("windows-enabled", True)
 #these would need testing/work:
 xpra_opts.auto_refresh_delay = 1.0
 xpra_opts.max_bandwidth = 0.0
@@ -598,6 +600,7 @@ class ApplicationWindow:
 		opts = AdHocStruct()
 		opts.clipboard = xpra_opts.clipboard
 		opts.pulseaudio = xpra_opts.pulseaudio
+		opts.password = xpra_opts.password
 		opts.password_file = xpra_opts.password_file
 		opts.title = "@title@ on @client-machine@"
 		opts.encoding = xpra_opts.encoding
@@ -627,12 +630,30 @@ class ApplicationWindow:
 		opts.notifications = xpra_opts.notifications
 		opts.delay_tray = xpra_opts.delay_tray
 		opts.sharing = xpra_opts.sharing
+		opts.windows_enabled = xpra_opts.windows_enabled
 
 		def start_XpraClient():
 			app = XpraClient(socket_wrapper, opts)
+			if opts.password:
+				app.password = opts.password
+			warn_and_quit_save = app.warn_and_quit
+			def warn_and_quit_override(exit_code, warning):
+				app.cleanup()
+				err = exit_code!=0 or warning.find("invalid password")>=0
+				self.set_info_color(err)
+				self.set_info_text(warning)
+				self.window.show()
+				self.window.set_sensitive(True)
+				if err:
+					def ignore_further_quit_events(*args):
+						pass
+					app.warn_and_quit = ignore_further_quit_events
+				else:
+					app.warn_and_quit = warn_and_quit_save
+					gtk.main_quit()
+			app.warn_and_quit = warn_and_quit_override
 			app.run()
-			self.window.show()
-			self.window.set_sensitive(True)
+			app.cleanup()
 		gobject.idle_add(start_XpraClient)
 
 	def launch_xpra(self):
@@ -660,12 +681,7 @@ class ApplicationWindow:
 				if err:
 					info += ",\nerror:\n%s" % err
 				#red only for non-zero returncode:
-				if ret!=0:
-					color_obj = gtk.gdk.color_parse("red")
-				else:
-					color_obj = gtk.gdk.color_parse("black")
-				if color_obj:
-					self.info.modify_fg(gtk.STATE_NORMAL, color_obj)
+				self.set_info_color(ret!=0)
 				self.set_info_text(info)
 				self.show()
 			gobject.idle_add(show_result, out, err)
@@ -673,6 +689,15 @@ class ApplicationWindow:
 			print("error: %s" % e)
 			gobject.idle_add(self.show)
 			self.set_info_text("Error launching: %s" % (e))
+
+	def set_info_color(self, is_error=False):
+		if is_error:
+			color_obj = gtk.gdk.color_parse("red")
+		else:
+			color_obj = gtk.gdk.color_parse("black")
+		if color_obj:
+			self.info.modify_fg(gtk.STATE_NORMAL, color_obj)
+
 
 	def start_xpra_process(self):
 		#ret = os.system(" ".join(args))
@@ -691,6 +716,8 @@ class ApplicationWindow:
 		args.append("--encoding=%s" % xpra_opts.encoding)
 		if xpra_opts.encoding in ["jpeg", "webp", "x264"]:
 			args.append("--quality=%s" % xpra_opts.quality)
+		if xpra_opts.password:
+			xpra_opts.password_file = create_password_file(xpra_opts.password)
 		if xpra_opts.password_file:
 			args.append("--password-file=%s" % xpra_opts.password_file)
 		print("Running %s" % args)
@@ -703,17 +730,14 @@ class ApplicationWindow:
 		xpra_opts.encoding = self.encoding_combo.get_active_text()
 		xpra_opts.quality = XPRA_COMPRESSION_OPTIONS_DICT.get(self.quality_combo.get_active_text())
 		xpra_opts.mode = self.mode_combo.get_active_text()
-		password = self.password_entry.get_text()
-		if len(password) > 0:
-			xpra_opts.password_file = create_password_file(password)
+		xpra_opts.password = self.password_entry.get_text()
 
 	def destroy(self, *args):
 		gtk.main_quit()
 
 def create_password_file(password):
 	pass_file = tempfile.NamedTemporaryFile(delete = False)
-	pass_file.write("%s\n" % password)
-	xpra_opts.password_file=pass_file.name
+	pass_file.write("%s" % password)
 	pass_file.close()
 	return pass_file.name
 
@@ -744,9 +768,7 @@ def update_options_from_file(filename):
 			setattr(xpra_opts, prop, val)
 	xpra_opts.port = str_to_int(propDict.get("port"), 10000)
 	xpra_opts.autoconnect = str_to_bool(propDict.get("autoconnect"), False)
-	val = propDict.get("password")
-	if val:
-		xpra_opts.password_file = create_password_file(val)
+	xpra_opts.password = propDict.get("password", None)
 
 
 def main():

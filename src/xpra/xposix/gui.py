@@ -42,7 +42,7 @@ class ClientExtras(ClientExtrasBase):
                 log.error("turning notifications off")
 
     def exit(self):
-        ClientExtrasBase.exit(self)
+        ClientExtrasBase.cleanup(self)
         if self.tray_widget:
             self.hide_tray()
             self.tray_widget = None
@@ -339,8 +339,8 @@ class ClientExtras(ClientExtrasBase):
                 #ie: {"shift" : ["Shift_L", "Shift_R"], "mod1" : "Meta_L", ...]}
                 log.debug("modifier mappings=%s", mod_mappings)
                 meanings = {}
-                for modifier,keynames in mod_mappings.items():
-                    for keyname in keynames:
+                for modifier,keys in mod_mappings.items():
+                    for _,keyname in keys:
                         meanings[keyname] = modifier
                 return  meanings, [], []
         except ImportError, e:
@@ -368,6 +368,14 @@ class ClientExtras(ClientExtrasBase):
                     meanings[x] = parts[0]
         log.debug("get_keymap_modifiers parsed: meanings=%s", meanings)
         return  meanings, [], []
+
+    def get_x11_keymap(self):
+        try:
+            from wimpiggy.lowlevel import get_keycode_mappings      #@UnresolvedImport
+            return get_keycode_mappings(gtk.gdk.get_default_root_window())
+        except Exception, e:
+            log.error("failed to use raw x11 keymap: %s", e)
+        return  ""
 
     def get_keymap_spec(self):
         xkbmap_print = self.exec_get_keyboard_data(["setxkbmap", "-print"])

@@ -92,6 +92,7 @@ SelectionNotify
 ColormapNotify
 ClientMessage
 MappingNotify
+#GenericEvent (not available on all platforms)
 LASTEvent
 
 # Property modification types
