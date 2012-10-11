@@ -1,3 +1,11 @@
+v0.7.1 (2012-10-11)
+======================
+	-- fix keyboard mapping for AltGr with old versions of X11 server
+	-- fix for Mac OSX zero keycode (letter 'a')
+	-- fix for invalid modifiers: try harder to apply valid mappings
+	-- fix gtk import warning with text clients (xpra version, xpra info)
+
+
 v0.7.0 (2012-10-08)
 ======================
 	-- Mac DMG client download
