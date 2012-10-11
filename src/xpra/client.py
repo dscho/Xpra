@@ -37,7 +37,7 @@ else:
         for gtkwindow in gtkwindows:
             gtkwindow.get_window().set_cursor(cursor)
 
-
+import sys
 import os
 import time
 import ctypes
@@ -560,6 +560,12 @@ class XpraClient(XpraClientBase):
         capabilities["share"] = self.client_supports_sharing
         capabilities["auto_refresh_delay"] = int(self.auto_refresh_delay*1000)
         capabilities["windows"] = self.windows_enabled
+        try:
+            from wimpiggy.prop import set_xsettings_format
+            assert set_xsettings_format
+            capabilities["xsettings-tuple"] = True
+        except:
+            pass
         return capabilities
 
     def send_ping(self):
@@ -656,6 +662,12 @@ class XpraClient(XpraClientBase):
         self.notifications_enabled = self.server_supports_notifications and self.client_supports_notifications
         self.server_supports_cursors = capabilities.get("cursors", True)    #added in 0.5, default to True!
         self.cursors_enabled = self.server_supports_cursors and self.client_supports_cursors
+        try:
+            from wimpiggy.prop import set_xsettings_format
+            set_xsettings_format(use_tuple=capabilities.get("xsettings-tuple", False))
+        except Exception, e:
+            if os.name=="posix" and not sys.platform.startswith("darwin"):
+                log.error("failed to set xsettings format: %s", e)
         self.server_supports_bell = capabilities.get("bell", True)          #added in 0.5, default to True!
         self.bell_enabled = self.server_supports_bell and self.client_supports_bell
         self.server_supports_clipboard = capabilities.get("clipboard", False)
