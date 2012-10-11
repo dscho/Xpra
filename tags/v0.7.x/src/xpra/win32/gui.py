@@ -88,8 +88,8 @@ class ClientExtras(ClientExtrasBase):
         if pressed:
             if "mod5" not in modifiers:
                 modifiers.append("mod5")
-            else:
-                clear.append("mod5")
+        else:
+            clear.append("mod5")
         for x in clear:
             if x in modifiers:
                 modifiers.remove(x)
@@ -120,7 +120,7 @@ class ClientExtras(ClientExtrasBase):
         #if we have modifier_mappings
         if keyname=="Alt_R" and len(self.modifier_mappings)>0:
             keyname = "ISO_Level3_Shift"
-            altgr_keycodes = self.modifier_keycodes.get(keyname)
+            altgr_keycodes = self.modifier_keycodes.get(keyname, [])
             if len(altgr_keycodes)>0:
                 keycode = altgr_keycodes[0]         #FIXME: we just pick the first one..
                 self.emulate_altgr = pressed
