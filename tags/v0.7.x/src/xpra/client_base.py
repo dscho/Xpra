@@ -146,12 +146,6 @@ class XpraClientBase(gobject.GObject):
             u.update("/")
             u.update(str(os.getgid()))
         capabilities["uuid"] = u.hexdigest()
-        try:
-            from wimpiggy.prop import set_xsettings_format
-            assert set_xsettings_format
-            capabilities["xsettings-tuple"] = True
-        except:
-            pass
         capabilities["randr_notify"] = False    #only client.py cares about this
         capabilities["windows"] = False         #only client.py cares about this
         return capabilities
@@ -221,12 +215,6 @@ class XpraClientBase(gobject.GObject):
     def parse_server_capabilities(self, capabilities):
         self._remote_version = capabilities.get("version")
         self._remote_revision = capabilities.get("revision")
-        try:
-            from wimpiggy.prop import set_xsettings_format
-            set_xsettings_format(use_tuple=capabilities.get("xsettings-tuple", False))
-        except Exception, e:
-            if os.name=="posix" and not sys.platform.startswith("darwin"):
-                log.error("failed to set xsettings format: %s", e)
         if not is_compatible_with(self._remote_version):
             self.warn_and_quit(EXIT_INCOMPATIBLE_VERSION, "incompatible remote version: %s" % self._remote_version)
             return False
