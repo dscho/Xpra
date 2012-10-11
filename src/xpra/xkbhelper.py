@@ -276,7 +276,7 @@ def gtk_keycodes_to_mappings(gtk_mappings):
     #use the keycodes supplied by gtk:
     mappings = {}
     for _, name, keycode, group, level in gtk_mappings:
-        if keycode<=0:
+        if keycode<0:
             continue            #ignore old 'add_if_missing' client side code
         index = group*2+level
         mappings.setdefault(keycode, set()).add((name, index))
@@ -347,7 +347,7 @@ def translate_keycodes(kcmin, kcmax, keycodes, preserve_keycode_entries={}, keys
                 free_keycodes.remove(server_keycode)
             #record it in trans map:
             for name, _ in entries:
-                if keycode>0 and server_keycode!=keycode:
+                if keycode>=0 and server_keycode!=keycode:
                     keycode_trans[(keycode, name)] = server_keycode
                 keycode_trans[name] = server_keycode
             server_keycodes[server_keycode] = entries
@@ -404,7 +404,7 @@ def translate_keycodes(kcmin, kcmax, keycodes, preserve_keycode_entries={}, keys
     #add all the other preserved ones that have not been mapped to any client keycode:
     for server_keycode, entries in preserve_keycode_entries.items():
         if server_keycode not in server_keycodes:
-            do_assign(0, server_keycode, entries)
+            do_assign(-1, server_keycode, entries)
 
     #find all keysyms assigned so far:
     all_keysyms = set()
@@ -418,7 +418,7 @@ def translate_keycodes(kcmin, kcmax, keycodes, preserve_keycode_entries={}, keys
         if keysym not in all_keysyms:
             debug("found missing keysym %s for modifier %s, will add it", keysym, modifier)
             new_keycode = set([(keysym, 0)])
-            server_keycode = assign(0, new_keycode)
+            server_keycode = assign(-1, new_keycode)
             debug("assigned keycode %s for key '%s' of modifier '%s'", server_keycode, keysym, modifier)
 
     debug("translated keycodes=%s", keycode_trans)
@@ -550,7 +550,7 @@ def get_modifiers_from_keycodes(xkbmap_keycodes):
         if modifier not in matches:
             #define it since it is completely missing
             defaults.setdefault(modifier, set()).add(keyname)
-        elif modifier in ["shift", "lock", "control", "mod1", "mod2"]:
+        elif modifier in ["shift", "lock", "control", "mod1", "mod2"] or keyname=="ISO_Level3_Shift":
             #these ones we always add them, even if a record for this modifier already exists
             matches.setdefault(modifier, set()).add(keyname)
     debug("get_modifiers_from_keycodes(...) adding defaults: %s", defaults)
