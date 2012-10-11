@@ -111,6 +111,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Thu Oct 11 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.1-1
+- fix keyboard mapping for AltGr with old versions of X11 server
+- fix for invalid modifiers: try harder to apply valid mappings
+- fix gtk import warning with text clients (xpra version, xpra info)
+
 * Mon Oct 08 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.0-1
 - fix "AltGr" key handling with MS Windows clients (and others)
 - fix crash with x264 encoding
