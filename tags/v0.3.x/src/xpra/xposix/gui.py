@@ -37,7 +37,7 @@ class ClientExtras(ClientExtrasBase):
         except ImportError:
             self.clipboard_helper = None
 
-    def exit(self):
+    def cleanup(self):
         ClientExtrasBase.exit(self)
         if self.tray_widget:
             self.hide_tray()
