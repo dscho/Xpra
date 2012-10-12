@@ -1,6 +1,5 @@
 xpra (0.6.5-1) UNRELEASED; urgency=low
   * fix mitm attack vector in password mode due to shared salt
-  * fix multiple tray shown when using the launcher and authentication fails
   * fix gtk import warning with text clients (xpra version, xpra info)
 
  -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 13 Oct 2012 00:28:34 +0700
