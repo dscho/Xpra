@@ -89,7 +89,6 @@ So basically it's screen for remote X apps.
 %changelog
 * Sat Oct 13 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.7-1
 - fix mitm attack vector in password mode due to shared salt
-- fix multiple tray shown when using the launcher and password authentication fails
 - fix gtk import warning with text clients (xpra version, xpra info)
 
 * Fri Oct 05 2012 Antoine Martin <antoine@nagafix.co.uk> 0.5.6-1
