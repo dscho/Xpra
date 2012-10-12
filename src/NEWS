@@ -1,3 +1,10 @@
+v0.5.7 (2012-10-13)
+======================
+	-- fix mitm attack vector in password mode due to shared salt
+	-- fix multiple tray shown when using the launcher and password authentication fails
+	-- fix gtk import warning with text clients (xpra version, xpra info)
+
+
 v0.5.6 (2012-10-05)
 ======================
 	-- fix bencoder to properly handle dicts with non-string keys
