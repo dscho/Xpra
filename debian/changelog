@@ -1,7 +1,7 @@
 xpra (0.7.1-1) UNRELEASED; urgency=low
   * fix mitm attack vector in password mode due to shared salt
   * fix division by zero in graphs causing displayed information to stall
-  * fix multiple tray shown when using the launcher and password authentication fails
+  * fix multiple tray shown when using the launcher and authentication fails
   * fix override redirect windows cleanup code
   * fix keyboard mapping for AltGr with old versions of X11 server
   * fix keyboard mapping for AltGr with old versions of X11 server
