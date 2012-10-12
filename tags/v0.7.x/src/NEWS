@@ -1,5 +1,9 @@
-v0.7.1 (2012-10-11)
+v0.7.1 (2012-10-13)
 ======================
+	-- fix mitm attack vector in password mode due to shared salt
+	-- fix division by zero in graphs causing displayed information to stall
+	-- fix multiple tray shown when using the launcher and password authentication fails
+	-- fix override redirect windows cleanup code
 	-- fix keyboard mapping for AltGr with old versions of X11 server
 	-- fix for Mac OSX zero keycode (letter 'a')
 	-- fix for invalid modifiers: try harder to apply valid mappings

@@ -111,7 +111,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Thu Oct 11 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.1-1
+* Sat Oct 13 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.1-1
+- fix mitm attack vector in password mode due to shared salt
+- fix division by zero in graphs causing displayed information to stall
+- fix multiple tray shown when using the launcher and password authentication fails
+- fix override redirect windows cleanup code
 - fix keyboard mapping for AltGr with old versions of X11 server
 - fix for invalid modifiers: try harder to apply valid mappings
 - fix gtk import warning with text clients (xpra version, xpra info)
