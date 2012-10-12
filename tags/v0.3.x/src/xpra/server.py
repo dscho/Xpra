@@ -907,7 +907,6 @@ class XpraServer(gobject.GObject):
         self._upgrading = False
 
         self.password_file = opts.password_file
-        self.salt = None
 
         self.randr = opts.randr and has_randr()
         if self.randr and len(get_screen_sizes())<=1:
@@ -1011,6 +1010,7 @@ class XpraServer(gobject.GObject):
                         self._keynames_for_mod = set_modifiers_from_keycodes(self.xkbmap_keycodes)
                     else:
                         log.error("missing both xkbmap_mod_meanings and xkbmap_keycodes, modifiers will probably not work as expected!")
+        protocol.salt = None
                     log.debug("keyname_for_mod=%s", self._keynames_for_mod)
             except:
                 log.error("error setting xmodmap", exc_info=True)
@@ -1533,19 +1533,24 @@ class XpraServer(gobject.GObject):
             wids = None
         self._set_encoding(encoding, wids)
 
-    def _send_password_challenge(self, proto):
-        self.salt = "%s" % uuid.uuid4()
-        log.info("Password required, sending challenge")
-        packet = ("challenge", self.salt)
-        proto._add_packet_to_queue(packet)
-
     def send_disconnect(self, proto, reason):
         def force_disconnect(*args):
             proto.close()
         proto._add_packet_to_queue(["disconnect", reason])
         gobject.timeout_add(1000, force_disconnect)
 
+    def _send_password_challenge(self, proto):
+        proto.salt = "%s" % uuid.uuid4()
+        log.info("Password required, sending challenge")
+        packet = ("challenge", proto.salt)
+        proto._add_packet_to_queue(packet)
+
     def _verify_password(self, proto, client_hash):
+        salt = proto.salt
+        proto.salt = None
+        if not salt:
+            self.send_disconnect(proto, "illegal challenge response received - salt cleared or unset")
+            return
         try:
             passwordFile = open(self.password_file, "rU")
             password  = passwordFile.read()
@@ -1556,14 +1561,13 @@ class XpraServer(gobject.GObject):
             log.error("cannot open password file %s: %s", self.password_file, e)
             self.send_disconnect(proto, "invalid password file specified on server")
             return
-        password_hash = hmac.HMAC(password, self.salt)
+        password_hash = hmac.HMAC(password, salt)
         if client_hash != password_hash.hexdigest():
             def login_failed(*args):
                 log.error("Password supplied does not match! dropping the connection.")
                 self.send_disconnect(proto, "invalid password")
             gobject.timeout_add(1000, login_failed)
             return False
-        self.salt = None            #prevent replay attacks
         log.info("Password matches!")
         sys.stdout.flush()
         return True
@@ -1732,7 +1736,7 @@ class XpraServer(gobject.GObject):
         if self.password_file:
             log.debug("password auth required")
             client_hash = capabilities.get("challenge_response")
-            if not client_hash or not self.salt:
+            if not client_hash or not proto.salt:
                 self._send_password_challenge(proto)
                 return
             del capabilities["challenge_response"]
