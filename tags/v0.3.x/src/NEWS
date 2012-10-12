@@ -1,3 +1,9 @@
+v0.3.12 (2012-10-13)
+======================
+	-- fix mitm attack vector in password mode due to shared salt
+	-- fix multiple tray shown when using the launcher and password authentication fails
+
+
 v0.3.11 (2012-10-05)
 ======================
 	-- fix bencoder to properly handle dicts with non-string keys

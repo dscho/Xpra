@@ -1,3 +1,9 @@
+xpra (0.3.12-1) UNRELEASED; urgency=low
+  * fix mitm attack vector in password mode due to shared salt
+  * fix multiple tray shown when using the launcher and authentication fails
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 13 Oct 2012 00:55:47 +0700
+
 xpra (0.3.11-1) UNRELEASED; urgency=low
   * fix bencoder to properly handle dicts with non-string keys
   * take shortcut if there is nothing to send
