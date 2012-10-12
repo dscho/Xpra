@@ -63,7 +63,6 @@ So basically it's screen for remote X apps.
 %changelog
 * Sat Oct 13 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.12-1
 - fix mitm attack vector in password mode due to shared salt
-- fix multiple tray shown when using the launcher and password authentication fails
 
 * Fri Oct 05 2012 Antoine Martin <antoine@nagafix.co.uk> 0.3.11-1
 - fix bencoder to properly handle dicts with non-string keys
