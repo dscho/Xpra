@@ -111,8 +111,7 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Sat Oct 13 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.1-1
-- fix mitm attack vector in password mode due to shared salt
+* Sun Oct 21 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.1-1
 - fix division by zero in graphs causing displayed information to stall
 - fix multiple tray shown when using the launcher and password authentication fails
 - fix override redirect windows cleanup code
