@@ -55,7 +55,6 @@ from wimpiggy.util import (n_arg_signal,
 from wimpiggy.log import Logger
 log = Logger()
 
-from xpra import __version__
 from xpra.deque import maxdeque
 from xpra.client_base import XpraClientBase, EXIT_TIMEOUT
 from xpra.keys import DEFAULT_MODIFIER_MEANINGS, DEFAULT_MODIFIER_NUISANCE, DEFAULT_MODIFIER_IGNORE_KEYNAMES
@@ -89,7 +88,6 @@ class XpraClient(XpraClientBase):
         }
 
     def __init__(self, conn, opts):
-        log.info("xpra client version %s" % __version__)
         XpraClientBase.__init__(self, opts)
         self.start_time = time.time()
         self._window_to_id = {}
