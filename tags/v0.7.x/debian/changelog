@@ -1,3 +1,8 @@
+xpra (0.7.2-1) UNRELEASED; urgency=low
+  * fix version string hiding ssh password prompt
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 30 Oct 2012 11:53:26 +0700
+
 xpra (0.7.1-1) UNRELEASED; urgency=low
   * fix division by zero in graphs causing displayed information to stall
   * fix multiple tray shown when using the launcher and authentication fails
