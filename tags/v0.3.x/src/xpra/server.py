@@ -1010,7 +1010,6 @@ class XpraServer(gobject.GObject):
                         self._keynames_for_mod = set_modifiers_from_keycodes(self.xkbmap_keycodes)
                     else:
                         log.error("missing both xkbmap_mod_meanings and xkbmap_keycodes, modifiers will probably not work as expected!")
-        protocol.salt = None
                     log.debug("keyname_for_mod=%s", self._keynames_for_mod)
             except:
                 log.error("error setting xmodmap", exc_info=True)
@@ -1059,6 +1058,7 @@ class XpraServer(gobject.GObject):
             return  True
         log.info("New connection received: %s", sock.getsockname())
         protocol = Protocol(SocketConnection(sock, address), self.process_packet)
+        protocol.salt = None
         self._potential_protocols.append(protocol)
         protocol.start()
         def verify_connection_accepted(protocol):
