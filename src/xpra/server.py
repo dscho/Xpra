@@ -411,7 +411,6 @@ class XpraServer(gobject.GObject):
                     #now set the new modifier mappings:
                     self.clean_keyboard_state()
                     log("going to set modifiers, xkbmap_mod_meanings=%s, len(xkbmap_keycodes)=%s", self.xkbmap_mod_meanings, len(self.xkbmap_keycodes or []))
-        protocol.salt = None
                     if self.xkbmap_mod_meanings:
                         #Unix-like OS provides modifier meanings:
                         self._keynames_for_mod = set_modifiers_from_meanings(self.xkbmap_mod_meanings)
@@ -469,6 +468,7 @@ class XpraServer(gobject.GObject):
         sc = SocketConnection(sock, sock.getsockname(), address)
         log.info("New connection received: %s", sc)
         protocol = Protocol(sc, self.process_packet)
+        protocol.salt = None
         self._potential_protocols.append(protocol)
         protocol.start()
         def verify_connection_accepted(protocol):
