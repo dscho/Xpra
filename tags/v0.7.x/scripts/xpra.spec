@@ -111,9 +111,12 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Tue Oct 30 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.2-1
+* Sun Nov 04 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.2-1
 - fix version string hiding ssh password prompt
 - fix focus handling for applications setting XWMHints.input to False (ie: Java)
+- fix ssh shared connection mode: do not kill it on Ctrl-C
+- fix undefined variable exception in window setup/cleanup code
+- reduce Xdummy memory usage by limitting to lower maxmimum resolutions
 
 * Sun Oct 21 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.1-1
 - fix division by zero in graphs causing displayed information to stall

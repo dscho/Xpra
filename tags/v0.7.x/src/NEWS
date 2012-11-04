@@ -1,7 +1,10 @@
-v0.7.2 (2012-10-30)
+v0.7.2 (2012-11-04)
 ======================
 	-- fix version string hiding ssh password prompt
 	-- fix focus handling for applications setting XWMHints.input to False (ie: Java)
+	-- fix ssh shared connection mode: do not kill it on Ctrl-C
+	-- fix undefined variable exception in window setup/cleanup code
+	-- reduce Xdummy memory usage by limitting to lower maxmimum resolutions
 
 
 v0.7.1 (2012-10-21)
