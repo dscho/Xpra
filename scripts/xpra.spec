@@ -116,6 +116,7 @@ So basically it's screen for remote X apps.
 - fix focus handling for applications setting XWMHints.input to False (ie: Java)
 - fix ssh shared connection mode: do not kill it on Ctrl-C
 - fix undefined variable exception in window setup/cleanup code
+- fix undefined variable exception in window damage code
 - reduce Xdummy memory usage by limitting to lower maxmimum resolutions
 
 * Sun Oct 21 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.1-1
