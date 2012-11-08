@@ -1,3 +1,10 @@
+xpra (0.7.3-1) UNRELEASED; urgency=low
+  * fix crash with unknown X11 keysyms
+  * avoid error with focus being given to a destroyed window
+  * honour window aspect ratio
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 08 Nov 2012 12:33:00 +0700
+
 xpra (0.7.2-1) UNRELEASED; urgency=low
   * fix version string hiding ssh password prompt
   * fix focus handling for applications setting XWMHints.input to False (Java)
@@ -8,7 +15,7 @@ xpra (0.7.2-1) UNRELEASED; urgency=low
   * fix dimensions used for calculating the optimal picture encoding
   * reduce Xdummy memory usage by limitting to lower maxmimum resolutions
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Sun, 07 Nov 2012 16:11:54 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 07 Nov 2012 16:11:54 +0700
 
 xpra (0.7.1-1) UNRELEASED; urgency=low
   * fix division by zero in graphs causing displayed information to stall
