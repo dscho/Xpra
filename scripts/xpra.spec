@@ -111,8 +111,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Thu Nov 08 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.3-1
+* Tue Nov 13 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.3-1
 - fix crash with unknown X11 keysyms
+- fix lost window clicks because of window move offset
 - avoid error with focus being given to a destroyed window
 - honour window aspect ratio
 
