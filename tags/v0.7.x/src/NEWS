@@ -1,6 +1,7 @@
 v0.7.3 (2012-11-08)
 ======================
 	-- fix crash with unknown X11 keysyms
+	-- fix lost window clicks because of window move offset
 	-- avoid error with focus being given to a destroyed window
 	-- honour window aspect ratio
 
