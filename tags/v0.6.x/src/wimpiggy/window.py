@@ -257,7 +257,7 @@ class BaseWindowModel(AutoPropGObjectMixin, gobject.GObject):
             # Keith Packard says that composite state is undefined following a
             # reparent, so I'm not sure doing this here in the superclass,
             # before we reparent, actually works... let's wait and see.
-            self._composite = CompositeHelper(self.client_window, False, )  #self.composite_configure_event)
+            self._composite = CompositeHelper(self.client_window, False)
             h = self._composite.connect("contents-changed", self._forward_contents_changed)
             self._composite.connect("wimpiggy-configure-event", self.composite_configure_event)
             self._damage_forward_handle = h
@@ -286,6 +286,8 @@ class BaseWindowModel(AutoPropGObjectMixin, gobject.GObject):
 
     def composite_configure_event(self, composite_window, event):
         log("BaseWindowModel.composite_configure_event(%s,%s)", composite_window, event)
+        if self._composite:
+            self._composite.do_wimpiggy_configure_event(event)
 
     def do_get_property_geometry(self, pspec):
         (x, y, w, h, b) = self._geometry
@@ -697,26 +699,8 @@ class WindowModel(BaseWindowModel):
         self._internal_set_property("user-friendly-size", (wvis, hvis))
 
     def composite_configure_event(self, composite_window, event):
-        #the client window may have been resized (generally programmatically)
-        #so we may need to update the corral_window to match
         log("WindowModel.composite_configure_event(%s, %s)", composite_window, event)
-        cow, coh = self.corral_window.get_geometry()[2:4]
-        clx, cly, clw, clh = self.client_window.get_geometry()[:4]
-        if (clx, cly) != (0, 0):
-            log("WindowModel.composite_configure_event(%s, %s) client window has moved, resetting it", composite_window, event)
-            self.client_window.move(0, 0)
-        if cow!=clw or coh!=clh:
-            log("WindowModel.composite_configure_event(%s, %s) corral window (%sx%s) does not match client window (%sx%s), resizing it",
-                     composite_window, event, cow, coh, clw, clh)
-            self.corral_window.resize(clw, clh)
-            hints = self.get_property("size-hints")
-            self._sanitize_size_hints(hints)
-            size = calc_constrained_size(clw, clh, hints)
-            log("composite_configure_event: new constrained size=%s", size)
-            w, h, wvis, hvis = size
-            self._internal_set_property("actual-size", (w, h))
-            self._internal_set_property("user-friendly-size", (wvis, hvis))
-            self.emit("geometry", event)
+        BaseWindowModel.composite_configure_event(self, composite_window, event)
         gobject.idle_add(self.may_resize_corral_window)
 
     def may_resize_corral_window(self):
@@ -734,6 +718,26 @@ class WindowModel(BaseWindowModel):
             log.warn("failed to resize corral window: %s", e)
 
     def resize_corral_window(self):
+        #the client window may have been resized (generally programmatically)
+        #so we may need to update the corral_window to match
+        cow, coh = self.corral_window.get_geometry()[2:4]
+        clx, cly, clw, clh = self.client_window.get_geometry()[:4]
+        if (clx, cly) != (0, 0):
+            log("resize_corral_window() client window has moved, resetting it")
+            self.client_window.move(0, 0)
+        if cow!=clw or coh!=clh:
+            log("resize_corral_window() corral window (%sx%s) does not match client window (%sx%s), resizing it",
+                     cow, coh, clw, clh)
+            self.corral_window.resize(clw, clh)
+            hints = self.get_property("size-hints")
+            self._sanitize_size_hints(hints)
+            size = calc_constrained_size(clw, clh, hints)
+            log("resize_corral_window() new constrained size=%s", size)
+            w, h, wvis, hvis = size
+            self._internal_set_property("actual-size", (w, h))
+            self._internal_set_property("user-friendly-size", (wvis, hvis))
+            return True
+        return False
 
     def do_child_configure_request_event(self, event):
         # Ignore the request, but as per ICCCM 4.1.5, send back a synthetic
