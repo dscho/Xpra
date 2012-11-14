@@ -1,3 +1,8 @@
+v0.7.4 (2012-11-14)
+======================
+	-- avoid crash with configure events on windows being destroyed
+
+
 v0.7.3 (2012-11-08)
 ======================
 	-- fix crash with unknown X11 keysyms
