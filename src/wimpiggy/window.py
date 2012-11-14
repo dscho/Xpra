@@ -43,7 +43,7 @@ from wimpiggy.lowlevel.send_wm import (
                 send_wm_take_focus,                         #@UnresolvedImport
                 send_wm_delete_window)                      #@UnresolvedImport
 from wimpiggy.util import (AutoPropGObjectMixin,
-                           one_arg_signal,
+                           one_arg_signal, no_arg_signal,
                            non_none_list_accumulator)
 from wimpiggy.error import trap, XError
 from wimpiggy.prop import prop_get, prop_set
@@ -468,7 +468,7 @@ class WindowModel(BaseWindowModel):
     __gsignals__ = {
         # X11 bell event:
         "bell": one_arg_signal,
-        "geometry": one_arg_signal,
+        "geometry": no_arg_signal,
 
         "ownership-election": (gobject.SIGNAL_RUN_LAST,
                                gobject.TYPE_PYOBJECT, (),
@@ -734,6 +734,23 @@ class WindowModel(BaseWindowModel):
             self._internal_set_property("actual-size", (w, h))
             self._internal_set_property("user-friendly-size", (wvis, hvis))
             self.emit("geometry", event)
+        gobject.idle_add(self.may_resize_corral_window)
+
+    def may_resize_corral_window(self):
+        if not self._managed:
+            return
+        if self.corral_window is None or not self.corral_window.is_visible():
+            return
+        if self.client_window is None or not self.client_window.is_visible():
+            return
+        try:
+            #workaround applications whose windows disappear from underneath us:
+            if trap.call(self.resize_corral_window):
+                self.emit("geometry")
+        except XError, e:
+            log.warn("failed to resize corral window: %s", e)
+
+    def resize_corral_window(self):
 
     def do_child_configure_request_event(self, event):
         # Ignore the request, but as per ICCCM 4.1.5, send back a synthetic
