@@ -111,8 +111,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Nov 14 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.4-1
+* Fri Nov 16 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.4-1
 - avoid crash with configure events on windows being destroyed
+- fix 100% cpu usage with python2.6 server started with no child
 
 * Tue Nov 13 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.3-1
 - fix crash with unknown X11 keysyms
