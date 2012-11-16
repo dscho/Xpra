@@ -1,7 +1,8 @@
 xpra (0.7.4-1) UNRELEASED; urgency=low
   * avoid crash with configure events on windows being destroyed
+  * fix 100% cpu usage with python2.6 server started with no child
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 14 Nov 2012 09:49:20 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 16 Nov 2012 16:57:27 +0700
 
 xpra (0.7.3-1) UNRELEASED; urgency=low
   * fix crash with unknown X11 keysyms
