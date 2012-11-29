@@ -769,7 +769,7 @@ else:
                 #if we're not using the wrapper, don't install it
                 scripts.remove("scripts/xpra_Xdummy")
             etc_files.append(xorg_conf)
-        data_files.append((etc_prefix, etc_files))
+        data_files.append((etc_prefix[1:], etc_files))
     setup_options["scripts"] = scripts
 
 
