@@ -1,0 +1,17 @@
+/add_build_info.pyc
+/build/
+/install/
+/make_constants_pxi.pyc
+/parti/__init__.pyc
+/wimpiggy/__init__.pyc
+/wimpiggy/gdk/gdk_atoms.c
+/wimpiggy/lowlevel/bindings.c
+/wimpiggy/lowlevel/constants.pxi
+/xpra/__init__.pyc
+/xpra/build_info.py
+/xpra/platform/__init__.pyc
+/xpra/rencode/rencode.c
+/xpra/vpx/codec.c
+/xpra/wait_for_x_server.c
+/xpra/x264/codec.c
+/xpra/xposix/__init__.pyc
