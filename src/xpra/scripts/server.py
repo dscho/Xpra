@@ -439,6 +439,7 @@ def run_server(parser, opts, mode, xpra_file, extra_args):
         log.info("upgrading: not cleaning up Xvfb or socket")
         # Upgrading, so leave X server running
         # and don't delete the new socket (not ours)
-        _cleanups.remove(kill_xvfb)
+        if kill_xvfb in _cleanups:
+            _cleanups.remove(kill_xvfb)
         _cleanups.remove(cleanup_socket)
     return  0
