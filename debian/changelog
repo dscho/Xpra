@@ -1,3 +1,13 @@
+xpra (0.7.5-1) UNRELEASED; urgency=low
+  * fix crash on empty keysym
+  * fix potential division by zero
+  * fix network queue access from invalid thread
+  * fix cleanup code on upgrade corner cases
+  * fix keyboard layout change detection
+  * try harder to apply keymaps when the number of free keycodes are limited
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 06 Dec 2012 14:54:01 +0700
+
 xpra (0.7.4-1) UNRELEASED; urgency=low
   * avoid crash with configure events on windows being destroyed
   * fix 100% cpu usage with python2.6 server started with no child
