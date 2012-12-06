@@ -20,10 +20,6 @@ export PYTHONPATH=$PWD/src/install/lib/python:$PYTHONPATH
 
 if test $# -gt 0
 then
-	test "attach" = "$1" && {
-		shift
-		set attach --no-keyboard-sync "$@"
-	}
 	exec ./src/install/bin/xpra "$@"
 else
 	DISPLAY=98
