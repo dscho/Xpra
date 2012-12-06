@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.7.4
+%define version 0.7.5
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -111,6 +111,14 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Thu Dec 06 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.5-1
+- fix crash on empty keysym
+- fix potential division by zero
+- fix network queue access from invalid thread
+- fix cleanup code on upgrade corner cases
+- fix keyboard layout change detection
+- try harder to apply keymaps when the number of free keycodes are limited
+
 * Fri Nov 16 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.4-1
 - avoid crash with configure events on windows being destroyed
 - fix 100% cpu usage with python2.6 server started with no child
