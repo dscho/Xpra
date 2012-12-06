@@ -16,6 +16,12 @@ test -x src/install/bin/xpra || (
 	./setup.py install --home=install
 )
 
-DISPLAY=98
 export PYTHONPATH=$PWD/src/install/lib/python:$PYTHONPATH
-./src/install/bin/xpra --xvfb="Xorg -verbose -noreset +extension GLX +extension RANDR +extension RENDER -logfile $HOME/.xpra/$DISPLAY.log -config $PWD/xorg.conf :$DISPLAY" "--start-child=dbus-launch gnome-terminal" start :$DISPLAY
+
+if test $# -gt 0
+then
+	exec ./src/install/bin/xpra "$@"
+else
+	DISPLAY=98
+	exec ./src/install/bin/xpra --xvfb="Xorg -verbose -noreset +extension GLX +extension RANDR +extension RENDER -logfile $HOME/.xpra/$DISPLAY.log -config $PWD/xorg.conf :$DISPLAY" "--start-child=dbus-launch gnome-terminal" start :$DISPLAY
+fi
