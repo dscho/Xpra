@@ -608,6 +608,9 @@ class WindowSource(object):
             packet = self.make_data_packet(*data)
             if packet:
                 self.queue_damage_packet(pixmap, packet, damage_time, process_damage_time)
+                if self.encoding in ("png", "rgb24"):
+                    #primary encoding is lossless, no need for auto-refresh
+                    return
                 #auto-refresh:
                 if self.auto_refresh_delay>0 and not self.is_cancelled(sequence):
                     client_options = packet[10]     #info about this packet from the encoder
