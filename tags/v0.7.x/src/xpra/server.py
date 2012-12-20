@@ -348,7 +348,8 @@ class XpraServer(gobject.GObject):
                 self.notifications_forwarder.release()
             except Exception, e:
                 log.error("failed to release dbus notification forwarder: %s", e)
-        for proto in self._server_sources.keys():
+        log("cleanup will disconnect: %s", self._potential_protocols)
+        for proto in self._potential_protocols:
             self.disconnect(proto, "shutting down")
 
     def _new_connection(self, listener, *args):
