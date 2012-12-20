@@ -418,6 +418,7 @@ class XpraServer(gobject.GObject):
             ss.bell(wid, event.device, event.percent, event.pitch, event.duration, event.bell_class, event.bell_id, event.bell_name or "")
 
     def send_clipboard_packet(self, packet):
+        assert self._clipboard_helper is not None
         if self._clipboard_client:
             self._clipboard_client.send(packet)
 
@@ -954,7 +955,8 @@ class XpraServer(gobject.GObject):
         else:
             root_w, root_h = gtk.gdk.get_default_root_window().get_size()
         #take the clipboard if no-one else has yet:
-        if ss.clipboard_enabled and (self._clipboard_client is None or self._clipboard_client.closed):
+        if ss.clipboard_enabled and self._clipboard_helper is not None and \
+            (self._clipboard_client is None or self._clipboard_client.closed):
             self._clipboard_client = ss
         #so only activate this feature afterwards:
         self.keyboard_sync = bool(capabilities.get("keyboard_sync", True))
@@ -1026,7 +1028,7 @@ class XpraServer(gobject.GObject):
         capabilities["toggle_cursors_bell_notify"] = True
         capabilities["toggle_keyboard_sync"] = True
         capabilities["notifications"] = self.notifications_forwarder is not None
-        capabilities["clipboard"] = self._clipboard_client == server_source
+        capabilities["clipboard"] = self._clipboard_helper is not None and self._clipboard_client == server_source
         capabilities["bell"] = self.bell
         capabilities["cursors"] = self.cursors
         if "key_repeat" in client_capabilities:
@@ -1553,6 +1555,7 @@ class XpraServer(gobject.GObject):
             assert self._clipboard_client==ss, \
                     "the clipboard packet '%s' does not come from the clipboard owner!" % packet_type
             assert ss.clipboard_enabled, "received a clipboard packet from a source which does not have clipboard enabled!"
+            assert self._clipboard_helper, "received a clipboard packet but we do not support clipboard sharing"
             gobject.idle_add(self._clipboard_helper.process_clipboard_packet, packet)
             return
         if proto in self._server_sources:
