@@ -1152,7 +1152,7 @@ class XpraServer(gobject.GObject):
             assert self._clipboard_client==self._server_sources.get(proto), \
                     "the request to change the clipboard enabled status does not come from the clipboard owner!"
             self._clipboard_client.clipboard_enabled = clipboard_enabled
-            log("toggled clipboard to %s", self.clipboard_enabled)
+            log("toggled clipboard to %s", clipboard_enabled)
         else:
             log.warn("client toggled clipboard-enabled but we do not support clipboard at all! ignoring it")
 
