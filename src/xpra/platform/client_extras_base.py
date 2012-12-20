@@ -734,6 +734,14 @@ class ClientExtrasBase(object):
             return  None
 
 
+    def handshake_menuitem(self, *args, **kwargs):
+        """ Same as menuitem() but this one will be disabled until we complete the server handshake """
+        mi = self.menuitem(*args, **kwargs)
+        mi.set_sensitive(False)
+        def enable_menuitem(*args):
+            mi.set_sensitive(True)
+        self.client.connect("handshake-complete", enable_menuitem)
+        return mi        
 
     def menuitem(self, title, icon_name=None, tooltip=None, cb=None):
         """ Utility method for easily creating an ImageMenuItem """
@@ -790,7 +798,7 @@ class ClientExtrasBase(object):
         return  self.menuitem("About Xpra", "information.png", None, self.about)
 
     def make_sessioninfomenuitem(self):
-        return  self.menuitem(self.session_name or "Session Info", "statistics.png", None, self.session_info)
+        return  self.handshake_menuitem(self.session_name or "Session Info", "statistics.png", None, self.session_info)
 
     def make_bellmenuitem(self):
         def bell_toggled(*args):
@@ -798,6 +806,7 @@ class ClientExtrasBase(object):
             self.client.send_bell_enabled()
             log.debug("bell_toggled(%s) bell_enabled=%s", args, self.client.bell_enabled)
         self.bell_menuitem = self.checkitem("Bell", bell_toggled)
+        self.bell_menuitem.set_sensitive(False)
         def set_bell_menuitem(*args):
             self.bell_menuitem.set_active(self.client.bell_enabled)
             c = self.client
@@ -816,6 +825,7 @@ class ClientExtrasBase(object):
             self.client.send_cursors_enabled()
             log.debug("cursors_toggled(%s) cursors_enabled=%s", args, self.client.cursors_enabled)
         self.cursors_menuitem = self.checkitem("Cursors", cursors_toggled)
+        self.cursors_menuitem.set_sensitive(False)
         def set_cursors_menuitem(*args):
             self.cursors_menuitem.set_active(self.client.cursors_enabled)
             c = self.client
@@ -834,6 +844,7 @@ class ClientExtrasBase(object):
             self.client.send_notify_enabled()
             log.debug("notifications_toggled(%s) notifications_enabled=%s", args, self.client.notifications_enabled)
         self.notifications_menuitem = self.checkitem("Notifications", notifications_toggled)
+        self.notifications_menuitem.set_sensitive(False)
         def set_notifications_menuitem(*args):
             self.notifications_menuitem.set_active(self.client.notifications_enabled)
             c = self.client
@@ -854,6 +865,7 @@ class ClientExtrasBase(object):
                 self.client.clipboard_enabled = new_state
                 self.client.emit("clipboard-toggled")
         self.clipboard_menuitem = self.checkitem("Clipboard", clipboard_toggled)
+        self.clipboard_menuitem.set_sensitive(False)
         def set_clipboard_menuitem(*args):
             self.clipboard_menuitem.set_active(self.client.clipboard_enabled)
             c = self.client
@@ -868,10 +880,11 @@ class ClientExtrasBase(object):
 
     def make_translatedclipboard_optionsmenuitem(self):
         clipboard_menu = self.menuitem("Clipboard", "clipboard.png", "Choose which remote clipboard to connect to", None)
-        clipboard_submenu = gtk.Menu()
-        clipboard_menu.set_submenu(clipboard_submenu)
-        self.popup_menu_workaround(clipboard_submenu)
+        clipboard_menu.set_sensitive(False)
         def set_clipboard_menu(*args):
+            clipboard_submenu = gtk.Menu()
+            clipboard_menu.set_submenu(clipboard_submenu)
+            self.popup_menu_workaround(clipboard_submenu)
             c = self.client
             can_clipboard = c.server_supports_clipboard and c.client_supports_clipboard and c.server_supports_clipboard
             log("set_clipboard_menu(%s) can_clipboard=%s, server=%s, client=%s", args, can_clipboard, c.server_supports_clipboard, c.client_supports_clipboard)
@@ -933,6 +946,7 @@ class ClientExtrasBase(object):
             set_keyboard_sync_tooltip()
             self.client.emit("keyboard-sync-toggled")
         self.keyboard_sync_menuitem = self.checkitem("Keyboard Synchronization", keyboard_sync_toggled)
+        self.keyboard_sync_menuitem.set_sensitive(False)
         def set_keyboard_sync_menuitem(*args):
             self.keyboard_sync_menuitem.set_active(self.client.keyboard_sync)
             self.keyboard_sync_menuitem.set_sensitive(self.client.toggle_keyboard_sync)
@@ -942,8 +956,8 @@ class ClientExtrasBase(object):
 
     def make_encodingsmenuitem(self):
         encodings = self.menuitem("Encoding", "encoding.png", "Choose picture data encoding", None)
+        encodings.set_sensitive(False)
         self.encodings_submenu = gtk.Menu()
-        encodings.set_submenu(self.encodings_submenu)
         self.popup_menu_workaround(self.encodings_submenu)
         def set_encodingsmenuitem(*args):
             if self.client.mmap_enabled:
@@ -951,6 +965,9 @@ class ClientExtrasBase(object):
                 encodings.set_label("Encoding")
                 set_tooltip_text(encodings, "memory mapped transfers are in use so picture encoding is disabled")
                 encodings.set_sensitive(False)
+                return
+            encodings.set_sensitive(True)
+            encodings.set_submenu(self.encodings_submenu)
             for encoding in ENCODINGS:
                 encoding_item = CheckMenuItem(encoding)
                 def encoding_changed(item):
@@ -972,8 +989,8 @@ class ClientExtrasBase(object):
 
     def make_qualitysubmenu(self):
         self.quality = self.menuitem("Quality", "slider.png", "Change quality setting", None)
+        self.quality.set_sensitive(False)
         self.quality_submenu = gtk.Menu()
-        self.quality.set_submenu(self.quality_submenu)
         self.popup_menu_workaround(self.quality_submenu)
         quality_options = [-1, 10, 50, 80, 95]
         if self.client.quality>0 and self.client.quality not in quality_options:
@@ -985,7 +1002,7 @@ class ClientExtrasBase(object):
                     break
                 i += 1
         def set_quality(item):
-            item = ensure_item_selected(self.quality_submenu, item)
+            item = ensure_item_selected(quality_submenu, item)
             q = -1
             try:
                 q = int(item.get_label().replace("%", ""))
@@ -1006,7 +1023,10 @@ class ClientExtrasBase(object):
             qi.connect('activate', set_quality)
             self.quality_submenu.append(qi)
         self.quality_submenu.show_all()
-        self.client.connect("handshake-complete", self.set_qualitymenu)
+        def enable_qualitymenu(*args):
+            self.quality.set_submenu(self.quality_submenu)
+            self.set_qualitymenu()
+        self.client.connect("handshake-complete", enable_qualitymenu)
         return self.quality
 
     def set_qualitymenu(self, *args):
@@ -1022,6 +1042,7 @@ class ClientExtrasBase(object):
 
     def make_layoutsmenuitem(self):
         keyboard = self.menuitem("Keyboard", "keyboard.png", "Select your keyboard layout", None)
+        keyboard.set_sensitive(False)
         self.layout_submenu = gtk.Menu()
         keyboard.set_submenu(self.layout_submenu)
         self.popup_menu_workaround(self.layout_submenu)
@@ -1029,6 +1050,7 @@ class ClientExtrasBase(object):
             def set_layout(item):
                 """ this callback updates the client (and server) if needed """
                 item = ensure_item_selected(self.layout_submenu, item)
+                speaker.set_sensitive(True)
                 layout = item.keyboard_layout
                 variant = item.keyboard_variant
                 if layout!=self.client.xkbmap_layout or variant!=self.client.xkbmap_variant:
@@ -1077,6 +1099,7 @@ class ClientExtrasBase(object):
                 #so no need to let the user override it
                 keyboard.hide()
                 return
+            keyboard.set_sensitive(True)
             layout = self.client.xkbmap_layout
             variant = self.client.xkbmap_variant
             def is_match(checkitem):
@@ -1087,6 +1110,7 @@ class ClientExtrasBase(object):
 
     def make_compressionmenu(self):
         self.compression = self.menuitem("Compression", "compressed.png", "Network packet compression", None)
+        self.compression.set_sensitive(False)
         self.compression_submenu = gtk.Menu()
         self.compression.set_submenu(self.compression_submenu)
         self.popup_menu_workaround(self.compression_submenu)
@@ -1103,7 +1127,10 @@ class ClientExtrasBase(object):
             c.set_active(i==self.client.compression_level)
             c.connect('activate', set_compression)
             self.compression_submenu.append(c)
-        self.compression_submenu.show_all()
+        def enable_compressionmenu(self):
+            self.compression.set_sensitive(True)
+            self.compression_submenu.show_all()
+        self.client.connect("handshake-complete", enable_compressionmenu)
         return self.compression
 
 
@@ -1115,17 +1142,17 @@ class ClientExtrasBase(object):
         def force_refresh(*args):
             log.debug("force refresh")
             self.client.send_refresh_all()
-        return self.menuitem("Refresh", "retry.png", None, force_refresh)
+        return self.handshake_menuitem("Refresh", "retry.png", None, force_refresh)
 
     def make_raisewindowsmenuitem(self):
         def raise_windows(*args):
             for win in self.client._window_to_id.keys():
                 if not win._override_redirect:
                     win.present()
-        return self.menuitem("Raise Windows", "raise.png", None, raise_windows)
+        return self.handshake_menuitem("Raise Windows", "raise.png", None, raise_windows)
 
     def make_disconnectmenuitem(self):
-        return self.menuitem("Disconnect", "quit.png", None, self.quit)
+        return self.handshake_menuitem("Disconnect", "quit.png", None, self.quit)
 
     def make_closemenuitem(self):
         return self.menuitem("Close Menu", "close.png", None, self.close_menu)
@@ -1150,14 +1177,11 @@ class ClientExtrasBase(object):
             menu.append(self.make_clipboardmenuitem())
         if self.client.windows_enabled and len(ENCODINGS)>1:
             menu.append(self.make_encodingsmenuitem())
-        else:
-            self.encodings_submenu = None
         lossy_encodings = set(ENCODINGS) & set(["jpeg", "webp", "x264", "vpx"])
         if self.client.windows_enabled and len(lossy_encodings)>0:
             menu.append(self.make_qualitysubmenu())
         else:
             self.quality = None
-            self.quality_submenu = None
         if SHOW_COMPRESSION_MENU:
             menu.append(self.make_compressionmenu())
         if not self.client.readonly:
