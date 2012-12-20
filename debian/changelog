@@ -1,3 +1,15 @@
+xpra (0.7.6-1) UNRELEASED; urgency=low
+  * fix tray options meant to be unusable until connected
+  * fix missing first bell in error case
+  * fix potential DoS in client disconnection accounting
+  * fix network calls coming from wrong thread in error case
+  * fix unlikely locking issue and reduce lock hold time
+  * fix disconnect all connected clients cleanly
+  * fix clipboard flag handling
+  * don't bother trying to auto-refresh in lossless modes
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 20 Dec 2012 16:48:23 +0700
+
 xpra (0.7.5-1) UNRELEASED; urgency=low
   * fix crash on empty keysym
   * fix potential division by zero
