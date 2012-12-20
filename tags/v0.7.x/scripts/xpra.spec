@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.7.5
+%define version 0.7.6
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -111,6 +111,16 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Thu Dec 20 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.5-1
+- fix tray options meant to be unusable until connected
+- fix missing first bell in error case
+- fix potential DoS in client disconnection accounting
+- fix network calls coming from wrong thread in error case
+- fix unlikely locking issue and reduce lock hold time
+- fix disconnect all connected clients cleanly
+- fix clipboard flag handling
+- don't bother trying to auto-refresh in lossless modes
+
 * Thu Dec 06 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.5-1
 - fix crash on empty keysym
 - fix potential division by zero
