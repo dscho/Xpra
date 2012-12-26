@@ -137,8 +137,10 @@
 	  		<br />
 	  		If you find a bug or missing feature, please do <a href="/index.html#help">let us know</a>.
 	  	</li>
+	  	<li class="q">My application menus are missing on Ubuntu</li>
+	  	<li class="a">This <a href="https://www.xpra.org/trac/ticket/228">breakage</a> was caused by Ubuntu's global menus hack, start your applications with <code>UBUNTU_MENUPROXY</code> set to an empty string to disable this mess (ie: <code>UBUNTU_MENUPROXY="" yourapplication</code>)</li>
 	  	<li class="q">Does this work with KDE?</li>
-	  	<li class="a">There are problems with some versions of the <code>oxygen</code> theme engine (older versions simply crashed, some newer versions prevented clicks from propagating to xpra)</li>
+	  	<li class="a">There are problems with some versions of <code>KDE</code>/<code>oxygen</code> (older versions simply crashed, some newer versions prevented clicks from propagating to xpra)</li>
 	  	<li class="q">Can this be fixed or worked around?</li>
 	  	<li class="a">Yes, the fix is now <a href="https://bugs.kde.org/show_bug.cgi?id=274485">in KDE trunk</a></li>
 	  </ul>
