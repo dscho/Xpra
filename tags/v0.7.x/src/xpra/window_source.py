@@ -551,7 +551,7 @@ class WindowSource(object):
             #x264 needs sizes divisible by 2:
             ww = ww & 0xFFFE
             wh = wh & 0xFFFE
-        if self.uses_swscale and (ww<8 or wh<=2):
+        if ww<8 or wh<=2:
             return switch()
         if pixel_count<ww*wh*0.01:
             #less than one percent of total area
