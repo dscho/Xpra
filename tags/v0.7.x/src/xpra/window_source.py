@@ -650,7 +650,6 @@ class WindowSource(object):
             #self.process_damage_region(time.time(), window, 0, 0, ww, wh, coding, new_options)
         self.cancel_refresh_timer()
         if self._damage_delayed:
-            debug("auto refresh: delayed region already exists")
             #there is already a new damage region pending, let it re-schedule when it gets sent
             return
         delay = int(max(50, self.auto_refresh_delay, self.batch_config.delay))
