@@ -111,8 +111,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Thu Dec 20 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.5-1
+* Tue Jan 01 2013 Antoine Martin <antoine@nagafix.co.uk> 0.7.6-1
 - fix tray options meant to be unusable until connected
+- fix auto refresh delay
 - fix missing first bell in error case
 - fix potential DoS in client disconnection accounting
 - fix network calls coming from wrong thread in error case
