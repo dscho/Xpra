@@ -492,7 +492,7 @@ class ServerSource(object):
         if q>=0:
             self.default_damage_options["quality"] = q
         self.png_window_icons = "png" in self.encodings and "png" in ENCODINGS
-        self.auto_refresh_delay = int(capabilities.get("auto_refresh_delay", 0)/1000)
+        self.auto_refresh_delay = int(capabilities.get("auto_refresh_delay", 0))/1000.0
         #keyboard:
         self.keyboard_config = KeyboardConfig()
         self.keyboard_config.enabled = self.send_windows and bool(capabilities.get("keyboard", True))
@@ -649,6 +649,7 @@ class ServerSource(object):
         info["cursors%" % suffix] = self.send_cursors
         info["bell%" % suffix] = self.send_bell
         info["notifications%" % suffix] = self.send_notifications
+        info["auto_refresh%s" % suffix] = int(self.auto_refresh_delay*1000.0)
 
     def send_clipboard(self, packet):
         if self.clipboard_enabled:
