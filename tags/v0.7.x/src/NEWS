@@ -8,6 +8,8 @@ v0.7.6 (2013-01-01)
 	-- fix unlikely locking issue and reduce lock hold time
 	-- fix disconnect all connected clients cleanly
 	-- fix clipboard flag handling
+	-- fix Mac OSX path with spaces handling
+	-- fix server minimum window dimensions with video encoders
 	-- don't bother trying to auto-refresh in lossless modes
 
 

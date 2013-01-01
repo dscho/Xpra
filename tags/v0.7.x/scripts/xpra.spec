@@ -120,6 +120,7 @@ So basically it's screen for remote X apps.
 - fix unlikely locking issue and reduce lock hold time
 - fix disconnect all connected clients cleanly
 - fix clipboard flag handling
+- fix server minimum window dimensions with video encoders
 - don't bother trying to auto-refresh in lossless modes
 
 * Thu Dec 06 2012 Antoine Martin <antoine@nagafix.co.uk> 0.7.5-1
