@@ -1002,7 +1002,7 @@ class ClientExtrasBase(object):
                     break
                 i += 1
         def set_quality(item):
-            item = ensure_item_selected(quality_submenu, item)
+            item = ensure_item_selected(self.quality_submenu, item)
             q = -1
             try:
                 q = int(item.get_label().replace("%", ""))
