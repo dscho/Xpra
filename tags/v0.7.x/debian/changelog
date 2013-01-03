@@ -1,3 +1,10 @@
+xpra (0.7.7-1) UNRELEASED; urgency=low
+  * fix quality menu
+  * fix for clients not using rencoder (ie: Java, Android..)
+  * fix pixel queue size accounting
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 03 Jan 2013 12:23:39 +0700
+
 xpra (0.7.6-1) UNRELEASED; urgency=low
   * fix tray options meant to be unusable until connected
   * fix auto refresh delay
