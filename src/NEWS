@@ -1,3 +1,10 @@
+v0.7.7 (2013-01-03)
+======================
+	-- fix quality menu
+	-- fix for clients not using rencoder (ie: Java, Android..)
+	-- fix pixel queue size accounting
+
+
 v0.7.6 (2013-01-01)
 ======================
 	-- fix tray options meant to be unusable until connected
