@@ -145,7 +145,12 @@
 		<pre><code>xpra start :100
 DISPLAY=:100 xterm
 </code></pre></div>
-		For the simple case, we can then attach to this session from the same machine with:
+		Or more simply (which is also more resilient if running these commands remotely):
+	    <div class="codebox">
+		<pre><code>xpra start :100 --start-child=xterm
+</code></pre></div>
+		
+		For the simple case, we can then attach to this xterm session from the same machine with:
 		<div class="codebox">
 		<pre><code>xpra attach :100
 </code></pre></div>
@@ -153,6 +158,7 @@ DISPLAY=:100 xterm
 		<div class="codebox">
 		<pre><code>xpra attach ssh:serverhostname:100
 </code></pre></div>
+		One can also use plain TCP sockets and password authentication if desired.
 	</div>
 
 	<a id="help"></a>
