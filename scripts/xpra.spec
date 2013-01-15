@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.7.7
+%define version 0.7.8
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -111,6 +111,13 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Tue Jan 15 2013 Antoine Martin <antoine@nagafix.co.uk> 0.7.8-1
+- fix xsettings integer parsing
+- fix 'quality' command line option availibility check
+- workaround Ubuntu's global menus
+- better compatibility with old servers: don't send new xsettings format
+- avoid logging for normal "clipboard is disabled" case
+
 * Thu Jan 03 2013 Antoine Martin <antoine@nagafix.co.uk> 0.7.7-1
 - fix quality menu
 - fix for clients not using rencoder (ie: Java, Android..)

@@ -1,3 +1,12 @@
+xpra (0.7.8-1) UNRELEASED; urgency=low
+  * fix xsettings integer parsing
+  * fix 'quality' command line option availibility check
+  * workaround Ubuntu's global menus
+  * better compatibility with old servers: don't send new xsettings format
+  * avoid logging for normal "clipboard is disabled" case
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 15 Jan 2013 11:46:52 +0700
+
 xpra (0.7.7-1) UNRELEASED; urgency=low
   * fix quality menu
   * fix for clients not using rencoder (ie: Java, Android..)
