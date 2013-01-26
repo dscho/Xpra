@@ -32,7 +32,7 @@
 	   <img src="/icons/xpra-logo.png" alt="xpra icon" />
    </div>
    <div id="logotitle">
-	   up-to-date fork
+	   Xdummy
    </div>
    <div id="logo_tr">
 		<a href="http://devloop.org.uk"><span class="lighter">/</span>dev<span class="lighter">/</span>loop<span class="lighter">.org.uk</span></a>
@@ -86,15 +86,17 @@
 	<div class="box">
 		<a id="status"></a>
 		<h2><img src="/icons/question.png" alt="question" /> Status</h2>
-		There are two changes to core Xorg code which are needed:
+		<h3>Versions Required</h3>
+		Most recent distributions now ship compatible packages though some may have issues with non world-readable binaries (see below),
+		for those that ship outdated versions there are two changes to core Xorg code which are needed:
 		<ul>
 			<li><a href="http://cgit.freedesktop.org/xorg/xserver/commit/?id=ead968a4300c0adeff89b9886e888b6d284c75cc">The xserver patch</a>:
-				which is part of the 1.12 release branch.
+				which is part of the 1.12 xserver.
 			</li>
 			<li><a href="http://cgit.freedesktop.org/xorg/driver/xf86-video-dummy/commit/?id=fb0888f90d5d1c10d69ec2add0a66e88c94f5d5c">This xf86-video-dummy patch</a>:
-				which is part of version 0.3.5 and later.
+				which is part of version 0.3.5.
 				<br />
-				<span class="smallnote">(if your client screen is smaller than 2048x2048, you may not need it)</span>
+				<span class="smallnote">(if your clients' screens are always smaller than 2048x2048, you may not need it)</span>
 			</li>
 		</ul>
 		If your distribution ships older versions of those packages,
@@ -102,17 +104,23 @@
 		<span class="smallnote">(no warranties given or implied)</span>
 		<br />
 		<br />
+		<h3>non-suid binary</h3>
 		If you distribution ships the newer version but only installs a <code>suid</code> Xorg binary,
-		you may need to copy it first to a non-suid file to avoid the message: &quot;<code>The ... option cannot be used with elevated privileges.</code>&quot;:
+		Xpra should have installed the <code>xpra_Xdummy</code> wrapper script and configured <code>xpra.conf</code> to use it instead
+		of the regular <code>Xorg</code> binary.
+		<br />
+		This script takes care of copying the <code>Xorg</code> binary to a non-suid executable before running it.
+		<br />
+		<b>Note:</b> in some cases, you may need to make the <code>Xorg</code> executable world-readable so that the wrapper can make the non-suid copy when needed:
 	    <div class="codebox">
-		<pre><code>sudo cp /usr/bin/Xorg /usr/local/bin/Xorg-nosuid</code></pre>
+		<pre><code>sudo chmod +r /usr/bin/Xorg</code></pre>
 		</div>
-		You can then replace &quot;<code>Xorg</code>&quot; with &quot;<code>Xorg-nosuid</code>&quot; in the instructions below.
 	</div>
 
 	<div class="box">
 	  <a id="usage"></a>
 	  <h2><img src="/icons/gears.png" alt="gears" /> Usage</h2>
+	  	<h3>Xdummy standlone</h3>
 		With this new xserver, you can start a new display using the dummy driver without needing any special privileges
 		whilst still specifying your own log and config files:
 	    <div class="codebox">
@@ -126,24 +134,25 @@
 		to match your specific resolution)</p>
 		<br />
 		<br />
-		With Xpra, you can specify this virtual framebuffer alternative using the <code>--xvfb</code> switch:
+		<h3>Xdummy with Xpra</h3>
+		With Xpra, this should all have been configured automatically for you by your package manager (whenever possible..).
+		<br />
+		You can specify this virtual framebuffer alternative using the <code>--xvfb</code> switch:
 		<div class="codebox">
 		<pre><code>xpra --xvfb="Xorg -dpi 96 -noreset -nolisten tcp \
 			+extension GLX +extension RANDR +extension RENDER \
 			-logfile ${HOME}/.xpra/Xvfb-10.log -config ${HOME}/xorg.conf" \
-			start :10</code></pre></div>
+			start :10</code></pre></div>		
+		or more simply by setting the <code>xvfb</code> option in your <code>/etc/xpra/xpra.conf</code>:
+		<div class="codebox">
+		<pre><code>xvfb=Xorg -dpi 96 -noreset -nolisten tcp \
+			+extension GLX +extension RANDR +extension RENDER \
+			-logfile ${HOME}/.xpra/Xvfb-10.log -config ${HOME}/xorg.conf</code></pre></div>
 		<p class="smallnote">(the <code>-noreset</code> option is only needed if the window manager is not
 		the first application started on the display, for example if you use the <code>--start-child=</code> option,
 		or if you want the display to survive once the window manager exits
 		- generally, this is a good idea since xpra could crash and when it exits cleanly via "xpra stop" it takes care
 		of shutting down the X11 server anyway)</p>
-		<!--
-		Those using <a href="http://winswitch.org/">Window Switch</a> should have the correct settings automatically detected when the initial configuration is created,
-		but if an upgrade (or patch) provides the new xserver features, you can then change the settings manually:
-	    <div class="codebox">
-		<pre><code>xpra_xvfb_command="/usr/local/bin/Xdummy -nolisten tcp +extension GLX +extension RANDR +extension RENDER -logfile ${logfile} -config /usr/share/winswitch/xorg-xdummy-xpra.conf"
-</code></pre></div>
-		-->	
   	</div>
 
   </div>

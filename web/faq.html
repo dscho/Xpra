@@ -32,7 +32,7 @@
 	   <img src="/icons/xpra-logo.png" alt="xpra icon" />
    </div>
    <div id="logotitle">
-	   How to build
+	   FAQ
    </div>
    <div id="logo_tr">
 		<a href="http://devloop.org.uk"><span class="lighter">/</span>dev<span class="lighter">/</span>loop<span class="lighter">.org.uk</span></a>
@@ -125,6 +125,12 @@
 	  	</li>
 	  	<li class="q">&quot;<code>Uh-oh, our size doesn't fit window sizing constraints ..</code>&quot;</li>
 	  	<li class="a">This means that xpra failed to create a window matching the desired constraints, you may experience display artifacts around the window's borders</li>
+	  	<li class="q">&quot;<code>Xorg</code> is not readable&quot;</li>
+	  	<li class="a">Your distribution ships <code>Xorg</code> <code>suid</code> but it is not readable by your current user,
+	  		since Xpra needs to run <code>Xorg</code> non-suid, it needs to make a non-suid copy of the file so you will have to make it readable
+	  		(please complain to your distributor - there is nothing we can do about this). <br />
+	  		For more details, see <a href="/Xdummy.html">Xdummy</a>.
+	  	</li>
 	  </ul>
 	</div>
 
