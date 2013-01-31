@@ -1,0 +1,847 @@
+v0.8.0 (2012-12-20)
+======================
+	-- fix modal windows support
+	-- fix default mouse cursor: now uses the client's default cursor
+	-- fix "double-apple" in menu on OSX
+	-- fix short lived windows: avoid doing unnecessary work, avoid re-registering handlers
+	-- fix limit the number of raw packets per client to prevent DoS via memory exhaustion
+	-- fix authentication: ensure salt is per connection
+	-- fix for ubuntu global application menus
+	-- fix proxy handling of deadly signals
+	-- fix pixel queue size calculations used for performance tuning decisions
+	-- fix ^C exit on MS Windows: ensure we do cleanup the system tray on exit
+	-- edge resistance for colourspace conversion level changes to prevent yoyo effect
+	-- more aggressive picture quality tuning
+	-- better CPU utilization
+	-- new command line options and tray menu to trade latency for bandwidth
+	-- x264 disable unecessary I-frames and avoid IDR frames
+	-- performance and latency optimizations in critical sections
+	-- avoid server loops: prevent the client from connecting to itself
+	-- group windows according to the remote application they belong to
+	-- sound forwarding (initial code, high latency)
+	-- faster and more reliable client and server exit (from signal or otherwise)
+	-- SSH support on MS Windows
+	-- "xpra shadow" mode to clone an existing X11 display (compositors not supported yet)
+	-- support for delta pixels mode (most useful for shadow mode)
+	-- avoid warnings and X11 errors with the screenshot command
+	-- better mouse cursor support: send cursors by name so their size matches the client's settings
+	-- mitigate bandwidth eating cursor change storms: introduce simple cursor update batching
+	-- support system tray icon forwarding (limited)
+	-- preserve window workspace
+	-- AES packet encryption for TCP mode (without key secure exchange for now)
+	-- launcher entry box for username in SSH mode
+	-- launcher improvements: highlight the password field if needed, prevent warnings, etc
+	-- better window manager specification compatibility (for broken applications or toolkits)
+	-- use lossless encoders more aggressively when possible
+	-- new x264 tuning options: profiles to use and thresholds
+	-- better detection of dead server sockets: retry and remove them if needed
+	-- improved session information dialog and graphs
+	-- more detailed hierarchical per-window details via "xpra info"
+	-- send window icons in dedicated compressed packet (smaller new-window packets, faster)
+	-- detect overly large main packets
+	-- partial/initial Java/AWT keyboard support
+	-- py2exe, ebuild and distutils improvements: faster and cleaner builds, discarding unwanted modules
+	-- OSX and MS Windows build updates: newer py2app, gtk-mac-bundler, pywin32 and support libraries
+	-- OSX command line path fix
+	-- updated libx264 and libav on OSX
+	-- updated Cython to 0.17.4 for all binary builds
+
+
+v0.7.8 (2013-01-15)
+======================
+	-- fix xsettings integer parsing
+	-- fix 'quality' command line option availibility check
+	-- workaround Ubuntu's global menus
+	-- better compatibility with old servers: don't send new xsettings format
+	-- avoid logging for normal "clipboard is disabled" case
+
+
+v0.7.7 (2013-01-03)
+======================
+	-- fix quality menu
+	-- fix for clients not using rencoder (ie: Java, Android..)
+	-- fix pixel queue size accounting
+
+
+v0.7.6 (2013-01-01)
+======================
+	-- fix tray options meant to be unusable until connected
+	-- fix auto refresh delay
+	-- fix missing first bell in error case
+	-- fix potential DoS in client disconnection accounting
+	-- fix network calls coming from wrong thread in error case
+	-- fix unlikely locking issue and reduce lock hold time
+	-- fix disconnect all connected clients cleanly
+	-- fix clipboard flag handling
+	-- fix Mac OSX path with spaces handling
+	-- fix server minimum window dimensions with video encoders
+	-- don't bother trying to auto-refresh in lossless modes
+
+
+v0.7.5 (2012-12-06)
+======================
+	-- fix crash on empty keysym
+	-- fix potential division by zero
+	-- fix network queue access from invalid thread
+	-- fix cleanup code on upgrade corner cases
+	-- fix keyboard layout change detection
+	-- try harder to apply keymaps when the number of free keycodes are limited
+
+
+v0.7.4 (2012-11-16)
+======================
+	-- avoid crash with configure events on windows being destroyed
+	-- fix 100% cpu usage with python2.6 server started with no child
+
+
+v0.7.3 (2012-11-08)
+======================
+	-- fix crash with unknown X11 keysyms
+	-- avoid error with focus being given to a destroyed window
+	-- honour window aspect ratio
+
+
+v0.7.2 (2012-11-07)
+======================
+	-- fix version string hiding ssh password prompt
+	-- fix focus handling for applications setting XWMHints.input to False (ie: Java)
+	-- fix ssh shared connection mode: do not kill it on Ctrl-C
+	-- fix sanitization of aspect ratio hints
+	-- fix undefined variable exception in window setup/cleanup code
+	-- fix undefined variable exception in window damage code
+	-- fix dimensions used for calculating the optimal picture encoding
+	-- reduce Xdummy memory usage by limitting to lower maxmimum resolutions
+
+
+v0.7.1 (2012-10-21)
+======================
+	-- fix division by zero in graphs causing displayed information to stall
+	-- fix multiple tray shown when using the launcher and password authentication fails
+	-- fix override redirect windows cleanup code
+	-- fix keyboard mapping for AltGr with old versions of X11 server
+	-- fix for Mac OSX zero keycode (letter 'a')
+	-- fix for invalid modifiers: try harder to apply valid mappings
+	-- fix gtk import warning with text clients (xpra version, xpra info)
+
+
+v0.7.0 (2012-10-08)
+======================
+	-- Mac DMG client download
+	-- Android APK download
+	-- fix "AltGr" key handling with MS Windows clients (and others)
+	-- fix crash with x264 encoding
+	-- fix crash with fast disappearing tooltip windows
+	-- avoid storing password in a file when using the launcher (except on MS Windows)
+	-- many latency fixes and improvements: lower latency, better line congestion handling, etc
+	-- lower client latency: decompress pictures in a dedicated thread (including rgb24+zlib)
+	-- better launcher command feedback
+	-- better automatic compression heuristics
+	-- support for Xdummy on platforms with only a suid binary installed
+	-- support for 'webp' lossy picture encoding (better and faster than jpeg)
+	-- support fixed picture quality with x264, webp and jpeg (via command line and tray menu)
+	-- support for multiple "start-child" options in config files or command line
+	-- more reliable auto-refresh
+	-- performance optimizations: caching results, avoid unnecessary video encoder re-initialization
+	-- faster re-connection (skip keyboard re-configuration)
+	-- better isolation of the virtual display process and child processes
+	-- show performance statistics graphs on session info dialog (click to save)
+	-- start with compression enabled, even for initial packet
+	-- show more version and client information in logs and via "xpra info"
+	-- client launcher improvements: prevent logging conflict, add version info
+	-- large source layout cleanup, compilation warnings fixed
+
+
+v0.6.4 (2012-10-05)
+======================
+	-- fix bencoder to properly handle dicts with non-string keys
+	-- fix swscale bug with windows that are too small by switch encoding
+	-- fix locking of video encoder resizing leading to missing video frames
+	-- fix crash with compression turned off: fix unicode encoding
+	-- fix lack of locking sometimes causing errors with "xpra info"
+	-- fix password file handling: exceptions and ignore carriage returns
+	-- prevent races during setup and cleanup of network connections
+	-- take shortcut if there is nothing to send
+
+
+v0.6.3 (2012-09-27)
+======================
+	-- fix memory leak in server after client disconnection
+	-- fix launcher: clear socket timeout once connected and add missing options
+	-- fix potential bug in network code (prevent disconnection)
+	-- enable auto-refresh by default since we now use a lossy encoder by default
+
+
+v0.6.2 (2012-09-25)
+======================
+	-- fix missing key frames with x264/vpx: always reset the video encoder when we skip some frames (forces a new key frame)
+	-- fix server crash on invalid keycodes (zero or negative)
+	-- fix latency: isolate per-window latency statistics from each other
+	-- fix latency: ensure we never record zero or even negative decode time
+	-- fix refresh: server error was causing refresh requests to be ignored
+	-- fix window options handling: using it for more than one value would fail
+	-- fix video encoder/windows dimensions mismatch causing missing key frames
+	-- fix damage options merge code (options were being squashed)
+	-- ensure that small lossless regions do not cancel the auto-refresh timer
+	-- restore protocol main packet compression and single chunk sending
+	-- drop unnecessary OpenGL dependencies from some deb/rpm packages
+
+
+v0.6.1 (2012-09-14)
+======================
+	-- fix compress clipboard data (previous fix was ineffectual)
+	-- fix missing damage data queue statistics (was causing latency issues)
+	-- use memory aligned allocations for colourspace conversion
+
+
+v0.6.0 (2012-09-08)
+======================
+	-- fix launcher: don't block the UI whilst connecting, and use a lower timeout, fix icon lookup on *nix
+	-- fix clipboard contents too big (was causing connection drops): try to compress them and just drop them if they are still too big
+	-- x264 or vpx are now the default encodings (if available)
+	-- compress rgb24 pixel data with zlib from the damage thread (rather than later in the network layer)
+	-- better build environment detection
+	-- experimental multi-user support (see --enable-sharing)
+	-- better, more accurate "xpra info" statistics (per encoding, etc)
+	-- tidy up main source directory
+	-- simplify video encoders/decoders setup and cleanup code
+	-- many debian build files updates
+	-- remove 'nogil' switch (as 'nogil' is much faster)
+	-- test all socket types with automated tests
+
+
+v0.5.4 (2012-09-08)
+======================
+	-- fix man page typo
+	-- fix non bash login shell compatibility
+	-- fix xpra screenshot argument parsing error handling
+	-- fix video encoding mismatch when switching encoding
+	-- fix ssh mode on OpenBSD
+
+
+v0.5.3 (2012-09-05)
+======================
+	-- zlib compatibility fix: use chunked decompression when supported (newer versions)
+
+
+v0.5.2 (2012-08-29)
+======================
+	-- fix xpra launcher icon lookup on *nix
+	-- fix big clipboard packets causing disconnection: just drop them instead
+	-- fix zlib compression in raw packet mode: ensure we always flush the buffer for each chunk
+	-- force disconnection after irrecoverable network parsing error
+	-- fix window refresh: do not skip all windows after a hidden one!
+	-- Fedora 16 freshrpms spec file fix: build against rpmfusion despite more limited csc features
+
+
+v0.5.1 (2012-08-25)
+======================
+	-- fix xpra_launcher
+	-- fix DPI issue with Xdummy: set virtual screen to 96dpi by default
+	-- avoid looping forever doing maths on 'infinity' value
+	-- fix incomplete cloning of attributes causing default values to be used for batch configuration
+	-- damage data queue batch factor was being calculated but not used
+	-- ensure we update the data we use for calculations (was always using zero value)
+	-- ensure "send_bell" is initialized before use
+	-- add missing path string in warning message
+	-- fix test code compatibility with older xpra versions
+	-- statistics shown for 'damage_packet_queue_pixels' were incorrect
+
+
+v0.5.0 (2012-08-20)
+======================
+	-- new packet encoder written in C (much faster and data is now smaller too)
+	-- read provided /etc/xpra/xpra.conf and user's own ~/.xpra/xpra.conf
+	-- support Xdummy out of the box on platforms with recent enough versions of Xorg (and not installed suid)
+	-- pass dpi to server and allow clients to specify dpi on the command line
+	-- fix xsettings endianness problems
+	-- fix clipboard tokens sent twice on start
+	-- new command line options and UI to disable notifications forwarding, cursors and bell
+	-- MS Windows clients can now choose the remote clipboard they sync with ('clipboard', 'primary' or 'secondary')
+	-- x264: adapt colourspace conversion, encoding speed and picture quality according to link and encoding/decoding performance
+	-- automatically change video encoding: handle small region updates (ie: blinking cursor or spinner) without doing a full video frame refresh
+	-- fairer window batching calculations, better performance over low latency links and bandwidth constrained links
+	-- lower tcp socket connection timeout (10 seconds)
+	-- better compression of cursor data
+	-- log date and time with messages, better log messages (ie: "Ignoring ClientMessage..")
+	-- send more client and server version information (python, gtk, etc)
+	-- build cleanups: let distutils clean take care of removing all generated .c files
+	-- code cleanups: move all win32 specific headers to win32 tree, fix vpx compilation warnings, whitespace, etc
+	-- more reliable MS Windows build: detect missing/wrong DLLs and abort
+	-- removed old "--no-randr" option
+	-- drop compatibility with versions older than 0.3: we now assume the "raw_packets" feature is supported
+
+
+v0.4.2 (2012-08-16)
+======================
+
+	-- fix clipboard atom packing (was more noticeable with qt and Java applications)
+	-- fix clipboard selection for non X11 clients: only 'multiple' codepath requires X11 bindings
+	-- fix python3 build
+	-- fix potential double free in x264 error path
+	-- fix logging format error on "window dimensions have changed.." (parameter grouping was wrong)
+	-- fix colour bleeding with x264 (ie: green on black text)
+	-- remove incorrect and unnecessary callback to setup_xprops which may have caused the pulseaudio flag to use the wrong value
+	-- delay 'check packet size' to allow the limit to be raised - important over slower links where it triggers more easily
+
+
+v0.4.1 (2012-07-31)
+======================
+	-- fix clipboard bugs
+	-- fix batch delay calculations with multiple windows
+	-- fix tests (update import statements)
+	-- robustify cython version string parsing
+	-- fix source files changed detection during build
+
+
+v0.4.0 (2012-07-23)
+======================
+	-- fix client application resizing its own window
+	-- fix window dimensions hints not applied
+	-- fix memleak in x264 cleanup code
+	-- fix xpra command exit code (more complete fix)
+	-- fix latency bottleneck in processing of damage requests
+	-- fix free uninitialized pointers in video decoder initialization error codepath
+	-- fix x264 related crash when resizing windows to one pixel width or height
+	-- fix accounting of client decode time: ignore figure in case of decoding error
+	-- fix subversion build information detection on MS Windows
+	-- fix some binary packages which were missing some menu icons
+	-- restore keyboard compatiblity code for MS Windows and OSX clients
+	-- use padded buffers to prevent colourspace conversion from reading random memory
+	-- release Python's GIL during vpx and x264 compression and colourspace conversion
+	-- better UI launcher: UI improvements, detect encodings, fix standalone/win32 usage, minimize window once the client has started
+	-- "xpra stop" disconnects all potential clients cleanly before exiting
+	-- x264 uses memory aligned buffer for better performance
+	-- avoid vpx/x264 overhead for very small damage regions
+	-- detect dead connection with ping packets: disconnect if echo not received
+	-- force a full refresh when the encoding is changed
+	-- more dynamic framerate performance adjustments, based on more metrics
+	-- new menu option to toggle keyboard sync at runtime
+	-- vpx/x264 runtime imports: detect broken installations and warn, but ignore when the codec is simply not installed
+	-- enable environment debugging for damage batching via "XPRA_DEBUG_LATENCY" env variable
+	-- simplify build by using setup file to generate all constants
+	-- text clients now ignore packets they are not meant to handle
+	-- removed compression menu since the default is good enough
+	-- "xpra info" reports all build version information
+	-- report server pygtk/gtk versions and show them on session info dialog and "xpra info"
+	-- ignore dependency issues during sdist/clean phase of build
+	-- record more statistics (mostly latency) in test reports
+	-- documentation and logging added to code, moved test code out of main packages
+	-- better MS Windows installer graphics
+	-- include distribution name in RPM version/filename
+	-- CentOS 6 RPMs now depends on libvpx rather than a statically linked library
+	-- CentOS static ffmpeg build with memalign for better performance
+	-- debian: build with hardening features
+	-- debian: don't record as modified the files we know we modify during debian build
+	-- MS Windows build: allow user to set --without-vpx / --without-x264 in the batch file
+	-- MS Windows build fix: simpler/cleaner build for vpx/x264's codec.pyd
+	-- no longer bundle parti window manager
+
+
+v0.3.3 (2012-07-10)
+======================
+	-- do not try to free the empty x264/vpx buffers after a decompression failure
+	-- fix xpra command exit code (zero) when no error occurred
+	-- fix Xvfb deadlock on shutdown
+	-- fix wrongly removing unix domain socket on startup failure
+	-- fix wrongly killing Xvfb on startup failure
+	-- fix race in network code and meta data packets
+	-- ensure clients use raw_packets if the server supports it (fixes 'gibberish' compressed packet errors)
+	-- fix screen resolution reported by the server
+	-- fix maximum packet size check wrongly dropping valid connections
+	-- honour the --no-tray command line argument
+	-- detect Xvfb startup failures and avoid taking over other displays
+	-- don't record invalid placeholder value for "server latency"
+	-- fix missing "damage-sequence" packet for sequence zero
+	-- fix window focus with some Tk based application (ie: git gui)
+	-- prevent large clipboard packets from causing the connection to drop
+	-- fix for connection with older clients and server without raw packet support and rgb24 encoding
+	-- high latency fix: reduce batch delay when screen updates slow down
+	-- non-US keyboard layout fix
+	-- correctly calculate min_batch_delay shown in statistics via "xpra info"
+	-- require x264-libs for x264 support on Fedora
+
+
+v0.3.2 (2012-06-04)
+======================
+	-- fix missing 'a' key using OS X clients
+	-- fix debian packaging for xpra_launcher
+	-- fix unicode decoding problems in window title
+	-- fix latency issue
+
+
+v0.3.1 (2012-05-29)
+======================
+	-- fix DoS in network connections setup code
+	-- fix for non-ascii characters in source file
+	-- log remote IP or socket address
+	-- more graceful disconnection of invalid clients
+	-- updates to the man page and xpra command help page
+	-- support running the automated tests against older versions
+	-- "xpra info" to report the number of clients connected
+	-- use xpra's own icon for its own windows (about and info dialogs)
+
+
+v0.3.0 (2012-05-20)
+======================
+	-- zero-copy network code, per packet compression
+	-- fix race causing DoS in threaded network protocol setup
+	-- fix vpx encoder memory leak
+	-- fix vpx/x264 decoding: recover from frame failures
+	-- fix small per-window memory leak in server
+	-- per-window update batching auto-tuning, which is fairer
+	-- windows update batching now takes into account the number of pixels rather than just the number of regions to update
+	-- support --socket-dir option over ssh
+	-- IPv6 support using the syntax: ssh/::ffff:192.168.1.100/10 or tcp/::ffff:192.168.1.100/10000
+	-- all commands now return a non-zero exit code in case of failure
+	-- new "xpra info" command to report server statistics
+	-- prettify some of the logging and error messages
+	-- avoid doing most of the keyboard setup code when clients are in read-only mode
+	-- Solaris build files
+	-- automated regression and performance tests
+	-- remove compatibility code for versions older than 0.1
+
+
+v0.2.0 (2012-04-20)
+======================
+	-- x264 and vpx video encoding support
+	-- gtk3 and python 3 partial support (client only - no keyboard support)
+	-- detect missing X11 server extensions and exit with error
+	-- X11 server no longer listens on a TCP port
+	-- clipboard fixes for Qt/KDE applications
+	-- option for clients not to supply any keyboard mapping data (the server will no longer complain)
+	-- show more system version information in session information dialog
+	-- hide window decorations for openoffice splash screen (workaround)
+
+
+v0.1.0 (2012-03-21)
+======================
+	-- security: strict filtering of packet handlers until connection authenticated
+	-- prevent DoS: limit number of concurrent connections attempting login (20)
+	-- prevent DoS: limit initial packet size (memory exhaustion: 32KB)
+	-- mmap: options to place sockets in /tmp and share mmap area across users via unix groups
+	-- remove large amount of compatiblity code for older versions
+	-- fix for Mac OS X clients sending hexadecimal keysyms
+	-- fix for clipboard sharing and some applications (ie: Qt)
+	-- notifications systems with dbus: re-connect if needed
+	-- notifications: try not to interfere with existing notification services
+	-- mmap: check for protected file access and ignore rather than error out (oops)
+	-- clipboard: handle empty data rather than timing out
+	-- spurious warnings: remove many harmless stacktraces/error messages
+	-- detect and discard broken windows with invalid atoms, avoids vfb + xpra crash
+	-- unpress keys all keys on start (if any)
+	-- fix screen size check: also check vertical size is sufficient
+	-- fix for invisible 0 by 0 windows: restore a minimum size
+	-- fix for window dimensions causing enless resizing or missing window contents
+	-- toggle cursors, bell and notifications by telling the server not to bother sending them, saves bandwidth
+	-- build/deploy: don't modify file in source tree, generate it at build time only
+	-- add missing GPL2 license file to show in about dialog
+	-- Python 2.5: workarounds to restore support
+	-- turn off compression over local connections (when mmap is enabled)
+	-- Android fixes: locking, maximize, focus, window placement, handle rotation, partial non-soft keyboard support
+	-- clients can specify maximum refresh rate and screen update batching options
+
+
+v0.0.7.36 (2012-02-09)
+======================
+	-- fix clipboard bug which was causing Java applications to crash
+	-- ensure we always properly disconnect previous client when new connection is accepted
+	-- avoid warnings with Java applications, focus errors, etc
+
+
+v0.0.7.35 (2012-02-01)
+======================
+	-- ssh password input fix
+	-- osx dock_menu fixed
+	-- ability to take screenshots ("xpra screenshot")
+	-- report server version ("xpra version")
+	-- slave windows (drop down menus, etc) now move with their parent window
+	-- show more session statistics: damage regions per second
+	-- posix clients no longer interfere with the GTK/X11 main loop
+	-- ignore missing properties when they are changed, and report correct source of the problem
+	-- code style cleanups and improvements
+
+
+v0.0.7.34 (2012-01-19)
+======================
+	-- security: restrict access to run-xpra script (chmod)
+	-- security: cursor data sent to the client was too big (exposing server memory)
+	-- fix thread leak - properly this time, SIGUSR1 now dumps all threads
+	-- off-by-one keyboard mapping error could cause modifiers to be lost
+	-- pure python/cython method for finding modifier mappings (faster and more reliable)
+	-- retry socket read/write after temporary error EINTR
+	-- avoid warnings when asked to refresh windows which are now hidden
+	-- auto-refresh was using an incorrect window size
+	-- logging formatting fixes (only shown with logging on)
+	-- hide picture encoding menu when mmap in use (since it is then ignored)
+
+
+v0.0.7.33 (2012-01-13)
+======================
+	-- readonly command line option
+	-- correctly stop all network related threads on disconnection
+	-- faster pixel data transfers for large areas via mmap
+	-- fix auto-refresh jpeg quality
+	-- fix on-the-fly change of pixel encoding
+	-- fix potential exhaustion of mmap area
+	-- fix potential race in packet compression setup code
+	-- keyboard: better modifiers detection, synchronization of capslock and numlock
+	-- keyboard: support all modifiers correctly with and without keyboard-sync option
+
+
+v0.0.7.32 (2011-12-08)
+======================
+	-- bug fix: disconnection could leave the server (and X11 server) in a broken state due to threaded UI calls
+	-- bug fix: don't remove window focus when just any connection is lost, only when the real client goes away
+	-- bug fix: initial windows should get focus (partial fix)
+	-- bug fix: correctly clear focus when a window goes away
+	-- support key repeat latency workaround without needing raw keycodes (OS X and MS Windows)
+	-- command line switch to enable client side key repeat: "--no-keyboard-sync" (for high latency/jitter links)
+	-- session info dialog: shows realtime connection and server details
+	-- menu entry in system tray to raise all managed windows
+	-- key mappings: try harder to unpress all keys before setting the new keymap
+	-- key mappings: try to reset modifier keys as well as regular keys
+	-- key mappings: apply keymap using Cython code rather than execing xmodmap
+	-- key mappings: fire change callbacks only once when all the work is done
+	-- use dbus for tray notifications if available, prefered to pynotify
+	-- show full version information in about dialog
+
+
+v0.0.7.31 (2011-11-28)
+======================
+	-- threaded server for much lower latency
+	-- fast memory mapped transfers for local connections
+	-- adaptive damage batching, fixes window refresh
+	-- xpra "detach" command
+	-- fixed system tray for Ubuntu clients
+	-- fixed maximized windows on Ubuntu clients
+
+
+v0.0.7.30 (2011-11-01)
+======================
+	-- fix for update batching causing screen corruption
+	-- fix AttributeError jpegquality: make PIL (aka python-imaging) truly optional
+	-- fix for jitter compensation code being a little bit too trigger-happy
+
+
+v0.0.7.29 (2011-10-25)
+======================
+	-- fix partial packets on boundary causing connection to drop
+	-- clipboard support on MS Windows
+	-- support ubuntu's appindicator (yet another system tray implementation)
+	-- improve disconnection diagnostic messages
+	-- scale cursor down to the client's default size
+	-- better handling of right click on system tray icon
+	-- posix: detect when there is no DISPLAY and error out
+	-- remove harmless warnings about missing properties on startup
+
+
+v0.0.7.28 (2011-10-18)
+======================
+	-- much more efficient and backwards compatible network code, prevents a CPU bottleneck on the client
+	-- forwarding of system notifications, system bell and custom cursors
+	-- system tray menu to make it easier to change settings and disconnect
+	-- automatically resize Xdummy to match the client's screen size whenever it changes
+	-- PNG image compression support
+	-- JPEG and PNG compression are now optional, only available if the Python Imaging Library is installed
+	-- scale window icons before sending if they are too big
+	-- fixed keyboard mapping for OSX and MS Windows clients
+	-- compensate for line jitter causing keys to repeat
+	-- fixed cython warnings, unused variables, etc
+
+
+v0.0.7.27 (2011-09-20)
+======================
+	-- compatibility fix for python 2.4 (remove "with" statement)
+	-- slow down updates from windows that refresh continuously
+
+
+v0.0.7.26 (2011-09-20)
+======================
+	-- minor changes to support the Android client (work in progress)
+	-- allow keyboard shortcuts to be specified, default is meta+shift+F4 to quit (disconnects client)
+	-- clear modifiers when applying new keymaps to prevent timeouts
+	-- reduce context switching in the network read loop code
+	-- try harder to close connections cleanly
+	-- removed some unused code, fixed some old test code
+
+
+v0.0.7.25 (2011-08-31)
+======================
+	-- Proper keymap and modifiers support
+
+
+v0.0.7.24 (2011-08-15)
+======================
+	-- Use raw keycodes whenever possible, should fix keymapping issues for all Unix-like clients
+	-- Keyboard fixes for AltGr and special keys for non Unix-like clients
+
+
+v0.0.7.23-2 (2011-07-27)
+======================
+	-- More keymap fixes..
+
+
+v0.0.7.23 (2011-07-20)
+======================
+	-- Try to use setxkbmap before xkbcomp to setup the matching keyboard layout
+	-- Handle keyval level (shifted keys) explicitly, should fix missing key mappings
+	-- More generic option for setting window titles
+	-- Exit if the server dies
+
+
+v0.0.7.22 (2011-06-02)
+======================
+	-- minor fixes: jpeg, man page, etc
+
+
+v0.0.7.21 (2011-05-24)
+======================
+  New features:
+	-- Adaptive JPEG mode (bandwidth constrained)
+	-- Use an existing display
+	-- Disable randr
+
+
+v0.0.7.20 (2011-05-04)
+======================
+	-- more reliable fix for keyboard mapping issues
+
+
+v0.0.7.19 (2011-04-25)
+======================
+	-- xrandr support when running against Xdummy, screen resizes on demand
+	-- fixes for keyboard mapping issues: multiple keycodes for the same key
+
+
+v0.0.7.18-2 (2011-04-04)
+======================
+	-- Fix for older distros (like CentOS) with old versions of pycairo
+
+
+v0.0.7.18 (2011-03-28)
+======================
+	-- Fix jpeg compression on MS Windows
+	-- Add ability to disable clipboard code
+	-- Updated man page
+
+
+v0.0.7.17 (2011-04-04)
+======================
+	-- Honour the pulseaudio flag on client
+
+
+v0.0.7.16 (2010-08-25)
+======================
+	-- Merged upstream changes
+
+
+v0.0.7.15 (2010-07-01)
+======================
+	-- Add option to disable Pulseaudio forwarding as this can be a real network hog
+	-- Use logging rather than print statements
+
+
+v0.0.7.13 (2010-05-04)
+======================
+	-- Ignore minor version differences in the future (must bump to 0.0.8 to cause incompatibility error)
+
+
+v0.0.7.12 (2010-03-13)
+======================
+	-- bump screen resolution
+
+
+v0.0.7.11 (2010-01-11)
+======================
+	-- first rpm spec file
+
+
+v0.0.7.x (2009)
+======================
+	-- Start of this fork
+	-- Password file support
+	-- Better OSX/win32 support
+	-- JPEG compression
+	-- Lots of small fixes
+
+
+v0.0.6 (2009-03-22)
+===================
+
+Xpra:
+  New features:
+    -- Clipboard sharing (with full X semantics).
+    -- Icon support.
+    -- Support for raw TCP sockets. Insecure if you don't know what
+       you are doing.
+
+  Bug fixes:
+    -- Xvfb doesn't support mouse wheels, so they still don't work in
+       xpra. But now xpra doesn't crash if you try.
+    -- Running FSF Emacs under xpra no longer creates an infinite loop.
+    -- The directory that xpra was launched from is now correctly
+       saved in ~/.xpra/run-xpra.
+    -- Work around PyGtk weirdness that caused the server and client
+       to sometimes ignore control-C.
+    -- The client correctly notices keyboard layout changes.
+    -- The client no longer crashes on keymaps in which unnamed keys
+       are bound to modifiers.
+    -- Workarounds are included for several buggy versions of Pyrex.
+
+Wimpiggy:
+  -- Assume that EWMH-style icons have non-premultiplied alpha.
+
+Other:
+  -- Add copyright comments to all source files.
+
+v0.0.5 (2008-11-02)
+===================
+
+This release primarily contains cleanups and bugfixes for xpra.
+
+General:
+  -- Logging cleanup -- all logging now goes through the Python
+     logging framework instead of using raw 'prints'.  By default
+     debug logging is suppressed, but can be enabled in a fine- or
+     coarse-grained way.
+
+Xpra:
+  -- Protocol changes; v0.0.5 clients can only be used with v0.0.5
+     servers, and vice-versa.  Use 'xpra upgrade' to upgrade old
+     servers without losing your session state.
+  -- Man page now included.
+  Important bug fixes:
+  -- Qt apps formerly could not receive keyboard input due to a focus
+     handling bug; now fixed.
+  -- Fedora's pygtk2 has mysterious local hacks that broke xpra;
+     a workaround is now included.
+  UI improvements:
+  -- 'xpra attach ssh:machine' now works out-of-the-box even if xpra
+     is not present in the remote machine's PATH, or requires
+     PYTHONPATH tweaks, or whatever.  (The server does still need to
+     be running on the remote machine, though, of course.)
+  -- Commands that connect to a running xpra server ('attach', 'stop',
+     etc.) now can generally be used without specifying the name of
+     the server, assuming only one server is running.  (E.g., instead
+     of 'xpra attach :10', you can use 'xpra attach'; ditto for remote
+     hosts, you can now use plain 'xpra attach ssh:remote'.)
+  -- Mouse scroll wheels now supported.
+  -- 'xpra start' can now spawn child programs directly (--with-child)
+     and exit automatically when these children have exited
+     (--exit-with-children).
+  Other:
+  -- More robust strategy for handling window stacking order.
+     (Side-effect: the xpra client no longer requires you to be using
+     an EWMH-compliant window manager.)
+  -- The xpra client no longer crashes when receiving an unknown key
+     event (e.g. a multimedia key).
+  -- Very brief transient windows (e.g., tooltips) no longer create
+     persistent "litter" on the screen.
+  -- Windows with non-empty X borders (e.g., xterm popup menus) are
+     now handled properly.
+  -- Withdrawn windows no longer reappear after 'xpra upgrade'.
+
+Wimpiggy:
+  -- Do not segfault when querying the tree structure of destroyed
+     windows.
+  -- Other bugfixes.
+
+Parti:
+  -- No changes.
+
+v0.0.4 (2008-04-04)
+===================
+
+Xpra:
+  -- Protocol changes break compatibility with 0.0.3, but:
+  -- New command 'xpra upgrade', to restart/upgrade an xpra server
+     without losing any client state.  (Won't work when upgrading from
+     0.0.3, unfortunately, but you're covered going forward.)
+  -- Fix bug that left stray busy-looping processes behind on server
+     when using ssh connections.
+  -- Export window class/instance hints (patch from Ethan Blanton).
+  -- Hack to make backspace key work (full support for keyboard maps
+     still TBD).
+  -- Added discussion of xmove to README.xpra.
+
+Wimpiggy:
+  -- Make compatible with current Pyrex releases (thanks to many
+     people for reporting this).
+  -- Work around X server bug #14648 (thanks to Ethan Blanton for help
+     tracking this down).  This improves speed dramatically.
+  -- Reverse-engineer X server lifetime rules for NameWindowPixmap,
+     and handle it properly.  Also handle it lazily.  This fixes the
+     bug where window contents stop updating.
+  -- Avoid crashing when acknowledging damage against an
+     already-closed window.
+  -- Improve server extension checking (thanks to 'moreilcon' for the
+     report).
+  -- Remove spurious (and harmless) assertion messages when a window
+     closes.
+  -- Make manager selection handling fully ICCCM-compliant (in
+     particular, we now pause properly while waiting for a previous
+     window manager to exit).
+  -- Make algorithm for classifying unmapped client windows fully
+     correct.
+  -- Reduce required version of Composite extension to 0.2.
+
+Parti:
+  -- Remove a stale import that caused a crash at runtime (thanks to
+     'astronouth7303' for the report).
+
+General:
+  -- Error out build with useful error message if required packages
+     are missing.
+
+Parti 0.0.3 (2008-02-20)
+========================
+
+Massive refactoring occurred for this release.
+
+wimpiggy: The WM backend parts of Parti have been split off into a
+separate package known as wimpiggy.  As compared to the corresponding
+code in 0.0.2, wimpiggy 0.0.3 adds:
+  -- Compositing support
+  -- Model/view separation for client windows (based on compositing
+     support)
+  -- Improved client hint support, including icon handling, strut
+     handling, and more correct geometry handling.
+  -- Keybinding support
+  -- Event dispatching that doesn't leak memory
+  -- Better interaction with already running window managers (i.e., a
+     --replace switch as seen in metacity etc.)
+
+parti: This package will eventually become the real window manager,
+but for now is essentially a testbed for wimpiggy.
+
+xpra: This is a new, independent program dependent on wimpiggy (which
+is why wimpiggy had to be split out).  It implements 'screen for X' --
+letting one run applications remotely that can be detached and then
+re-attached without losing state.  This is the first release, but
+while not perfect, it is substantially usable.
+
+general: The test runner was hacked to share a single X/D-Bus session
+across multiple tests.  This speeds up the test suite by a factor of
+~3, but seems to be buggy and fragile and may be reverted in the
+future.
+
+Parti 0.0.2 (2007-10-26)
+========================
+
+This release adds a mostly comprehensive test suite, plus fixes a lot
+of bugs.  Still only useful for experimentation and hacking.
+
+'python setup.py sdist' sort of works now.
+
+Parti 0.0.1 (2007-08-10)
+========================
+
+Initial release.
+
+Contains basic window manager functionality, including a fair amount
+of compliance to ICCCM/EWMH, focus handling, etc., and doesn't seem to
+crash in basic testing.
+
+Doesn't do much useful with this; only a simple placeholder layout
+manager is included, and only skeleton of virtual desktop support is
+yet written.
