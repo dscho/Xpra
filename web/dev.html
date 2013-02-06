@@ -104,14 +104,11 @@
 	  or rely on third party packages.
 	  <br />
 	  <br />
-	  For running the server, you will also need <code>Xvfb</code>, <code>xauth</code> and keyboard utilities
+	  For running the server, you will also need a <code>Xvfb</code>, <code>xauth</code> and keyboard utilities
 	  - only the keyboard utilities are needed when using the client.
 	  <div class="codebox">
-		<pre><code>yum install xorg-x11-server-Xvfb xorg-x11-xauth xorg-x11-xkb-utils</code></pre>
+		<pre><code>yum install xorg-x11-server-Xorg xorg-x11-drv-dummy xorg-x11-xauth xorg-x11-xkb-utils</code></pre>
 	  </div>
-	  Although Fedora does ship recent enough versions of Xorg and dummy-driver for using <a href="./Xdummy.html">Xdummy</a>,
-	  the Xorg binary is installed <code>suid</code>, so when using Xdummy you will need to make a non-suid copy of Xorg
-	  (and remember to make a new copy everytime there is an update..)
 	  <br />
 	  <br />
 	  For x264 support, Fedora users should install the <a class="ext" href="http://rpmfusion.org/">rpmfusion</a> repository then:
@@ -119,6 +116,10 @@
 		<pre><code>yum install ffmpeg-devel x264-devel libvpx-devel</code></pre>
 	  </div>
 	  <span class="smallnote">(building x264/vpx on CentOS is out of scope - previous versions used <a class="ext" href="http://atrpms.net/">atrpms</a>)</span>
+	  At runtime, to get optimal support for <code>PNG</code>, <code>JPEG</code> and <code>WEBP</code>, install:
+	  <div class="codebox">
+		<pre><code>yum install python-imaging libwebp</code></pre>
+	  </div>	   
 	</div>
 
   	<a id="debian"></a>
