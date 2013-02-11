@@ -39,6 +39,7 @@ typedef void x264_t;
 
 #include <libswscale/swscale.h>
 #include <libavcodec/avcodec.h>
+#include <libavutil/mem.h>
 #include "x264lib.h"
 
 //beware that these macros may evaluate a or b twice!
@@ -55,6 +56,7 @@ struct x264lib_ctx {
 	// Decoding
 	AVCodec *codec;
 	AVCodecContext *codec_ctx;
+	AVFrame *frame;
 	struct SwsContext *yuv2rgb;
 
 	// Encoding
@@ -374,7 +376,12 @@ void do_clean_encoder(struct x264lib_ctx *ctx)
 }
 
 #else
-struct x264lib_ctx *init_encoder(int width, int height)
+struct x264lib_ctx *init_encoder(int width, int height,
+		int initial_quality, int initial_speed,
+		int supports_csc_option,
+		int I422_quality, int I444_quality,
+		int I422_min, int I444_min,
+        char *i420_profile, char *i422_profile, char *i444_profile)
 {
 	return NULL;
 }
@@ -410,6 +417,11 @@ int init_decoder_context(struct x264lib_ctx *ctx, int width, int height, int csc
 		fprintf(stderr, "could not open codec\n");
 		return 1;
 	}
+	ctx->frame = avcodec_alloc_frame();
+	if (!ctx->frame) {
+	    fprintf(stderr, "could not allocate an AVFrame for decoding\n");
+	    return 1;
+	}
 	return 0;
 }
 struct x264lib_ctx *init_decoder(int width, int height, int csc_fmt)
@@ -434,6 +446,7 @@ void do_clean_decoder(struct x264lib_ctx *ctx)
 		sws_freeContext(ctx->yuv2rgb);
 		ctx->yuv2rgb = NULL;
 	}
+	avcodec_free_frame(&ctx->frame);
 }
 void clean_decoder(struct x264lib_ctx *ctx)
 {
@@ -538,7 +551,7 @@ int decompress_image(struct x264lib_ctx *ctx, uint8_t *in, int size, uint8_t *(*
 	int len;
 	int i;
 	int outsize = 0;
-	AVFrame picture;
+	AVFrame *picture = ctx->frame;
 	AVPacket avpkt;
 
 	av_init_packet(&avpkt);
@@ -546,12 +559,12 @@ int decompress_image(struct x264lib_ctx *ctx, uint8_t *in, int size, uint8_t *(*
 	if (!ctx->codec_ctx || !ctx->codec)
 		return 1;
 
-	avcodec_get_frame_defaults(&picture);
+	avcodec_get_frame_defaults(picture);
 
 	avpkt.data = in;
 	avpkt.size = size;
 
-	len = avcodec_decode_video2(ctx->codec_ctx, &picture, &got_picture, &avpkt);
+	len = avcodec_decode_video2(ctx->codec_ctx, picture, &got_picture, &avpkt);
 	if (len < 0) {
 		fprintf(stderr, "Error while decoding frame\n");
 		memset(out, 0, sizeof(*out));
@@ -559,13 +572,13 @@ int decompress_image(struct x264lib_ctx *ctx, uint8_t *in, int size, uint8_t *(*
 	}
 
 	for (i = 0; i < 3; i++) {
-		(*out)[i] = picture.data[i];
-		outsize += ctx->height * picture.linesize[i];
-		(*outstride)[i] = picture.linesize[i];
+		(*out)[i] = picture->data[i];
+		outsize += ctx->height * picture->linesize[i];
+		(*outstride)[i] = picture->linesize[i];
 	}
 
     if (outsize == 0) {
-        fprintf(stderr, "Decoded image, size %d %d %d, ptr %p %p %p\n", (*outstride)[0] * ctx->height, (*outstride)[1]*ctx->height, (*outstride)[2]*ctx->height, picture.data[0], picture.data[1], picture.data[2]);
+        fprintf(stderr, "Decoded image, size %d %d %d, ptr %p %p %p\n", (*outstride)[0] * ctx->height, (*outstride)[1]*ctx->height, (*outstride)[2]*ctx->height, picture->data[0], picture->data[1], picture->data[2]);
         return 3;
     }
 

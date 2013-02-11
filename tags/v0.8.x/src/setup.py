@@ -84,9 +84,19 @@ opengl_ENABLED = True
 
 
 
+warn_ENABLED = True
+
+
+
+strict_ENABLED = True
+
+
+
 #allow some of these flags to be modified on the command line:
 filtered_args = []
-SWITCHES = ("x264", "vpx", "webp", "rencode", "clipboard", "server", "sound", "cyxor", "cymaths", "opengl", "parti")
+SWITCHES = ("x264", "vpx", "webp", "rencode", "clipboard", "server",
+            "sound", "cyxor", "cymaths", "opengl", "parti",
+            "warn", "strict")
 HELP = "-h" in sys.argv or "--help" in sys.argv
 if HELP:
     setup()
@@ -237,10 +247,12 @@ def pkgconfig(*packages_options, **ekw):
             add_to_keywords(kw, 'extra_link_args', token)
         for k, v in kw.items(): # remove duplicates
             kw[k] = list(set(v))
-    WARN_ALL = True
-    if WARN_ALL:
+    if warn_ENABLED:
         add_to_keywords(kw, 'extra_compile_args', "-Wall")
         add_to_keywords(kw, 'extra_link_args', "-Wall")
+    if strict_ENABLED:
+        #these are almost certainly real errors since our code is "clean":
+        add_to_keywords(kw, 'extra_compile_args', "-Werror=implicit-function-declaration")
     PIC = True
     if PIC:
         add_to_keywords(kw, 'extra_compile_args', "-fPIC")
@@ -376,6 +388,8 @@ if sys.platform.startswith("win"):
     # ffmpeg-git-4082198-win32-dev
     # ffmpeg-20120708-git-299387e-win32-dev
     # This is where I keep them, you will obviously need to change this value:
+    # you can also try to use libav:
+    #ffmpeg_path="C:\\libav-win32"
     ffmpeg_path="C:\\ffmpeg-win32-shared"
     ffmpeg_include_dir = "%s\\include" % ffmpeg_path
     ffmpeg_lib_dir = "%s\\lib" % ffmpeg_path
@@ -415,6 +429,7 @@ if sys.platform.startswith("win"):
             add_to_keywords(kw, 'include_dirs', "win32", ffmpeg_include_dir)
             add_to_keywords(kw, 'libraries', "swscale", "avcodec", "avutil")
             add_to_keywords(kw, 'extra_link_args', "/LIBPATH:%s" % ffmpeg_lib_dir)
+            add_to_keywords(kw, 'extra_link_args', "/LIBPATH:%s" % ffmpeg_bin_dir)
         elif "vpx" in packages[0]:
             add_to_PATH(ffmpeg_bin_dir)
             add_to_keywords(kw, 'include_dirs', "win32", vpx_include_dir, ffmpeg_include_dir)
@@ -422,6 +437,7 @@ if sys.platform.startswith("win"):
             add_to_keywords(kw, 'extra_link_args', "/NODEFAULTLIB:LIBCMT")
             add_to_keywords(kw, 'extra_link_args', "/LIBPATH:%s" % vpx_lib_dir)
             add_to_keywords(kw, 'extra_link_args', "/LIBPATH:%s" % ffmpeg_lib_dir)
+            add_to_keywords(kw, 'extra_link_args', "/LIBPATH:%s" % ffmpeg_bin_dir)
         elif "pygobject-2.0" in packages[0]:
             add_to_keywords(kw, 'include_dirs', python_include_PATH,
                             pygtk_include_dir, atk_include_dir, gtk2_include_dir,

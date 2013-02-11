@@ -100,7 +100,7 @@ else:
     def set_tooltip_text(widget, text):
         widget.set_tooltip_text(text)
 
-def CheckMenuItem(label):
+def CheckMenuItem(label, tooltip=None):
     """ adds a get_label() method for older versions of gtk which do not have it
         beware that this label is not mutable!
     """
@@ -109,6 +109,8 @@ def CheckMenuItem(label):
         def get_label():
             return  label
         cmi.get_label = get_label
+    if tooltip:
+        cmi.set_tooltip_text(tooltip)
     return cmi
 
 class ClientExtrasBase(object):
@@ -637,9 +639,25 @@ class ClientExtrasBase(object):
         self.client.connect("handshake-complete", set_encodingsmenuitem)
         return encodings
 
-    def make_encodingssubmenu(self):
+    def make_encodingssubmenu(self, handshake_complete=True):
         encodings_submenu = gtk.Menu()
         self.popup_menu_workaround(encodings_submenu)
+        self.populate_encodingssubmenu(encodings_submenu)
+        encodings_submenu.show_all()
+        return encodings_submenu
+
+    def reset_encoding_options(self, encodings_menu):
+        server_encodings = self.client.server_capabilities.get("encodings", [])
+        for x in encodings_menu.get_children():
+            if isinstance(x, gtk.CheckMenuItem):
+                encoding = x.get_label()
+                active = encoding==self.client.encoding
+                if active!=x.get_active():
+                    x.set_active(active)
+                x.set_sensitive(encoding in server_encodings)
+    
+    def populate_encodingssubmenu(self, encodings_submenu):
+        server_encodings = self.client.server_capabilities.get("encodings", [])
         for encoding in ENCODINGS:
             encoding_item = CheckMenuItem(encoding)
             def encoding_changed(item):
@@ -651,12 +669,10 @@ class ClientExtrasBase(object):
                     self.set_qualitymenu()
                     self.set_speedmenu()
             encoding_item.set_active(encoding==self.client.encoding)
-            encoding_item.set_sensitive(encoding in self.client.server_capabilities.get("encodings", ["rgb24"]))
+            encoding_item.set_sensitive(encoding in server_encodings)
             encoding_item.set_draw_as_radio(True)
             encoding_item.connect("toggled", encoding_changed)
             encodings_submenu.append(encoding_item)
-        encodings_submenu.show_all()
-        return encodings_submenu
 
     def make_qualitymenuitem(self):
         self.quality = self.menuitem("Min Quality", "slider.png", "Minimum picture quality", None)
@@ -696,7 +712,13 @@ class ClientExtrasBase(object):
 
     def set_qualitymenu(self, *args):
         if self.quality:
-            self.quality.set_sensitive(not self.client.mmap_enabled and self.client.encoding in ("jpeg", "webp", "x264"))
+            can_use = not self.client.mmap_enabled and self.client.encoding in ("jpeg", "webp", "x264")
+            self.quality.set_sensitive(can_use)
+            if can_use:
+                self.quality.set_tooltip_text("Minimum picture quality")
+            else:
+                self.quality.set_tooltip_text("Not supported with %s encoding" % self.client.encoding)
+                
 
     def make_speedmenuitem(self):
         self.speed = self.menuitem("Speed", "speed.png", "Encoding latency vs size", None)
@@ -742,18 +764,27 @@ class ClientExtrasBase(object):
 
     def set_speedmenu(self, *args):
         if self.speed:
-            self.speed.set_sensitive(not self.client.mmap_enabled and self.client.encoding in ("x264", ) and self.client.change_speed)
+            can_use = not self.client.mmap_enabled and self.client.encoding=="x264" and self.client.change_speed
+            self.speed.set_sensitive(can_use)
+            if self.client.mmap_enabled:
+                self.speed.set_tooltip_text("Quality is always 100% with mmap")
+            elif not self.client.change_speed:
+                self.speed.set_tooltip_text("Server does not support changing speed")
+            elif self.client.encoding!="x264":
+                self.speed.set_tooltip_text("Not supported with %s encoding" % self.client.encoding)
+            else:
+                self.speed.set_tooltip_text("Encoding latency vs size")
 
 
+    def spk_on(self, *args):
+        log("spk_on(%s)", args)
+        self.client.start_receiving_sound()
+    def spk_off(self, *args):
+        log("spk_off(%s)", args)
+        self.client.stop_receiving_sound()
     def make_speakermenuitem(self):
         speaker = self.menuitem("Speaker", "speaker.png", "Forward sound output from the server")
         speaker.set_sensitive(False)
-        def spk_on(*args):
-            log("spk_on(%s)", args)
-            self.client.start_receiving_sound()
-        def spk_off(*args):
-            log("spk_off(%s)", args)
-            self.client.stop_receiving_sound()
         def is_speaker_on(*args):
             return self.client.speaker_enabled
         def speaker_state(*args):
@@ -762,19 +793,19 @@ class ClientExtrasBase(object):
                 set_tooltip_text(speaker, "Server does not support speaker forwarding")
                 return
             speaker.set_sensitive(True)
-            speaker.set_submenu(self.make_soundsubmenu(is_speaker_on, spk_on, spk_off, "speaker-changed"))
+            speaker.set_submenu(self.make_soundsubmenu(is_speaker_on, self.spk_on, self.spk_off, "speaker-changed"))
         self.client.connect("handshake-complete", speaker_state)
         return speaker
 
+    def mic_on(self, *args):
+        log("mic_on(%s)", args)
+        self.client.start_sending_sound()
+    def mic_off(self, *args):
+        log("mic_off(%s)", args)
+        self.client.stop_sending_sound()
     def make_microphonemenuitem(self):
         microphone = self.menuitem("Microphone", "microphone.png", "Forward sound input to the server", None)
         microphone.set_sensitive(False)
-        def mic_on(*args):
-            log("mic_on(%s)", args)
-            self.client.start_sending_sound()
-        def mic_off(*args):
-            log("mic_off(%s)", args)
-            self.client.stop_sending_sound()
         def is_microphone_on(*args):
             return self.client.microphone_enabled
         def microphone_state(*args):
@@ -783,7 +814,7 @@ class ClientExtrasBase(object):
                 set_tooltip_text(microphone, "Server does not support microphone forwarding")
                 return
             microphone.set_sensitive(True)
-            microphone.set_submenu(self.make_soundsubmenu(is_microphone_on, mic_on, mic_off, "microphone-changed"))
+            microphone.set_submenu(self.make_soundsubmenu(is_microphone_on, self.mic_on, self.mic_off, "microphone-changed"))
         self.client.connect("handshake-complete", microphone_state)
         return microphone
 

@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.8.1
+%define version 0.8.2
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -64,6 +64,7 @@
 %define requires_sound %{nil}
 %define no_webp 1
 %define no_sound 1
+%define no_strict 1
 %define requires_extra , python-uuid, python-ctypes
 %define include_egg 0
 %if 0%{?static_video_libs}
@@ -111,6 +112,8 @@ Patch3: disable-webp.patch
 Patch4: use-static-x264lib.patch
 Patch5: use-static-vpxlib.patch
 Patch6: x264-limited-csc.patch
+Patch7: no-strict.patch
+Patch8: old-libav.patch
 
 
 %description
@@ -121,6 +124,16 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Sun Feb 10 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.2-1
+- fix libav uninitialized structure crash
+- fix warning on installations without sound libraries
+- fix warning when pulseaudio utils are not installed
+- fix delta compression race
+- fix the return of some ghost windows
+- stop pulseaudio on exit, warn if it fails to start
+- re-enable system tray forwarding
+- remove spurious "too many receivers" warnings
+
 * Mon Feb 04 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.1-1
 - fix server daemonize on some platforms
 - fix server SSH support on platforms with old versions of glib
@@ -607,6 +620,13 @@ cd parti-all-%{version}
 %if 0%{?limited_csc}
 %patch6 -p1
 %endif
+%if 0%{?no_strict}
+%patch7 -p1
+%endif
+%if 0%{?old_libav}
+%patch8 -p1
+%endif
+
 
 %build
 cd parti-all-%{version}

@@ -78,7 +78,7 @@ from xpra.deque import maxdeque
 from xpra.client_base import XpraClientBase, EXIT_TIMEOUT
 from xpra.keys import DEFAULT_MODIFIER_MEANINGS, DEFAULT_MODIFIER_NUISANCE, DEFAULT_MODIFIER_IGNORE_KEYNAMES
 from xpra.platform.gui import ClientExtras
-from xpra.scripts.main import ENCODINGS
+from xpra.scripts.main import ENCODINGS, get_codecs
 from xpra.version_util import add_gtk_version_info
 from xpra.stats.base import std_unit
 from xpra.protocol import Compressed
@@ -145,11 +145,13 @@ class XpraClient(XpraClientBase, gobject.GObject):
         self.microphone_allowed = bool(opts.microphone)
         self.microphone_enabled = False
         self.speaker_codecs = opts.speaker_codec
-        if len(self.speaker_codecs)==0:
-            self.speaker_allowed = False
+        if len(self.speaker_codecs)==0 and self.speaker_allowed:
+            self.speaker_codecs = get_codecs(True, False)
+            self.speaker_allowed = len(self.speaker_codecs)>0
         self.microphone_codecs = opts.microphone_codec
-        if len(self.microphone_codecs)==0:
-            self.microphone_allowed = False
+        if len(self.microphone_codecs)==0 and self.microphone_allowed:
+            self.microphone_codecs = get_codecs(False, False)
+            self.microphone_allowed = len(self.microphone_codecs)>0
         self.sound_sink = None
         self.sound_source = None
         self.server_pulseaudio_id = None
@@ -318,12 +320,12 @@ class XpraClient(XpraClientBase, gobject.GObject):
             "desktop_size":         self._process_desktop_size,
             "window-icon":          self._process_window_icon,
             "sound-data":           self._process_sound_data,
+            "draw":                 self._process_draw,
             # "clipboard-*" packets are handled by a special case below.
             }.items():
             self._ui_packet_handlers[k] = v
         #these handlers can run directly from the network thread:
         for k,v in {
-            "draw":                 self._process_draw,
             "ping":                 self._process_ping,
             "ping_echo":            self._process_ping_echo,
             "info-response":        self._process_info_response,
@@ -661,10 +663,9 @@ class XpraClient(XpraClientBase, gobject.GObject):
             capabilities["encoding.supports_delta"] = []    #need implementing in window_backing
         else:
             capabilities["encoding.supports_delta"] = [x for x in ("png", "rgb24") if x in ENCODINGS]
-        try:
-            import xpra.sound
+        from xpra.scripts.main import HAS_SOUND
+        if HAS_SOUND:
             try:
-                assert xpra.sound
                 from xpra.sound.pulseaudio_util import add_pulseaudio_capabilities
                 add_pulseaudio_capabilities(capabilities)
                 from xpra.sound.gstreamer_util import add_gst_capabilities
@@ -673,8 +674,6 @@ class XpraClient(XpraClientBase, gobject.GObject):
                 log("sound capabilities: %s", [(k,v) for k,v in capabilities.items() if k.startswith("sound.")])
             except Exception, e:
                 log.error("failed to setup sound: %s", e)
-        except ImportError, e:
-            log("sound modules were not included in this installation")
         #batch options:
         for bprop in ("always", "min_delay", "max_delay", "delay", "max_events", "max_pixels", "time_unit"):
             evalue = os.environ.get("XPRA_BATCH_%s" % bprop.upper())
@@ -842,8 +841,9 @@ class XpraClient(XpraClientBase, gobject.GObject):
         self.server_sound_send = capabilities.get("sound.send", False)
         if self.server_sound_send and self.speaker_allowed:
             self.start_receiving_sound()
-        if self.server_sound_receive and self.microphone_allowed:
-            self.start_sending_sound()
+        #dont' send sound automatically, wait for user to request it:
+        #if self.server_sound_receive and self.microphone_allowed:
+        #    self.start_sending_sound()
 
         #ui may want to know this is now set:
         self.emit("clipboard-toggled")
