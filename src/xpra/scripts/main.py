@@ -231,8 +231,8 @@ def main(script_file, cmdline):
     if supports_server:
         start_str = "\t%prog start DISPLAY\n"
         list_str = "\t%prog list\n"
-        upgrade_str = "\t%prog upgrade DISPLAY"
-        shadow_str = "\t%prog upgrade DISPLAY"
+        upgrade_str = "\t%prog upgrade DISPLAY\n"
+        shadow_str = "\t%prog shadow DISPLAY\n"
         note_str = ""
         stop_str = "\t%prog stop [DISPLAY]\n"
     else:
@@ -321,7 +321,7 @@ def main(script_file, cmdline):
                       "(you may specify more than one to define the preferred order, use 'help' to get a list of options, "
                       "when unspecified all available codecs are allowed and the first one is used)")
     group.add_option("--no-microphone", action="store_false",
-                      dest="microphone", default=bool_default("microphone", None),
+                      dest="microphone", default=bool_default("microphone", True),
                       help="Disable forwarding of sound input to the server")
     group.add_option("--microphone-codec", action="append",
                       dest="microphone_codec", default=string_list("microphone-codec", []),
@@ -555,18 +555,17 @@ def main(script_file, cmdline):
 
 # we end up initializing gstreamer here and it does things
 # we don't want with sys.argv, so hack around it:
-has_sound = False
 saved_args = sys.argv
 sys.argv = sys.argv[:1]
 try:
-    from xpra.sound import gstreamer_util
-    has_sound = gstreamer_util is not None
+    from xpra.sound import gstreamer_util   #@UnusedImport
+    HAS_SOUND = True
 except:
-    pass
+    HAS_SOUND = False
 sys.argv = saved_args
 
 def get_codecs(is_speaker, is_server):
-    if not has_sound:
+    if not HAS_SOUND:
         return []
     try:
         from xpra.sound.gstreamer_util import can_encode, can_decode
@@ -644,6 +643,15 @@ def parse_display_name(parser, opts, display_name):
             #ie: XPRA_SOCKET_DIR=/tmp .xpra/run-xpra _proxy :10
             remote_xpra.append("--socket-dir=%s" % opts.sockdir)
         desc["remote_xpra"] = remote_xpra
+        if desc.get("password") is None and opts.password_file and os.path.exists(opts.password_file):
+            try:
+                try:
+                    passwordFile = open(opts.password_file, "rb")
+                    desc["password"] = passwordFile.read()
+                finally:
+                    passwordFile.close()
+            except Exception, e:
+                print("failed to read password file %s: %s", opts.password_file, e)
         return desc
     elif display_name.startswith(":"):
         desc["type"] = "unix-domain"
@@ -751,7 +759,7 @@ def set_signal_handlers(app):
         print("\ngot signal %s, exiting" % {signal.SIGINT:"SIGINT", signal.SIGTERM:"SIGTERM"}.get(signum, signum))
         signal.signal(signal.SIGINT, deadly_signal)
         signal.signal(signal.SIGTERM, deadly_signal)
-        gobject.timeout_add(0, app.quit, priority=gobject.PRIORITY_HIGH)
+        gobject.timeout_add(0, app.quit, 128 + signum, priority=gobject.PRIORITY_HIGH)
     signal.signal(signal.SIGINT, app_signal)
     signal.signal(signal.SIGTERM, app_signal)
 

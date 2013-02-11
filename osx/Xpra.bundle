@@ -34,13 +34,13 @@
     ${prefix}/lib/libgtk-quartz-2.0.0.dylib
   </binary>
   <binary>
-    ${prefix}/lib/libgtkmacintegration.0.dylib
+    ${prefix}/lib/libgtkmacintegration.2.dylib
   </binary>
   <binary>
     ${prefix}/lib/librsvg-2.2.dylib
   </binary>
   <binary>
-  	${prefix}/lib/pango/1.6.0/modules/pango*.so
+  	${prefix}/lib/pango/1.8.0/modules/pango*.so
   </binary>
   <binary>
 	${prefix}/lib/libx264.*.dylib
@@ -57,9 +57,16 @@
   <binary>
 	${prefix}/lib/libwebp.*dylib
   </binary>
+  <binary>
+	${prefix}/lib/pango/${pkg:pango:pango_module_version}/modules/*.so
+  </binary>
 
   <data dest="${bundle}/Contents/Resources/">
     ${project}/dist/Xpra.app/Contents/Resources/
+  </data>
+
+  <data dest="${bundle}/Contents/Helpers/gst-plugin-scanner">
+    ${prefix}/libexec/gstreamer-0.10/gst-plugin-scanner
   </data>
 
   <data>

@@ -14,10 +14,11 @@ try:
 except:
     pass
 try:
-    MAX_NONVIDEO_OR_INITIAL_PIXELS = int(os.environ.get("MAX_NONVIDEO_OR_INITIAL_PIXELS", 1024*64))
+    MAX_NONVIDEO_OR_INITIAL_PIXELS = int(os.environ.get("XPRA_MAX_NONVIDEO_OR_INITIAL_PIXELS", 1024*64))
 except:
     pass
 
+AUTO_REFRESH_ENCODING = os.environ.get("XPRA_AUTO_REFRESH_ENCODING", "")
 AUTO_REFRESH_THRESHOLD = int(os.environ.get("XPRA_AUTO_REFRESH_THRESHOLD", 90))
 AUTO_REFRESH_QUALITY = int(os.environ.get("XPRA_AUTO_REFRESH_QUALITY", 95))
 AUTO_REFRESH_SPEED = int(os.environ.get("XPRA_AUTO_REFRESH_SPEED", 0))
@@ -823,6 +824,8 @@ class WindowSource(object):
                 return  False
             self.refresh_timer = None
             new_options = damage_options.copy()
+            if AUTO_REFRESH_ENCODING:
+                new_options["encoding"] = AUTO_REFRESH_ENCODING
             #FIXME: with x264, the quality must be higher than the YUV444 threshold
             new_options["quality"] = AUTO_REFRESH_QUALITY
             new_options["speed"] = AUTO_REFRESH_SPEED
@@ -888,6 +891,9 @@ class WindowSource(object):
             start_send_at, start_bytes, end_send_at, end_bytes, pixels = pending
             bytecount = end_bytes-start_bytes
             self.global_statistics.record_latency(self.wid, decode_time, start_send_at, end_send_at, pixels, bytecount)
+        else:
+            #something failed client-side, so we can't rely on the delta being available
+            self.last_pixmap_data = None
         if self._damage_delayed is not None and self._damage_delayed_expired:
             gobject.idle_add(self.may_send_delayed)
 

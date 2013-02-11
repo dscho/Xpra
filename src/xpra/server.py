@@ -206,6 +206,7 @@ class XpraServer(gobject.GObject, XpraServerBase):
 
         self.default_cursor_data = None
         self.last_cursor_serial = None
+        self.send_cursor_pending = True
         self.cursor_data = None
         def get_default_cursor():
             self.default_cursor_data = get_cursor_image()
@@ -264,8 +265,12 @@ class XpraServer(gobject.GObject, XpraServerBase):
             if window.is_tray():
                 #code more or less duplicated from _send_new_tray_window_packet:
                 w, h = window.get_property("geometry")[2:4]
-                ss.new_tray(wid, window, w, h)
-                ss.damage(wid, window, 0, 0, w, h)
+                if ss.system_tray:
+                    ss.new_tray(wid, window, w, h)
+                    ss.damage(wid, window, 0, 0, w, h)
+                else:
+                    #park it outside the visible area
+                    window.move_resize(-200, -200, w, h)
             elif window.is_OR():
                 #code more or less duplicated from _send_new_or_window_packet:
                 x, y, w, h = window.get_property("geometry")
@@ -374,11 +379,17 @@ class XpraServer(gobject.GObject, XpraServerBase):
             log("ignoring cursor event with the same serial number")
             return
         self.last_cursor_serial = event.cursor_serial
+        if not self.send_cursor_pending:
+            self.send_cursor_pending = True
+            gobject.timeout_add(10, self.send_cursor)
+
+    def send_cursor(self):
+        self.send_cursor_pending = True
         self.cursor_data = get_cursor_image()
-        if self.cursor_data:
+        if not self.cursor_data:
             pixels = self.cursor_data[7]
             if self.default_cursor_data and pixels==self.default_cursor_data[7]:
-                log("cursor event: default cursor - clearing it")
+                log("send_cursor(): default cursor - clearing it")
                 self.cursor_data = None
             elif pixels is not None:
                 if len(pixels)<64:
@@ -386,9 +397,10 @@ class XpraServer(gobject.GObject, XpraServerBase):
                 else:
                     self.cursor_data[7] = zlib_compress("cursor", pixels)
         else:
-            log("do_wimpiggy_cursor_event(%s) failed to get cursor image", event)
+            log("send_cursor() failed to get cursor image")
         for ss in self._server_sources.values():
             ss.send_cursor(self.cursor_data)
+        return False
 
     def _bell_signaled(self, wm, event):
         log("bell signaled on window %s", get_xwindow(event.window))

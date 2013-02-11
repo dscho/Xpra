@@ -66,9 +66,9 @@ class CompositeHelper(AutoPropGObjectMixin, gobject.GObject):
         remove_event_receiver(self._window, self)
         self.invalidate_pixmap()
         if not self._already_composited:
-            xcomposite_unredirect_window(self._window)
+            trap.swallow_synced(xcomposite_unredirect_window, self._window)
         if self._damage_handle:
-            xdamage_stop(self._window, self._damage_handle)
+            trap.swallow_synced(xdamage_stop, self._window, self._damage_handle)
             self._damage_handle = None
         self._window = None
 
@@ -124,7 +124,7 @@ class CompositeHelper(AutoPropGObjectMixin, gobject.GObject):
                         # clobbering.  They are our friends!  X is driving me
                         # slowly mad.
                         addXSelectInput(win, const["StructureNotifyMask"])
-                        add_event_receiver(win, self)
+                        add_event_receiver(win, self, max_receivers=-1)
                         listening.append(win)
                         win = get_parent(win)
                     handle = xcomposite_name_window_pixmap(self._window)

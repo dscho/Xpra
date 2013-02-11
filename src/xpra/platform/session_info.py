@@ -195,11 +195,12 @@ class SessionInfo(gtk.Window):
             tb.new_row("GTK", label(client_version_info("gtk_version")), label(server_version_info("gtk_version")))
         tb.new_row("Python", label(platform.python_version()), label(server_version_info("python_version")))
         cl_gst_v, cl_pygst_v = "", ""
-        try:
-            from xpra.sound.gstreamer_util import gst_version as cl_gst_v, pygst_version as cl_pygst_v
-            pass
-        except:
-            pass
+        from xpra.scripts.main import HAS_SOUND
+        if HAS_SOUND:
+            try:
+                from xpra.sound.gstreamer_util import gst_version as cl_gst_v, pygst_version as cl_pygst_v
+            except:
+                pass
         tb.new_row("GStreamer", label(make_version_str(cl_gst_v)), label(server_version_info("gst_version")))
         tb.new_row("pygst", label(make_version_str(cl_pygst_v)), label(server_version_info("pygst_version")))
         tb.new_row("OpenGL", label(make_version_str(self.client.opengl_props.get("opengl", "n/a"))), label("n/a"))
@@ -445,6 +446,9 @@ class SessionInfo(gtk.Window):
         since = time.time()-1
         decoded = [0]+[pixels for t,pixels in self.client.pixel_counter if t>since]
         self.pixel_in_data.append(sum(decoded))
+        #update latency values
+        self.server_latency = [1000.0*x for _,x in list(self.client.server_ping_latency)[-20:]]
+        self.client_latency = [1000.0*x for _,x in list(self.client.client_ping_latency)[-20:]]
         return not self.is_closed
 
     def populate_tab(self, *args):
@@ -665,13 +669,11 @@ class SessionInfo(gtk.Window):
             self.bandwidth_graph.set_size_request(*pixmap.get_size())
             self.bandwidth_graph.set_from_pixmap(pixmap, None)
         #latency graph:
-        server_latency = [1000.0*x for _,x in list(self.client.server_ping_latency)[-20:]]
-        client_latency = [1000.0*x for _,x in list(self.client.client_ping_latency)[-20:]]
-        for l in (server_latency, client_latency):
+        for l in (self.server_latency, self.client_latency):
             if len(l)<20:
                 for _ in range(20-len(l)):
                     l.insert(0, None)
-        pixmap = make_graph_pixmap([server_latency, client_latency], labels=["server", "client"],
+        pixmap = make_graph_pixmap([self.server_latency, self.client_latency], labels=["server", "client"],
                                     width=w, height=h/2,
                                     title="Latency (ms)", min_y_scale=10, rounding=50,
                                     start_x_offset=start_x_offset)

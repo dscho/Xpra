@@ -1,3 +1,15 @@
+xpra (0.8.2-1) UNRELEASED; urgency=low
+  * fix libav uninitialized structure crash
+  * fix warning on installations without sound libraries
+  * fix warning when pulseaudio utils are not installed
+  * fix delta compression race
+  * fix the return of some ghost windows
+  * stop pulseaudio on exit, warn if it fails to start
+  * re-enable system tray forwarding, fix location conflicts
+  * remove spurious "too many receivers" warnings
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sun, 10 Feb 2013 14:21:24 +0700
+
 xpra (0.8.1-1) UNRELEASED; urgency=low
   * fix server daemonize on some platforms
   * fix server SSH support on platforms with old versions of glib
