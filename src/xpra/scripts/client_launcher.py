@@ -113,7 +113,8 @@ def about(*args):
 	dialog.set_website(SITE_URL)
 	dialog.set_website_label(SITE_DOMAIN)
 	dialog.set_logo(get_icon("xpra.png"))
-	dialog.set_program_name(APPLICATION_NAME)
+	if hasattr(dialog, "set_program_name"):
+		dialog.set_program_name(APPLICATION_NAME)
 	def response(*args):
 		dialog.destroy()
 		global about_dialog
@@ -348,7 +349,7 @@ class ApplicationWindow:
 		self.window.set_default_size(400, 300)
 		self.window.set_border_width(20)
 		self.window.set_title(APPLICATION_NAME)
-		self.window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("white"))
+		self.window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(red=255, green=255, blue=255))
 		icon_pixbuf = get_icon("xpra.png")
 		if icon_pixbuf:
 			self.window.set_icon(icon_pixbuf)

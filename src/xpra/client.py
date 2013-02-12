@@ -51,7 +51,10 @@ else:
                     y = int(y/ratio)
                 cursor = gdk.Cursor(gdk.display_get_default(), pixbuf, x, y)
         for gtkwindow in gtkwindows:
-            gdkwin = gtkwindow.get_window()
+            if gtk.gtk_version>=(2,14):
+                gdkwin = gtkwindow.get_window()
+            else:
+                gdkwin = gtkwindow.window
             #trays don't have a gdk window
             if gdkwin:
                 gdkwin.set_cursor(cursor)
@@ -259,9 +262,10 @@ class XpraClient(XpraClientBase, gobject.GObject):
                 os.fchmod(fd, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP)
             self.mmap_size = max(4096, mmap.PAGESIZE)*32*1024   #generally 128MB
             log("using mmap file %s, fd=%s, size=%s", self.mmap_file, fd, self.mmap_size)
-            os.lseek(fd, self.mmap_size-1, os.SEEK_SET)
+            SEEK_SET = 0        #os.SEEK_SET==0 but this is not available in python2.4
+            os.lseek(fd, self.mmap_size-1, SEEK_SET)
             assert os.write(fd, '\x00')
-            os.lseek(fd, 0, os.SEEK_SET)
+            os.lseek(fd, 0, SEEK_SET)
             self.mmap = mmap.mmap(fd, length=self.mmap_size)
             #write the 16 byte token one byte at a time - no endianness
             self.mmap_token = uuid.uuid4().int
@@ -826,11 +830,14 @@ class XpraClient(XpraClientBase, gobject.GObject):
         if modifier_keycodes:
             self._client_extras.set_modifier_mappings(modifier_keycodes)
 
-        try:
-            import glib
-            glib.set_application_name(self.session_name)
-        except ImportError, e:
-            log.warn("glib is missing, cannot set the application name, please install glib's python bindings: %s", e)
+        if sys.version_info[:2]<(2,5):
+            log.warn("Python %s is too old!", sys.version_info)
+        else:
+            try:
+                import glib
+                glib.set_application_name(self.session_name)
+            except ImportError, e:
+                log.warn("glib is missing, cannot set the application name, please install glib's python bindings: %s", e)
 
         #sound:
         self.server_pulseaudio_id = capabilities.get("sound.pulseaudio.id")
@@ -1022,8 +1029,16 @@ class XpraClient(XpraClientBase, gobject.GObject):
             monitors = []
             while j<screen.get_n_monitors():
                 geom = screen.get_monitor_geometry(j)
-                monitor = (screen.get_monitor_plug_name(j) or "", geom.x, geom.y, geom.width, geom.height,
-                            screen.get_monitor_width_mm(j), screen.get_monitor_height_mm(j))
+                plug_name = ""
+                if hasattr(screen, "get_monitor_plug_name"):
+                    plug_name = screen.get_monitor_plug_name(j)
+                wmm = -1
+                if hasattr(screen, "get_monitor_width_mm"):
+                    wmm = screen.get_monitor_width_mm(j)
+                hmm = -1
+                if hasattr(screen, "get_monitor_height_mm"):
+                    hmm = screen.get_monitor_height_mm(j)
+                monitor = plug_name, geom.x, geom.y, geom.width, geom.height, wmm, hmm
                 monitors.append(monitor)
                 j += 1
             root = screen.get_root_window()
