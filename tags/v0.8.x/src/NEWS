@@ -1,3 +1,9 @@
+v0.8.4 (2013-02-13)
+======================
+	-- fix hello packet encoding bug
+	-- fix colours in launcher and session-info windows
+
+
 v0.8.3 (2013-02-12)
 ======================
 	-- Python 2.4 compatiblity fixes (CentOS 5.x)
