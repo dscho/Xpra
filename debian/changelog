@@ -1,3 +1,8 @@
+xpra (0.8.5-1) UNRELEASED; urgency=low
+  * fix server crash with transient windows
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sun, 17 Feb 2013 18:11:27 +0700
+
 xpra (0.8.4-1) UNRELEASED; urgency=low
   * fix hello packet encoding bug
   * fix colours in launcher and session-info windows
