@@ -1,3 +1,11 @@
+v0.8.6 (2013-02-20)
+======================
+	-- fix python2.4 compatibility in icon grabbing code
+	-- fix libav compatibility on MS Windows with VisualStudio
+	-- fix exit message location
+	-- prevent invalid Python bindings version from being included in the MS Windows installer
+
+
 v0.8.5 (2013-02-17)
 ======================
 	-- fix server crash with transient windows
