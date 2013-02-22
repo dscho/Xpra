@@ -1,5 +1,6 @@
-v0.8.6 (2013-02-20)
+v0.8.6 (2013-02-22)
 ======================
+	-- fix launcher on MS Windows, better SSH support
 	-- fix python2.4 compatibility in icon grabbing code
 	-- fix libav compatibility on MS Windows with VisualStudio
 	-- fix exit message location

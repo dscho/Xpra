@@ -124,7 +124,7 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Feb 20 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.6-1
+* Fri Feb 22 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.6-1
 - fix python2.4 compatibility in icon grabbing code
 - fix exit message location
 
