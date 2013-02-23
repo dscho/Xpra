@@ -2,7 +2,6 @@ xpra (0.8.6-1) UNRELEASED; urgency=low
   * fix python2.4 compatibility in icon grabbing code
   * fix libav compatibility on MS Windows with VisualStudio
   * fix exit message location
-  * prevent invalid Python bindings version from being included in the MS Windows installer
 
  -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 22 Feb 2013 16:45:53 +0700
 
