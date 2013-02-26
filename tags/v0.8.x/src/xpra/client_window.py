@@ -217,6 +217,13 @@ class ClientWindow(gtk.Window):
 
         self.update_metadata(metadata)
 
+        display = gtk.gdk.display_get_default()
+        screen_num = client_properties.get("screen")
+        if screen_num and screen_num>=0 and screen_num<display.get_n_screens():
+            screen = display.get_screen(screen_num)
+            if screen:
+                self.set_screen(screen)
+
         self.set_app_paintable(True)
         self.add_events(WINDOW_EVENT_MASK)
         self.move(x, y)
@@ -231,11 +238,11 @@ class ClientWindow(gtk.Window):
 
     def set_workspace(self):
         if not CAN_SET_WORKSPACE or self._been_mapped:
-            return
-        workspace = self._client_properties.get("workspace")
+            return -1
+        workspace = self._client_properties.get("workspace", -1)
         log("set_workspace() workspace=%s", workspace)
-        if not workspace or workspace==self.get_workspace():
-            return
+        if workspace<0 or workspace==self.get_workspace():
+            return -1
         try:
             from wimpiggy.lowlevel import sendClientMessage, const  #@UnresolvedImport
             from wimpiggy.error import trap
@@ -243,14 +250,16 @@ class ClientWindow(gtk.Window):
             ndesktops = xget_u32_property(root, "_NET_NUMBER_OF_DESKTOPS")
             log("set_workspace() ndesktops=%s", ndesktops)
             if ndesktops is None or ndesktops<=1:
-                return
+                return  -1
             workspace = max(0, min(ndesktops-1, workspace))
             event_mask = const["SubstructureNotifyMask"] | const["SubstructureRedirectMask"]
             trap.call_synced(sendClientMessage, root, gdk_window(self), False, event_mask, "_NET_WM_DESKTOP",
                       workspace, const["CurrentTime"],
                       0, 0, 0)
+            return workspace
         except Exception, e:
             log.error("failed to set workspace: %s", e)
+            return -1
 
     def is_OR(self):
         return self._override_redirect
@@ -269,7 +278,9 @@ class ClientWindow(gtk.Window):
         for target, prop in ((window, "_NET_WM_DESKTOP"), (root, "_NET_CURRENT_DESKTOP")):
             value = xget_u32_property(target, prop)
             if value is not None:
+                log("get_workspace() found value=%s from %s / %s", value, target, prop)
                 return value
+        log("get_workspace() value not found!")
         return  -1
 
     def new_backing(self, w, h):
@@ -442,11 +453,16 @@ class ClientWindow(gtk.Window):
         #set group leader (but avoid ugly "not implemented" warning on win32):
         if self.group_leader and not sys.platform.startswith("win"):
             self.window.set_group(self.group_leader)
-        self.set_workspace()
         if not self._override_redirect:
             x, y, w, h = get_window_geometry(self)
-            client_properties = {"workspace" : self.get_workspace()}
-            self._client.send("map-window", self._id, x, y, w, h, client_properties)
+            if not self._been_mapped:
+                workspace = self.set_workspace()
+            else:
+                workspace = self.get_workspace()
+            if workspace>=0:
+                self._client_properties["workspace"] = workspace
+            self._client_properties["screen"] = self.get_screen().get_number()
+            self._client.send("map-window", self._id, x, y, w, h, self._client_properties)
             self._pos = (x, y)
             self._size = (w, h)
         self._been_mapped = True
@@ -465,7 +481,10 @@ class ClientWindow(gtk.Window):
         self._pos = (x, y)
         if self._client.window_configure:
             #if we support configure-window, send that first
-            client_properties = {"workspace" : self.get_workspace()}
+            client_properties = {
+                                 "workspace"    : self.get_workspace(),
+                                 "screen"       : self.get_screen().get_number()
+                                 }
             self._client.send("configure-window", self._id, x, y, w, h, client_properties)
         if dx!=0 or dy!=0:
             #window has moved
