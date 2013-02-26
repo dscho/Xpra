@@ -1,11 +1,12 @@
 xpra (0.8.7-1) UNRELEASED; urgency=low
+  * fix x264 crash with older versions of libav
   * fix 32-bit builds breakage introduce by python2.4 fix in 0.8.6
   * fix missing sound forwarding when using the GUI launcher
   * fix microphone forwarding errors
   * fix client window properties store
   * fix first workspace not preserved and other workspace issues
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 26 Feb 2013 17:33:40 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 27 Feb 2013 00:27:50 +0700
 
 xpra (0.8.6-1) UNRELEASED; urgency=low
   * fix python2.4 compatibility in icon grabbing code

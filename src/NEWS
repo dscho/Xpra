@@ -1,5 +1,6 @@
-v0.8.7 (2013-02-26)
+v0.8.7 (2013-02-27)
 ======================
+	-- fix x264 crash with older versions of libav
 	-- fix 32-bit builds breakage introduce by python2.4 fix in 0.8.6
 	-- fix missing sound forwarding when using the GUI launcher
 	-- fix microphone forwarding errors

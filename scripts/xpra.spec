@@ -124,7 +124,8 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Tue Feb 26 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.7-1
+* Wed Feb 27 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.7-1
+- fix x264 crash with older versions of libav
 - fix 32-bit builds breakage introduce by python2.4 fix in 0.8.6
 - fix missing sound forwarding when using the GUI launcher
 - fix microphone forwarding errors
