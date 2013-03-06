@@ -2,6 +2,7 @@ xpra (0.8.8-1) UNRELEASED; urgency=low
   * fix compatiblity with older versions of Python
   * fix sound capture script usage via command line
   * fix screen number preserve code
+  * fix error in logs in shadow mode
 
  -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 06 Mar 2013 17:51:46 +0700
 
