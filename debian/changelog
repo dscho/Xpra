@@ -1,10 +1,11 @@
 xpra (0.8.8-1) UNRELEASED; urgency=low
+  * fix server deadlock on dead connections
   * fix compatiblity with older versions of Python
   * fix sound capture script usage via command line
   * fix screen number preserve code
   * fix error in logs in shadow mode
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 06 Mar 2013 17:51:46 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 07 Mar 2013 00:35:22 +0700
 
 xpra (0.8.7-1) UNRELEASED; urgency=low
   * fix x264 crash with older versions of libav

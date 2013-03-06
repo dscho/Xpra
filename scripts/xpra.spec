@@ -124,7 +124,8 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Mar 06 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.8-1
+* Thu Mar 07 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.8-1
+- fix server deadlock on dead connections
 - fix compatiblity with older versions of Python
 - fix sound capture script usage via command line
 - fix screen number preserve code
