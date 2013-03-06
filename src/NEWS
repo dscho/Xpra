@@ -3,6 +3,7 @@ v0.8.8 (2013-03-06)
 	-- fix compatiblity with older versions of Python
 	-- fix sound capture script usage via command line
 	-- fix screen number preserve code
+	-- fix error in logs in shadow mode
 
 
 v0.8.7 (2013-02-27)

@@ -128,6 +128,7 @@ So basically it's screen for remote X apps.
 - fix compatiblity with older versions of Python
 - fix sound capture script usage via command line
 - fix screen number preserve code
+- fix error in logs in shadow mode
 
 * Wed Feb 27 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.7-1
 - fix x264 crash with older versions of libav
