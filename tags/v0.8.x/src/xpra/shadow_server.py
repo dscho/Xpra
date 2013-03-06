@@ -186,7 +186,7 @@ class XpraShadowServer(XpraServerBase):
         self.mapped_at = x, y, width, height
         self._damage(window, 0, 0, width, height)
         if len(packet)>=7:
-            self._set_client_properties(proto, packet[6])
+            self._set_client_properties(proto, wid, packet[6])
         self.start_refresh()
 
     def _process_unmap_window(self, proto, packet):
@@ -201,7 +201,7 @@ class XpraShadowServer(XpraServerBase):
         self.mapped_at = x, y, w, h
         self._damage(window, 0, 0, w, h)
         if len(packet)>=7:
-            self._set_client_properties(proto, packet[6])
+            self._set_client_properties(proto, wid, packet[6])
 
     def _process_move_window(self, proto, packet):
         wid, x, y = packet[1:4]
