@@ -1,3 +1,10 @@
+xpra (0.8.8-1) UNRELEASED; urgency=low
+  * fix compatiblity with older versions of Python
+  * fix sound capture script usage via command line
+  * fix screen number preserve code
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 06 Mar 2013 17:51:46 +0700
+
 xpra (0.8.7-1) UNRELEASED; urgency=low
   * fix x264 crash with older versions of libav
   * fix 32-bit builds breakage introduce by python2.4 fix in 0.8.6
