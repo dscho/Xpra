@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.8.7
+%define version 0.8.8
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -124,6 +124,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Wed Mar 06 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.8-1
+- fix compatiblity with older versions of Python
+- fix sound capture script usage via command line
+- fix screen number preserve code
+
 * Wed Feb 27 2013 Antoine Martin <antoine@devloop.org.uk> 0.8.7-1
 - fix x264 crash with older versions of libav
 - fix 32-bit builds breakage introduce by python2.4 fix in 0.8.6
