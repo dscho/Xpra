@@ -24,6 +24,12 @@ test -x src/install/bin/xpra || (
 
 export PYTHONPATH=$PWD/src/install/lib/python:$PYTHONPATH
 
+case "$*" in
+"attach :"[1-9]*)
+	DISPLAY="$2" xrandr -s 2048x2048
+	;;
+esac
+
 if test $# = 0
 then
 	display=98
