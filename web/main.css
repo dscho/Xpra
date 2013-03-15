@@ -349,6 +349,15 @@ li.a {
 	list-style-image: url(/icons/arrow.png);
 }
 
+#content.ticket {
+	width: auto;
+	min-width: 58em;
+}
+div.trac-ticket-buttons {
+	height: 1.5em;
+}
+div.trac-ticket-buttons form {
+}
 div#ticketchange {
 	clear: both;
 }
