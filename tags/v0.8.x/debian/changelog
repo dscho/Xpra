@@ -1,3 +1,8 @@
+xpra (0.8.9-1) UNRELEASED; urgency=low
+  * fix UI thread latency issues caused by network retries
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 27 Mar 2013 18:33:35 +0100
+
 xpra (0.8.8-1) UNRELEASED; urgency=low
   * fix server deadlock on dead connections
   * fix compatibility with older versions of Python
