@@ -1,3 +1,8 @@
+v0.8.9 (2013-03-27)
+======================
+	-- fix UI thread latency issues caused by network retries
+
+
 v0.8.8 (2013-03-07)
 ======================
 	-- fix server deadlock on dead connections
