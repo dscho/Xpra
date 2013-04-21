@@ -82,12 +82,18 @@
 	<div class="box">
 	  <h2>Issues - known problems</h2>
 	  <ul>
+	  	<li class="q">Xpra crashed! Can I recover my session?</li>
+	  	<li class="a">Generally yes, as long as the virtual display server (vfb) has not crashed. <br/>
+	  		If the xpra server is completely gone, you can start a new one with "<code>xpra start --use-display<code>" to re-use
+	  		the existing display. If it is still running but unresponsive, you may have to kill it first (use kill -9 to prevent
+	  		the tear down code from stopping the display)
+	  	</li>
 	  	<li class="q">Pasting from the clipboard is slow</li>
 	  	<li class="a">Please make sure that you are not running a clipboard manager which may interfere with xpra's clipboard synchronization code (ie: <code>klipper</code> is known to cause such problems)</li>
 	  	<li class="q">I cannot click on menus</li>
 	  	<li class="a">If you are using Qt/KDE, this is known bug which has been fixed so you will need up to date Qt/KDE libraries, see the <a href="#platforms">platforms</a> section below</li>
 	  	<li class="q">I cannot use Xpra with NFS home</li>
-	  	<li class="a">Use the <code>socket-dir</code> option to place Xpra's log files and sockets to a location that is not NFS mounted (ie: <code>/tmp/</code>)</li>
+	  	<li class="a">Use the <code>socket-dir</code> option to place Xpra's log files and sockets in a location that is not NFS mounted (ie: <code>/tmp/</code>)</li>
 	  </ul>
 	</div>
 
@@ -128,7 +134,8 @@
 	  	<li class="q">&quot;<code>Xorg</code> is not readable&quot;</li>
 	  	<li class="a">Your distribution ships <code>Xorg</code> <code>suid</code> but it is not readable by your current user,
 	  		since Xpra needs to run <code>Xorg</code> non-suid, it needs to make a non-suid copy of the file so you will have to make it readable
-	  		(please complain to your distributor - there is nothing we can do about this). <br />
+	  		(please complain to your distributor - there is nothing we can do about this and the security beneffits 
+	  		of preventing read access to a suid binary are dubious at best in most cases). <br />
 	  		For more details, see <a href="/Xdummy.html">Xdummy</a>.
 	  	</li>
 	  </ul>
