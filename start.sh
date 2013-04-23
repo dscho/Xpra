@@ -5,6 +5,12 @@ set -e
 mkdir -p "$HOME/.xpra"
 
 cd "$(dirname "$0")"
+basename="$0"
+while basename="$(readlink "$(basename "$basename")")"
+do
+	cd "$(dirname "$basename")"
+done
+pwd
 
 test -x src/install/bin/xpra || (
 	modules="libx11-dev libxtst-dev libxcomposite-dev libxdamage-dev python-gobject-dev python-gtk2-dev xvfb cython libx264-dev libswscale-dev libavcodec-dev libvpx-dev"
