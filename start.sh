@@ -24,10 +24,16 @@ test -x src/install/bin/xpra || (
 
 export PYTHONPATH=$PWD/src/install/lib/python:$PYTHONPATH
 
-if test $# -gt 0
+if test $# = 0
 then
-	exec ./src/install/bin/xpra "$@"
-else
-	DISPLAY=98
-	exec ./src/install/bin/xpra --xvfb="Xorg -verbose -noreset +extension GLX +extension RANDR +extension RENDER -logfile $HOME/.xpra/$DISPLAY.log -config $PWD/xorg.conf :$DISPLAY" "--start-child=dbus-launch gnome-terminal" start :$DISPLAY
+	display=98
+	case "$HOSTNAME" in
+	gene099-iMac)
+		set --xvfb="Xorg -verbose -noreset +extension GLX +extension RANDR +extension RENDER -logfile $HOME/.xpra/$display.log -config $PWD/xorg.conf :$display" "--start-child=dbus-launch gnome-terminal" start :$display
+		;;
+	*)
+		set attach ssh:bigmac:$display
+		;;
+	esac
 fi
+exec ./src/install/bin/xpra "$@"
