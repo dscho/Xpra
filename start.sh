@@ -24,22 +24,28 @@ test -x src/install/bin/xpra || (
 
 export PYTHONPATH=$PWD/src/install/lib/python:$PYTHONPATH
 
-case "$*" in
-"attach :"[1-9]*)
-	DISPLAY="$2" xrandr -s 2048x2048
-	;;
-esac
-
 if test $# = 0
 then
-	display=98
-	case "$HOSTNAME" in
-	gene099-iMac)
-		set --xvfb="Xorg -verbose -noreset +extension GLX +extension RANDR +extension RENDER -logfile $HOME/.xpra/$display.log -config $PWD/xorg.conf :$display" "--start-child=dbus-launch gnome-terminal" start :$display
+	display=97
+	case "$SESSION_MANAGER" in
+	*iMac*)
+		if fuser $HOME/.xpra/$display.log
+		then
+			set attach :$display
+		else
+			set -- --xvfb="Xorg -verbose -noreset +extension GLX +extension RANDR +extension RENDER -logfile $HOME/.xpra/$display.log -config $PWD/xorg.conf" "--start-child=dbus-launch gnome-terminal" start :$display
+		fi
 		;;
 	*)
 		set attach ssh:bigmac:$display
 		;;
 	esac
 fi
+
+case "$*" in
+"attach :"[1-9]*)
+	DISPLAY="$2" xrandr -s 2048x2048
+	;;
+esac
+
 exec ./src/install/bin/xpra "$@"
