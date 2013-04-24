@@ -33,7 +33,7 @@ then
 		then
 			set attach :$display
 		else
-			set -- --xvfb="Xorg -verbose -noreset +extension GLX +extension RANDR +extension RENDER -logfile $HOME/.xpra/$display.log -config $PWD/xorg.conf" "--start-child=dbus-launch gnome-terminal" start :$display
+			set -- --xvfb="Xorg -dpi 96 -noreset -verbose +extension GLX +extension RANDR +extension RENDER -logfile $HOME/.xpra/$display.log -config $PWD/xorg.conf" "--start-child=dbus-launch gnome-terminal" start :$display
 		fi
 		;;
 	*)
