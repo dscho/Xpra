@@ -431,7 +431,7 @@ struct x264lib_ctx *init_decoder(int width, int height, int use_swscale, int csc
 void do_clean_decoder(struct x264lib_ctx *ctx)
 {
 	if (ctx->frame) {
-		avcodec_free_frame(&ctx->frame);
+		//avcodec_free_frame(&ctx->frame);
 		ctx->frame = NULL;
 	}
 	if (ctx->codec_ctx) {
