@@ -1,0 +1,709 @@
+.\" Man page for xpra
+.\"
+.\" Copyright (C) 2008-2009 Nathaniel Smith <njs@pobox.com>
+.\" Copyright (C) 2010-2013 Antoine Martin <antoine@devloop.org.uk>
+.\"
+.\" You may distribute under the terms of the GNU General Public
+.\" license, either version 2 or (at your option) any later version.
+.\" See the file COPYING for details.
+.\"
+.TH XPRA 1
+.SH NAME
+xpra \- viewer for remote, persistent X applications
+.\" --------------------------------------------------------------------
+.SH SYNOPSIS
+.PD 0
+.HP \w'xpra\ 'u
+\fBxpra\fP \fBstart\fP \fI:DISPLAY\fP | \fBxpra\fP \fBstart\fP \fIssh:HOST:DISPLAY\fP
+[\fB\-\-start\-child\fP=\fICHILD\fP]\fB .\|.\|.\fP
+[\fB\-\-exit\-with\-children\fP] [\fB\-\-no\-daemon\fP]
+[\fB\-\-use\-display\fP]
+[\fB\-\-xvfb\fP=\fICMD\fP]
+[\fB\-\-no\-pulseaudio\fP]
+[\fB\-\-pulseaudio\-command\fP=\fISERVER START COMMAND\fP]
+[\fB\-\-no\-clipboard\fP]
+[\fB\-\-no\-cursors\fP]
+[\fB\-\-no\-notifications\fP]
+[\fB\-\-no\-system\-tray\fP]
+[\fB\-\-no\-bell\fP]
+[\fB\-\-no\-speaker\fP]
+[\fB\-\-speaker\-codec\fP=\fICODEC\fP]
+[\fB\-\-no\-microphone\fP]
+[\fB\-\-microphone\-codec\fP=\fICODEC\fP]
+[\fB\-\-enable-sharing\fP]
+[\fB\-\-bind\-tcp\fP=\fI[HOST]:PORT\fP]
+[\fB\-\-password\-file\fP=\fIfilename\fP]
+[\fB\-\-clipboard-filter\-file\fP=\fIfilename\fP]
+[\fB\-\-dpi\fP=\fIVALUE\fP]
+[\fB\-\-socket\-dir\fP=\fIDIR\fP]
+.HP
+\fBxpra\fP \fBattach\fP
+[\fI:DISPLAY\fP | \fIssh:USER@HOST:DISPLAY\fP | \fIssh:HOST:DISPLAY\fP | \fItcp:HOST:PORT\fP]
+[\fB\-zLEVEL | \-\-compress\fP=\fILEVEL\fP]
+[\fB\-\-no\-mmap\fP]
+[\fB\-\-no\-windows\fP]
+[\fB\-\-no\-clipboard\fP]
+[\fB\-\-no\-cursors\fP]
+[\fB\-\-no\-notifications\fP]
+[\fB\-\-no\-system\-tray\fP]
+[\fB\-\-no\-bell\fP]
+[\fB\-\-no\-keyboard\-sync\fP]
+[\fB\-\-no\-tray\fP]
+[\fB\-\-no\-speaker\fP]
+[\fB\-\-speaker\-codec\fP=\fICODEC\fP]
+[\fB\-\-no\-microphone\fP]
+[\fB\-\-microphone\-codec\fP=\fICODEC\fP]
+[\fB\-\-delay\-tray\fP]
+[\fB\-\-encoding\fP=\fIENCODING\fP]
+[\fB\-\-opengl\fP=\fIyes\fP|\fIno\fP|\fIauto\fP]
+[\fB\-\-quality\fP=\fIQUALITY\fP]
+[\fB\-\-min\-quality\fP=\fIMIN\-QUALITY\fP]
+[\fB\-\-speed\fP=\fISPEED\fP]
+[\fB\-\-min-speed\fP=\fIMIN-SPEED\fP]
+[\fB\-\-auto\-refresh\-delay\fP=\fIDELAY\fP]
+[\fB\-\-max\-bandwidth\fP=\fIBW\fP]
+[\fB\-\-key\-shortcut\fP=\fIkey:action\fP]
+[\fB\-\-readonly\fP]
+[\fB\-\-enable-sharing\fP]
+[\fB\-\-title\-suffix\fP=\fIVALUE\fP]
+[\fB\-\-title\fP=\fIVALUE\fP]
+[\fB\-\-window\-icon\fP=\fIFILENAME\fP]
+[\fB\-\-tray\-icon\fP=\fIfilename\fP]
+[\fB\-\-ssh\fP=\fICMD\fP] [\fB\-\-remote\-xpra\fP=\fICMD\fP]
+[\fB\-\-password\-file\fP=\fIfilename\fP]
+[\fB\-\-dpi\fP=\fIVALUE\fP]
+[\fB\-\-socket\-dir\fP=\fIDIR\fP]
+[\fB\-\-mmap\-group\fP]
+[\fB\-\-enable\-pings\fP]
+[\fB\-\-encryption\fP=\fICIPHER\fP]
+.HP
+.HP \w'xpra\ 'u
+\fBxpra\fP \fBshadow\fP \fI:DISPLAY\fP
+[\fB\-\-start\-child\fP=\fICHILD\fP]\fB .\|.\|.\fP
+[\fB\-\-exit\-with\-children\fP] [\fB\-\-no\-daemon\fP]
+[\fB\-\-no\-clipboard\fP]
+[\fB\-\-no\-notifications\fP]
+[\fB\-\-no\-bell\fP]
+[\fB\-\-no\-speaker\fP]
+[\fB\-\-speaker\-codec\fP=\fICODEC\fP]
+[\fB\-\-no\-microphone\fP]
+[\fB\-\-microphone\-codec\fP=\fICODEC\fP]
+[\fB\-\-bind\-tcp\fP=\fI[HOST]:PORT\fP]
+[\fB\-\-password\-file\fP=\fIfilename\fP]
+[\fB\-\-socket\-dir\fP=\fIDIR\fP]
+.HP
+
+\fBxpra\fP \fBstop\fP [\fI:DISPLAY\fP | \fIssh:[USER@]HOST:DISPLAY\fP |
+\fItcp:HOST:PORT\fP] [\fB\-\-ssh=CMD\fP] [\fB\-\-remote\-xpra\fP=\fICMD\fP]
+[\fB\-\-socket\-dir\fP=\fIDIR\fP]
+.HP
+\fBxpra\fP \fBdetach\fP [\fI:DISPLAY\fP | \fIssh:[USER@]HOST:DISPLAY\fP |
+\fItcp:HOST:PORT\fP] [\fB\-\-ssh\fP=\fICMD\fP] [\fB\-\-remote\-xpra\fP=\fICMD\fP]
+[\fB\-\-socket\-dir\fP=\fIDIR\fP]
+.HP
+\fBxpra\fP \fBscreenshot\fP \fIfilename\fP [\fI:DISPLAY\fP | \fIssh:[USER@]HOST:DISPLAY\fP |
+\fItcp:HOST:PORT\fP] [\fB\-\-ssh\fP=\fICMD\fP] [\fB\-\-remote\-xpra\fP=\fICMD\fP]
+[\fB\-\-socket\-dir\fP=\fIDIR\fP]
+.HP
+\fBxpra\fP \fBversion\fP [\fI:DISPLAY\fP | \fIssh:[USER@]HOST:DISPLAY\fP |
+\fItcp:HOST:PORT\fP] [\fB\-\-ssh\fP=\fICMD\fP] [\fB\-\-remote\-xpra\fP=\fICMD\fP]
+[\fB\-\-socket\-dir\fP=\fIDIR\fP]
+.HP
+\fBxpra\fP \fBinfo\fP [\fI:DISPLAY\fP | \fIssh:[USER@]HOST:DISPLAY\fP |
+\fItcp:HOST:PORT\fP] [\fB\-\-ssh\fP=\fICMD\fP] [\fB\-\-remote\-xpra\fP=\fICMD\fP]
+[\fB\-\-socket\-dir\fP=\fIDIR\fP]
+.HP
+\fBxpra\fP \fBlist\fP [\fB\-\-socket\-dir\fP=\fIDIR\fP]
+.HP
+\fBxpra\fP \fBupgrade\fP \fI:DISPLAY\fP [...any options accepted by
+\fBxpra start\fP...]
+.PD
+.\" --------------------------------------------------------------------
+.SH DESCRIPTION
+Xpra is a tool which allows you to run X programs \(em usually on a
+remote host \(em and then direct their display to your local machine,
+disconnect from these programs, and reconnect from the same or another
+machine, all without losing any state.  It differs from standard X
+forwarding in that it allows disconnection and reconnection without
+disrupting the forwarded application; it differs from VNC and similar
+remote display technologies in that xpra is \fIrootless\fP: i.e.,
+applications forwarded by xpra appear on your desktop as normal
+windows managed by your window manager, rather than being all "trapped
+in a box together".  Xpra also uses a custom protocol that is
+self-tuning and relatively latency-insensitive, and thus is usable
+over network connections that are too slow or unreliable for standard
+X forwarding.
+Xpra can also be used to shadow an existing X11 display.
+.\" --------------------------------------------------------------------
+.SH EXAMPLES
+.TP \w'xpra\ 'u
+\fBxpra start\fP \fI:7\fP
+Start an xpra server using display number \fI:7\fP.
+.TP
+\fBxpra start\fP \fIssh:bigbox:8 \-\-start\-child=xterm\fP
+Start an xpra server on \fIbigbox\fP with an xterm in it,
+and connect to it.
+\fBDISPLAY=\fP\fI:7 firefox\fP
+Start \fIfirefox\fP running inside the xpra server.  No window will
+appear.
+.TP
+\fBxpra list\fP
+Show a list of xpra servers you have running on the current host.
+.TP
+\fBxpra attach\fP \fI:7\fP
+Attach to the xpra server that is using local display number \fI:7\fP.
+Any apps running on that server will appear on your screen.
+.TP
+\fBxpra attach\fP \fIssh:foo@frodo:7\fP
+Use ssh to attach to the xpra server that is running on machine
+\fIfrodo\fP as user \fIfoo\fP and using display \fI:7\fP.
+Any apps running on that server will appear on your local screen.
+.TP
+\fBxpra start\fP \fI:7\fP \fB&& DISPLAY=\fP\fI:7\fP \fBscreen\fP
+Start an xpra server and a \fBscreen\fP(1) session.  If any of the
+applications inside screen attempt to use X, they will be directed to
+the xpra server.
+.\" --------------------------------------------------------------------
+.SH DISPLAYS
+Understanding the basic idea of displays is critical to using xpra
+successfully.
+
+The idea comes from standard X.  If you have multiple X servers
+running on the same host, then there has to be some way to distinguish
+them.  X does this by assigning each server a small, unique integer
+called (perhaps confusingly) its "display".  In the common case of a
+desktop machine that has only one X server running, that server uses
+display ":0" (or sometimes you'll see ":0.0", which is effectively the
+same).  When an application starts under X, it needs to know how to
+find the right X server to use; it does this by checking the
+environment variable \fB$DISPLAY\fP.
+
+Xpra faces a similar problem \(em there may be multiple xpra servers
+running on the same host, as well as well as multiple X servers.  It
+solves this problem by re-using X's solution \(em each xpra server has
+a display associated with it.  This display functions as both an X
+display (for when xpra is talking to X applications) and as an
+identifier by which xpra clients (like \fBxpra attach\fP) can locate
+the xpra server.
+
+When starting an xpra server, you must specify the name of the display
+to use.  To do this, simply pick any number you like and stick a colon
+in front of it. For instance :7, :12, and :3117 are all valid display
+names.  Just keep in mind that:
+.IP \(bu
+Every X or xpra server that is running on a single machine must use a
+different display name.  If you pick a number that is already in use
+then xpra will not work.
+.IP \(bu
+The first few numbers (0, 1, 2) are commonly used by real X servers.
+.IP \(bu
+Everyone who connects to a given machine using \fBssh\fP(1) with X
+forwarding enabled will also use a display number; ssh generally picks
+numbers near ten (10, 11, 12, ...).
+.PP
+When specifying an xpra server to a client program like \fBxpra
+attach\fP or \fBxpra stop\fP, then you can use a display of the form
+\fB:\fP\fINUMBER\fP to refer to a server on the local host, or one of
+the form \fBssh:\fP\fI[USER@]HOST\fP\fB:\fP\fINUMBER\fP to refer to a server
+on a remote host; xpra will automatically connect to the remote host
+using \fBssh\fP(1).  Generally, if you have only one xpra server
+running on a machine, then you can omit the number entirely; \fBxpra
+attach\fP alone will attach to the lone xpra server on the current
+machine regardless of its number, \fBxpra attach ssh:frodo\fP will
+similarly attach to the lone xpra server on a remote machine.
+
+If the xpra server was given the \fB\-\-bind\-tcp\fP option when
+started (which is a security risk unless the \fB\-\-password\-file\fP
+option is used), then you can also connect to it using a display of
+the form \fBtcp:HOST:PORT\fP. (Notice that \fBssh:\fP takes an optional
+\fIdisplay\fP number, while \fBtcp:\fP takes a required \fIport\fP
+number.)
+.\" --------------------------------------------------------------------
+.SH SUBCOMMANDS
+.SS xpra start
+This command starts a new xpra server, including any necessary setup.
+(when starting a remote server with the \fBssh:HOST:PORT\fP syntax,
+the new session will also be attached)
+.SS xpra attach
+This command attachs to a running xpra server, and forwards any
+applications using that server to appear on your current screen.
+.SS xpra detach
+Detaches the given xpra display.
+.SS xpra screenshot
+Takes a screenshot and saves it to the filename specified.
+Note: screenshots can only be taken when a client is attached.
+.SS xpra version
+Queries the server version and prints it out.
+Note: older servers may not support this feature.
+.SS xpra info
+Queries the server for version, status and statistics.
+Note: older servers may not support this feature.
+.SS xpra stop
+This command attachs to a running xpra server, and requests that it
+terminate immediately.  This generally causes any applications using
+that server to terminate as well.
+.SS xpra list
+This command finds all xpra servers that have been started by the
+current user on the current machine, and lists them.
+.SS xpra upgrade
+This command starts a new xpra server, but instead of creating it from
+scratch, it attaches to another existing server, tells it to exit, and
+takes over managing the applications that it was managing before.  As
+the name suggests, the main use case is to replace a server running
+against an older version of xpra with a newer version, without having
+to restart your session.  Any currently-running \fBxpra attach\fP
+command will exit and need to be restarted.
+.SS xpra shadow
+This command shadows an existing X11 display. Note that this mode of
+operation uses screenscraping which is far less efficient. Using a
+video encoder (x264 or vpx) is highly recommended for this mode of
+operation.
+
+.SS Important Note
+Some platforms and package managers may choose to only build the client
+and not the server. In this case, only the \fBattach\fP subcommand will
+be available.
+
+.\" --------------------------------------------------------------------
+.SH OPTIONS
+.SS General options
+.TP
+\fB\-\-version\fP
+Displays xpra's version number.
+.TP
+\fB\-h, \-\-help\fP
+Displays a summary of command line usage.
+.TP
+\fB\-d\fP \fIFILTER1,FILTER2,...\fP, \fB\-\-debug\fP=\fIFILTER1,FILTER2,...\fP
+Enable debug logging.  The special value \fBall\fP enables all
+debugging; alternatively, debugging logs for particular subsystems can be
+enabled by specifying one or more filters (separated by commas).  In
+general, check the source to determine filter names \(em but they will
+look something like \fBxpra.protocol.raw\fP or \fBwimpiggy\fP
+(wimpiggy is the name of one of xpra's underlying libraries).  A
+filter like \fBxpra.protocol.raw\fP is more specific than one like
+\fBxpra.protocol\fP. Additionally, logging can be disabled for a
+specific subsystem by prefixing a minus sign to its name, like so:
+\fB\-\-debug\fP=\fIall,-wimpiggy\fP.
+.TP
+\fB\-\-no\-mmap\fP
+Disables memory mapped pixel data transfer.
+By default it is normally enabled automatically if the server and the
+client reside on the same filesystem namespace.
+This method of data transfer offers much lower overheads
+and reduces both CPU consumption and context switches.
+.TP
+\fB\-\-no\-windows\fP
+Tells the server not to send any window data,
+only notifications and bell events will be forwarded - if they
+are enabled.
+\fB\-\-no\-clipboard\fP
+Disables clipboard synchronization.
+If used on the server, no clients will be able to use clipboard
+synchronization at all. If used on the client, only this particular
+connection will ignore clipboard data from the server.
+.TP
+\fB\-\-no\-pulseaudio\fP
+Disables the starting of a pulseaudio server with the session.
+.TP
+\fB\-\-pulseaudio\-command\fP=\fISERVER START COMMAND\fP
+Specifies the pulseaudio command to use to start the pulseaudio
+server, unless disabled with \fB\-\-no\-pulseaudio\fP.
+.TP
+\fB\-\-session\-name\fP=\fIVALUE\fP
+Sets the name of this session. This value may be used in
+notifications, utilities, tray menu, etc.
+Setting this value on the server provides a default value which
+may be overridden on the client.
+.TP
+\fB\-\-encoding\fP=\fIENCODING\fP
+This specifies the image encoding to use,
+there are a number of encodings supported:
+\fBjpeg\fP, \fBpng\fP, \fBrgb24\fP, \fBvpx\fP and \fBx264\fP
+(some may not be available in your environment).
+The default is generally \fBpng\fP, if available.
+\fBpng\fP is compressed and lossless, the most efficient lossless
+encoding.
+\fBrgb24\fP (rather inefficient, it is compressed with zlib).
+\fBwebp\fP can be useful for graphical applications, and is
+generally better than jpeg.
+\fBjpeg\fP can be useful for graphical applications.
+\fBvpx\fP and \fBx264\fP are both lossy and are
+very efficient with graphics or high framerate applications,
+\fBx264\fP is also very usable with text.
+
+When specifying this option on the server, it will act as default
+for clients that do not specify which encoding they want to use.
+
+\fBjpeg\fP and \fBpng\fP require the Python Imaging Library.
+\fBvpx\fP and \fBx264\fP require their respective shared libraries.
+.TP
+\fB\-\-opengl\fP=\fIyes\fP|\fIno\fP|\fIauto\fP
+Use OpenGL accelerated rendering on the client.
+The default is to detect if the graphics card and drivers are
+supported (\fIauto\fP mode), but one can also disable OpenGL (\fIno\fP)
+or force it enabled (\fIyes\fP).
+.TP
+\fB\-\-socket\-dir\fP=\fIDIR\fP
+Location where to write and look for the Xpra socket files.
+Defaults to "~/.xpra". It may also be specified using the
+XPRA_SOCKET_DIR environment variable.
+
+When using the socket-dir option, it is generally necessary to specify
+socket-dir on all following commands, for xpra to work with the
+open sessions. Mixing different socket-dir options is not
+recommended.
+
+By specifying a shared directory this can be coupled with the
+mmap-group option to connect Xpra sessions across user accounts.
+
+.SS Options for start, upgrade
+.TP
+\fB\-\-start\-child\fP=\fICMD\fP
+After starting the server, runs the command \fICMD\fP using the
+default shell.  The command is run with its $DISPLAY set to point to
+the newly-started server.  This option may be given multiple times to
+start multiple children.
+.TP
+\fB\-\-exit\-with\-children\fP
+This option may only be used if \fB\-\-start\-child\fP is also
+given.  If it is given, then the xpra server will monitor the status
+of the children started by \fB\-\-start\-child\fP, and will
+automatically terminate itself when the last of them has exited.
+.TP
+\fB\-\-no\-daemon\fP
+By default, the xpra server puts itself into the background,
+i.e. 'daemonizes', and redirects its output to a log file.  This
+prevents that behavior (useful mostly for debugging).
+.TP
+\fB\-\-use\-display\fP
+Use an existing display rather than starting one with xvfb.
+You are responsible for starting the display yourself.
+This can also be used to rescue an existing display whose
+xpra server instance crashed.
+.TP
+\fB\-\-xvfb\fP=\fICMD\fP
+When starting the server, xpra starts a virtual X server to run the
+clients on. By default, this is 'Xvfb'. If your Xvfb is installed in a
+funny location, or you want to use some other virtual X server, then
+this switch allows you to specify how to run your preferred X server
+executable. The default value used is:
+\fIXvfb +extension Composite \-screen 0 3840x2560x24+32 \-nolisten tcp \-noreset  \-auth $XAUTHORITY\fP
+
+This can also be used to specify Xdummy as an alternative to Xvfb,
+this requires Xorg server version 1.12 or later and the dummy driver
+version 0.3.5 or later. For more information, see:
+https://xpra.org/Xdummy.html
+
+.TP
+\fB\-\-bind\-tcp\fP=\fI[HOST]:PORT\fP
+The xpra server always listens for connections on a local Unix domain
+socket, and supports local connections with the \fB:7\fP-style display
+address, and remote connections with the \fBssh:frodo:7\fP-style
+display address. If you want, it can also listen for connections on a
+raw TCP socket. This behavior is enabled with \fB\-\-bind-\-tcp\fP. If
+the host portion is omitted, then 127.0.0.1 (localhost) will be
+used. If you wish to accept connections on all interfaces, pass
+0.0.0.0 for the host portion.
+
+Using this switch without using the password option is not recommended,
+and is a major security risk (especially when passing 0.0.0.0)!
+Anyone at all may connect to this port and access your session.
+Use it only if you have special needs, and understand the consequences
+of your actions.
+
+.SS Options for start, upgrade and attach
+.TP
+\fB\-\-password\-file\fP=\fIFILENAME\fP
+This allows sessions to be secured with a password stored in a text
+file. You should use this if you use the \fB\-\-bind-\-tcp\fP option.
+If this is used on the server, it will reject any client connections
+that do not provide the same password value.
+.TP
+\fB\-\-clipboard-filter\-file\fP=\fIfilename\fP
+Name of a file containing regular expressions, any clipboard data
+that matches one of these regular expressions will be dropped.
+Note: at present this only applies to copying from the machine where
+this option is used, not to it.
+.TP
+\fB\-\-dpi\fP=\fIVALUE\fP
+The 'dots per inch' value that client applications should try to honour.
+This numeric value should be in the range 10 to 500 to be useful.
+Many applications will only read this value when starting up,
+so connecting to an existing session started with a different DPI
+value may not have the desired effect.
+.TP
+\fB\-\-no\-cursors\fP
+Disable forwarding of custom application mouse cursors.
+Client applications may change the mouse cursor at any time, which
+will cause the new cursor's pixels to be sent to the client each time.
+This disables the feature.
+.TP
+\fB\-\-no\-notifications\fP
+Disable forwarding of system notifications.
+System notifications require the xpra server to have its own instance
+of a dbus daemon, if it is missing a warning will be printed on
+startup. This switch disables the feature entirely, and avoids
+the warning.
+.TP
+\fB\-\-no\-system\-tray\fP
+Disable forwarding of system tray icons.
+This feature requires client support and may not be available on all
+platforms.
+.TP
+\fB\-\-no\-bell\fP
+Disable forwarding of the system bell.
+
+.SS Options for attach
+.TP
+\fB-z\fP\fILEVEL\fP, \fB\-\-compress\fP=\fILEVEL\fP
+Select the level of compression xpra will use when transmitting data
+over the network. Higher levels of compression transmit less data over
+the network, but use more CPU power. Valid options are between 0
+(meaning no compression) and 9, inclusive. Higher levels take
+progressively more CPU while giving diminishing returns in terms of
+actual compression achieved; the default is 3, which gives a
+reasonable trade-off in general.
+You generally do not need to use this option,
+the default value should be adequate in almost all cases.
+
+This compression is not used on pixel data (except
+when using the \fBrgb24\fP encoding).
+.TP
+\fB\-\-jpeg\-quality\fP=\fIVALUE\fP
+Deprecated, use \fB\-\-quality\fP:
+.TP
+
+\fB\-\-quality\fP=\fIVALUE\fP
+This option sets a fixed image compression quality lossy encodings
+(\fBjpeg\fP, \fBwebp\fP or \fBx264\fP).
+First, one of those lossy encodings must be enabled with \fB\-\-encoding\fP.
+Values range from 1 (lowest quality, high compression - generally unusable)
+to 100 (highest quality, low compression - not particularly useful).
+Specify a value of zero to let the system tune the quality dynamically
+to achieve the best bandwidth usage possible.
+(currently only implemented with x264 encoding)
+.TP
+\fB\-\-min\-quality\fP=\fIMIN\-QUALITY\fP
+This option sets the minimum encoding quality allowed when the quality option is
+set to automatic mode.
+.TP
+\fB\-\-speed\fP=\fISPEED\fP
+This option sets the x264 encoding speed. Slower compresses more, faster
+will give better latency.
+The system normally uses a variable speed, this option forces
+a fixed speed setting to be used instead.
+.TP
+\fB\-\-min\-speed\fP=\fIMIN\-SPEED\fP
+This option sets the minimum x264 encoding speed allowed when the speed option is
+set to automatic mode.
+.TP
+\fB\-\-auto\-refresh\-delay\fP=\fIDELAY\fP
+This option sets a delay after which the windows are automatically
+refreshed using a high quality picture setting (95%).
+The delay is a floating-point number and is in seconds.
+This option is enabled by default with a delay of 1 second.
+This option is only relevant when using a lossy encoding
+(\fBjpeg\fP, \fBwebp\fP, \fBx264\fP or \fBvpx\fP).
+.TP
+\fB\-\-max\-bandwidth\fP=\fIBW\fP
+Specify the link's maximal receive bandwidth. Xpra will adjust the
+JPEG quality to match this bandwidth. Specify 0.0 (default) to disable.
+(requires \fBjpeg\fP encoding)
+.TP
+\fB\-\-key\-shortcut\fP=\fIkey:action\fP
+Can be specified multiple times to add multiple key shortcuts.
+These keys will be caught by the client and trigger the action specified
+and the key presses will not be passed to the server.
+.br
+The \fBkey\fP specification may include keyboard modifiers in the form
+ \fB[modifier\+]*key\fP, for example: \fIShift+F10\fP or \fIShift+Control+B\fP
+.br
+The following \fBaction\fPs are currently defined:
+.RS
+.IP \fBquit\fP
+disconnects the xpra client
+.IP \fBvoid\fP
+does not do anything, and can therefore be used to prevent
+certain key combinations from ever being sent to the server.
+.IP \fBrefresh_window\fP
+forces the currently focused window to be refreshed.
+.IP \fBrefresh_all_windows\fP
+forces all windows to be refreshed.
+.RE
+.PP
+If no shortcuts are defined on the command line,
+the following default one will be used:
+.br
+\fIMeta+Shift+F4:quit\fP
+.TP
+\fB\-\-readonly\fP
+Read only mode prevents all keyboard and mouse activity from being sent
+to the server.
+.TP
+\fB\-\-enable-sharing\fP
+Allow more than one client to connect to the same session.
+This must be enabled on both the server and all co-operating clients
+to function.
+.TP
+\fB\-\-no\-keyboard\-sync\fP
+Disables keyboard state synchronization. Normally the key presses
+and key release events are sent to the server as they occur so that
+the server can maintain a consistent keyboard state.
+Using this option can prevent keys from repeating unexpectedly on
+high latency links but it may also disrupt applications which access
+the keyboard directly (games, etc).
+.TP
+\fB\-\-no\-speaker\fP
+Disable sound output forwarding support. Application sound output will
+not be sent to the client(s).
+.TP
+\fB\-\-no\-microphone\fP
+Disable sound input forwarding support. Application sound input will
+not be sent from the client(s) to the server.
+.TP
+\fB\-\-speaker\-codec\fP=\fICODEC\fP and \fB\-\-microphone\-codec\fP=\fICODEC\fP
+Specify the codec to use for sound output (speaker) or input (microphone).
+You may specify more than one to define the preferred order,
+use the special value 'help' to get a list of options.
+When unspecified, all the available codecs are allowed and the first one is used.
+.TP
+\fB\-\-title\-suffix\fP=\fIVALUE\fP
+Sets the portion of text which is appended to the windows' title.
+This option is deprecated and \fB\-\-title\fP should be used instead.
+.TP
+\fB\-\-title\fP\=\fIVALUE\fP
+Sets the text shown as window title.
+The string supplied can make use of remote metadata placeholders
+which will be populated at runtime with the values from the
+remote server. ie:
+ \f\@title\@\fP will be replaced by the remote window's title,
+ \f\@client-machine\@\fP will be replaced by the remote server's
+hostname.
+
+The default value used is "@title@ on @client-machine@".
+.TP
+\fB\-\-window\-icon\fP=\fIFILENAME\fP
+Path to the default image which will be used for all windows.
+This icon may be shown in the window's bar, its iconified
+state or task switchers. This depends on the operating system,
+the window manage and the application may override this too.
+\fB\-\-no\-tray\fP
+Disables the system tray. Not available on OSX since the dock
+icon is always shown.
+\fB\-\-delay\-tray\fP
+Waits for the first window or notification to appear before
+showing the system tray. (posix only)
+\fB\-\-tray\-icon\fP=\fIFILENAME\fP
+Specifies the icon shown in the dock/tray.
+By default it uses a simple default 'xpra' icon.
+(on Microsoft Windows, the icon must be in \fBico\fP format)
+.TP
+\fB\-\-mmap\-group\fP
+Sets the mmap file's gid to match the socket file's gid and sets
+the mmap file's permissions to 660.
+This is necessary to share the mmap file across user accounts.
+\fB\-\-enable\-pings\fP
+The client and server will exchange ping and echo packets
+which are used to gather latency statistics.
+Those statistics can be seen using the "xpra info" command.
+[\fB\-\-encryption\fP=\fICIPHER\fP]
+Specifies the cipher to use for securing the connection from
+prying eyes. This is only really useful with the \fB--bind-tcp\fP option.
+This option requires the use of the \fB--password-file\fP option.
+The only cipher supported at present is \fIAES\fP, if the client
+requests encryption it will be used by both the client and server
+for all communication after the initial password verification,
+but only if the server supports this feature too.
+
+.SS Options for attach, stop
+.TP
+\fB\-\-ssh\fP\=fICMD\fP
+When you use an \fBssh:\fP address to connect to a remote display,
+xpra runs \fBssh\fP(1) to make the underlying connection. By default,
+it does this by running the command "ssh". If your ssh program is in
+an unusual location, has an unusual name, or you want to pass special
+options to change ssh's behavior, then you can use the \fB\-\-ssh\fP
+switch to tell xpra how to run ssh. For example, if you want to use
+arcfour encryption, then you should run
+
+.\" I'm sure this is completely the wrong thing to do here, but it
+.\" produces fine output in the terminal, at least:
+.RS
+.RS
+\fBxpra attach \-\-ssh\fP=\fI"ssh \-c arcfour" ssh:frodo:7\fP
+
+.RE
+(\fINote:\fP don't bother to enable ssh compression; this
+is redundant with xpra's own compression, and will just waste your
+CPU. See also xpra's \fB\-\-compress\fP switch.)
+.RE
+.TP
+\fB\-\-remote\-xpra\fP=\fICMD\fP
+When connecting to a remote server over ssh, xpra needs to be able to
+find and run the xpra executable on the remote host.  If this
+executable is in a non-standard location, or requires special
+environment variables to be set before it can run, then accomplishing
+this may be non-trivial.  If running \fBxpra attach ssh:something\fP
+fails because it cannot find the remote xpra, then you can use this
+option to specify how to run xpra on the remote host.
+
+That said, this option should not be needed in normal usage, as xpra
+tries quite hard to work around the above problems.  If you find
+yourself needing it often, then that may indicate a bug that we would
+appreciate hearing about.
+.\" --------------------------------------------------------------------
+.SH ENVIRONMENT
+.TP
+\fBDISPLAY\fP
+\fBxpra start \-\-start\-child\fP=\fI...\fP sets this variable in the
+environment of the child to point to the xpra display.
+
+\fBxpra attach\fP, on the other hand, uses this variable to determine
+which display the remote applications should be shown on.
+.\" --------------------------------------------------------------------
+.SH FILES
+\fIxpra.conf\fP stores default values for most options.
+There is a global config file in \fI/etc\fP or \fI/usr/local/etc\fP,
+and each user may override it using \fI.xpra/xpra.conf\fP.
+Xpra uses the directory \fI~/.xpra\fP to store a number of files.
+(the examples below are given for the display \fI:7\fP)
+.TP
+\fI~/.xpra/:7\fP
+The unix domain socket that clients use to contact the xpra server.
+.TP
+\fI~/.xpra/:7.log\fP
+When run in daemon mode (the default), the xpra server directs all
+output to this file.  This includes all debugging output, if debugging
+is enabled.
+.TP
+\fI~/.xpra/run-xpra\fP
+A shell script that, when run, starts up xpra with the correct python
+interpreter, PYTHONPATH, PATH, location of the main xpra script, etc.
+Automatically generated by \fBxpra start\fP and used by \fBxpra
+attach\fP (see also the discussion of \fB\-\-remote\-xpra\fP).
+.\" --------------------------------------------------------------------
+.SH BUGS
+Xpra has no test suite.
+
+Xpra does not fully handle all aspects of the X protocol; for
+instance, fancy input features like pressure-sensitivity on tablets,
+some window manager hints, and probably other more obscure parts of the
+X protocol. It does, however, degrade gracefully, and patches for each
+feature would be gratefully accepted.
+
+The xpra server allocates an over-large framebuffer when using Xvfb;
+this wastes memory, and can cause applications to misbehave (e.g.,
+by letting menus go off-screen).  Conversely, if the framebuffer is ever
+insufficiently large, clients will misbehave in other ways (e.g.,
+input events will be misdirected). This is not a problem when using
+Xdummy, see the \fB\-\-xvfb\fP= switch for details.
+
+The need to choose display numbers by hand is annoying.
+.\" --------------------------------------------------------------------
+.SH REPORTING BUGS
+Send any questions or bugs reports to <antoine@devloop.org.uk>.
+.\" --------------------------------------------------------------------
+.SH SEE ALSO
+\fBscreen\fP(1)
+\fBwinswitch_applet\fP(1)
