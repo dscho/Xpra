@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.xpra</groupId>
+  <artifactId>xpra</artifactId>
+  <packaging>jar</packaging>
+  <description>A Java client for Xpra</description>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>Xpra</name>
+  <url>http://xpra.org/</url>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>${project.basedir}/src/</sourceDirectory>
+    <testSourceDirectory>${project.basedir}/src/</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <excludes>
+            <exclude>**/gtk/*.java</exclude>
+            <exclude>**/*Test.java</exclude>
+          </excludes>
+          <testIncludes>
+            <include>**/*Test.java</include>
+          </testIncludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>xpra.swing.Start</mainClass>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>xpra.swing.Start</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <issueManagement>
+    <system>Trac</system>
+    <url>https://www.xpra.org/trac/</url>
+  </issueManagement>
+
+  <scm>
+    <connection>scm:svn:http://xpra.org/svn/Xpra/</connection>
+    <developerConnection>scm:svn:http://xpra.org/svn/Xpra/</developerConnection>
+    <url>http://xpra.org/svn/Xpra/</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>antoine</id>
+      <name>Antoine Martin</name>
+      <email>antoine@nagafix.co.uk</email>
+      <url>http://devloop.org.uk/</url>
+      <organization>DevLoop</organization>
+      <organizationUrl>http://devloop.org.uk/</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
+  </developers>
+
+</project>
