@@ -228,17 +228,10 @@ pkg-config --libs --cflags x264 libswscale libavcodec</code></pre>
 		That said, it is generally enough to remove (but you must ensure that these are the correct files
 		as you may damage your system otherwise!):
 		<div class="codebox">
-		  <pre><code>/usr/bin/xpra
-/usr/bin/parti
-/usr/bin/parti-repl</code></pre>
+		  <pre><code>/usr/bin/xpra</code></pre>
 		</div>
-		And the following python packages and eggs:
-		<div class="codebox">
-		  <pre><code>xpra
-parti*
-wimpiggy</code></pre>
-        </div>
-        These are usually located in a python subdirectory named "<code>site-packages</code>" or "<code>dist-packages</code>".
+		And the <code>xpra</code> module and eggs,
+		which is usually located in a python subdirectory named "<code>site-packages</code>" or "<code>dist-packages</code>".
 	</div>
 
   	<a id="bugs"></a>
