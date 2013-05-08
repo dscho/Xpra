@@ -1,4 +1,5 @@
 # This file is part of Parti.
+# Copyright (C) 2013 Serviware (Arthur Huillet, <ahuillet@serviware.com>)
 # Copyright (C) 2012, 2013 Antoine Martin <antoine@devloop.org.uk>
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
@@ -26,6 +27,7 @@ from OpenGL.GL import GL_PROJECTION, GL_MODELVIEW, \
     GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST, \
     GL_UNSIGNED_BYTE, GL_LUMINANCE, GL_RGB, GL_LINEAR, \
     GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_QUADS, GL_COLOR_BUFFER_BIT, \
+    GL_DONT_CARE, GL_TRUE,\
     glActiveTexture, glTexSubImage2D, \
     glGetString, glViewport, glMatrixMode, glLoadIdentity, glOrtho, \
     glGenTextures, glDisable, \
@@ -40,13 +42,34 @@ from OpenGL.GL.ARB.vertex_program import glGenProgramsARB, \
     glBindProgramARB, glProgramStringARB, GL_PROGRAM_ERROR_STRING_ARB, GL_PROGRAM_FORMAT_ASCII_ARB
 from OpenGL.GL.ARB.fragment_program import GL_FRAGMENT_PROGRAM_ARB
 from OpenGL.GL.ARB.framebuffer_object import GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glGenFramebuffers, glBindFramebuffer, glFramebufferTexture2D
+try:
+    from OpenGL.GL.KHR.debug import GL_DEBUG_OUTPUT, GL_DEBUG_OUTPUT_SYNCHRONOUS, glDebugMessageControl, glDebugMessageCallback, glInitDebugKHR
+except ImportError:
+    log.warn("Unable to import GL_KHR_debug OpenGL extension. Debug output will be more limited.")
+    GL_DEBUG_OUTPUT = None
+try:
+    from OpenGL.GL.GREMEDY.string_marker import glInitStringMarkerGREMEDY, glStringMarkerGREMEDY
+    from OpenGL.GL.GREMEDY.frame_terminator import glInitFrameTerminatorGREMEDY, glFrameTerminatorGREMEDY
+    from OpenGL.GL import GLDEBUGPROC #@UnresolvedImport
+    def py_gl_debug_callback(source, error_type, error_id, severity, length, message, param):
+        log.error("src %x type %x id %x severity %x length %d message %s", source, error_type, error_id, severity, length, message)
+    gl_debug_callback = GLDEBUGPROC(py_gl_debug_callback)
+except ImportError:
+    # This is normal- GREMEDY_string_marker is only available with OpenGL debuggers
+    gl_debug_callback = None
+    glInitStringMarkerGREMEDY = None
+    glStringMarkerGREMEDY = None
+    glInitFrameTerminatorGREMEDY = None
+    glFrameTerminatorGREMEDY = None
+from ctypes import c_char_p
+
 
 # Texture number assignment
 #  1 = Y plane
 #  2 = U plane
 #  3 = V plane
 #  4 = RGB updates
-#  5 = FBO texture (guaranteed up-to-date window contents) 
+#  5 = FBO texture (guaranteed up-to-date window contents)
 TEX_Y = 0
 TEX_U = 1
 TEX_V = 2
@@ -60,7 +83,7 @@ The logic is as follows:
 We create an OpenGL framebuffer object, which will be always up-to-date with the latest windows contents.
 This framebuffer object is updated with YUV painting and RGB painting. It is presented on screen by drawing a
 textured quad when requested, that is: after each YUV or RGB painting operation, and upon receiving an expose event.
-The use of a intermediate framebuffer object is the only way to guarantee that the client keeps an always fully up-to-date 
+The use of a intermediate framebuffer object is the only way to guarantee that the client keeps an always fully up-to-date
 window image, which is critical because of backbuffer content losses upon buffer swaps or offscreen window movement.
 """
 class GLPixmapBacking(PixmapBacking):
@@ -96,6 +119,19 @@ class GLPixmapBacking(PixmapBacking):
             self.gl_setup = False
             self.size = w, h
 
+    def gl_marker(self, msg):
+        if not bool(glStringMarkerGREMEDY):
+            return
+        c_string = c_char_p(msg)
+        glStringMarkerGREMEDY(0, c_string)
+
+    def gl_frame_terminator(self):
+        # Mark the end of the frame
+        # This makes the debug output more readable especially when doing single-buffered rendering
+        if not bool(glFrameTerminatorGREMEDY):
+            return
+        glFrameTerminatorGREMEDY()
+
     def gl_init(self):
         drawable = self.gl_begin()
         w, h = self.size
@@ -103,15 +139,34 @@ class GLPixmapBacking(PixmapBacking):
         if not drawable:
             return  None
         if not self.gl_setup:
+            # Ask GL to send us all debug messages
+            if GL_DEBUG_OUTPUT and gl_debug_callback and glInitDebugKHR() == True:
+                glEnable(GL_DEBUG_OUTPUT)
+                glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS)
+                glDebugMessageCallback(gl_debug_callback, None)
+                glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, None, GL_TRUE)
+            # Initialize string_marker GL debugging extension if available
+            if glInitStringMarkerGREMEDY and glInitStringMarkerGREMEDY() == True:
+                log.info("Extension GL_GREMEDY_string_marker available. Will output detailed information about each frame.")
+            else:
+                # General case - running without debugger, extension not available
+                glStringMarkerGREMEDY = None
+            # Initialize frame_terminator GL debugging extension if available
+            if glInitFrameTerminatorGREMEDY and glInitFrameTerminatorGREMEDY() == True:
+                glFrameTerminatorGREMEDY = None
+
+
+
+            self.gl_marker("Initializing GL context for window size %d x %d" % (w, h))
             # Initialize viewport and matrices for 2D rendering
             glViewport(0, 0, w, h)
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
             glOrtho(0.0, w, h, 0.0, -1.0, 1.0)
             glMatrixMode(GL_MODELVIEW)
-            #TODO glEnableClientState(GL_VERTEX_ARRAY) 
+            #TODO glEnableClientState(GL_VERTEX_ARRAY)
             #TODO glEnableClientState(GL_TEXTURE_COORD_ARRAY)
-            
+
             # Clear to white
             glClearColor(1.0, 1.0, 1.0, 1.0)
 
@@ -158,6 +213,7 @@ class GLPixmapBacking(PixmapBacking):
         # Set GL state for RGB24 painting:
         #    no fragment program
         #    only tex unit #0 active
+        self.gl_marker("Switching to RGB24 paint state")
         glDisable(GL_FRAGMENT_PROGRAM_ARB);
         for texture in (GL_TEXTURE1, GL_TEXTURE2):
             glActiveTexture(texture)
@@ -167,11 +223,13 @@ class GLPixmapBacking(PixmapBacking):
 
     def unset_rgb24_paint_state(self):
         # Reset state to our default
+        self.gl_marker("Switching back to YUV paint state")
         glEnable(GL_FRAGMENT_PROGRAM_ARB)
-        
+
     def present_fbo(self):
         drawable = self.gl_init()
         debug("present_fbo() drawable=%s", drawable)
+        self.gl_marker("Presenting FBO on screen")
         if not drawable:
             return
         # Change state to target screen instead of our FBO
@@ -181,7 +239,7 @@ class GLPixmapBacking(PixmapBacking):
         self.set_rgb24_paint_state()
 
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, self.textures[TEX_FBO])
-        
+
         w, h = self.size
         glBegin(GL_QUADS)
         glTexCoord2i(0, h)
@@ -202,6 +260,7 @@ class GLPixmapBacking(PixmapBacking):
             glClear(GL_COLOR_BUFFER_BIT)
         else:
             glFlush()
+        self.gl_frame_terminator()
 
         self.unset_rgb24_paint_state()
         glBindFramebuffer(GL_FRAMEBUFFER, self.offscreen_fbo)
@@ -218,9 +277,10 @@ class GLPixmapBacking(PixmapBacking):
         if not drawable:
             debug("OpenGL cannot paint rgb24, drawable is not set")
             return False
-        
+
         self.set_rgb24_paint_state()
 
+        self.gl_marker("Painting RGB24 update at %d,%d, size %d,%d, stride is %d, row length %d" % (x, y, width, height, rowstride, rowstride/3))
         # Upload data as temporary RGB texture
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, self.textures[TEX_RGB])
         glPixelStorei(GL_UNPACK_ROW_LENGTH, rowstride/3)
@@ -228,7 +288,7 @@ class GLPixmapBacking(PixmapBacking):
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 4, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
-        
+
         # Draw textured RGB quad at the right coordinates
         glBegin(GL_QUADS)
         glTexCoord2i(0, 0)
@@ -240,11 +300,11 @@ class GLPixmapBacking(PixmapBacking):
         glTexCoord2i(width, 0)
         glVertex2i(x+width, y)
         glEnd()
-       
+
         # Present update to screen
         self.present_fbo()
         # present_fbo has resetted state already
-        
+
         drawable.gl_end()
         return True
 
@@ -293,6 +353,7 @@ class GLPixmapBacking(PixmapBacking):
             self.texture_size = (width, height)
             divs = get_subsampling_divs(pixel_format)
             debug("GL creating new YUV textures for pixel format %s using divs=%s", pixel_format, divs)
+            self.gl_marker("Creating new YUV textures")
             # Create textures of the same size as the window's
             glEnable(GL_TEXTURE_RECTANGLE_ARB)
 
@@ -321,6 +382,7 @@ class GLPixmapBacking(PixmapBacking):
                     #FIXME: maybe we should do something else here?
                     log.error(err)
 
+        self.gl_marker("Updating YUV textures")
         divs = get_subsampling_divs(pixel_format)
         U_width = 0
         U_height = 0
@@ -344,6 +406,7 @@ class GLPixmapBacking(PixmapBacking):
         if self.pixel_format not in (YUV420P, YUV422P, YUV444P):
             #not ready to render yet
             return
+        self.gl_marker("Painting YUV update")
         divs = get_subsampling_divs(self.pixel_format)
         glEnable(GL_FRAGMENT_PROGRAM_ARB)
         glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, self.yuv_shader[0])
