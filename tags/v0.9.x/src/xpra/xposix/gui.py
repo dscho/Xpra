@@ -158,10 +158,12 @@ class ClientExtras(ClientExtrasBase):
             def hide_appindicator(*args):
                 self.tray_widget.set_status(appindicator.STATUS_PASSIVE)
             self.hide_tray = hide_appindicator
-            if delay_tray:
-                self.hide_tray()
             def show_appindicator(*args):
                 self.tray_widget.set_status(appindicator.STATUS_ACTIVE)
+            if delay_tray:
+                self.hide_tray()
+            else:
+                show_appindicator()
             if hasattr(self.tray_widget, "set_icon_theme_path"):
                 self.tray_widget.set_icon_theme_path(get_icon_dir())
             self.tray_widget.set_attention_icon("xpra.png")
