@@ -1,3 +1,15 @@
+v0.9.1 (2013-05-08)
+======================
+	-- honour initial client window's requested position
+	-- fix for hidden appindicator
+	-- fix string formatting error in non-cython fallback math code
+	-- fix error if ping packets fail from the start
+	-- fix for windows without a valid window-type (ie: shadows)
+	-- fix OpenGL missing required feature detection (and add debug)
+	-- add required CentOS RPM libXfont dependency
+	-- tag our /etc configuration files in RPM spec file
+
+
 v0.9.0 (2013-04-25)
 ======================
 	-- fix focus problems with old Xvfb display servers

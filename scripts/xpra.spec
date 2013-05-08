@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.9.0
+%define version 0.9.1
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -143,6 +143,16 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Wed May 08 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.1-1
+- honour initial client window's requested position
+- fix for hidden appindicator
+- fix string formatting error in non-cython fallback math code
+- fix error if ping packets fail from the start
+- fix for windows without a valid window-type (ie: shadows)
+- fix OpenGL missing required feature detection (and add debug)
+- add required CentOS RPM libXfont dependency
+- tag our /etc configuration files in RPM spec file
+
 * Thu Apr 25 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.0-1
 - fix focus problems with old Xvfb display servers
 - fix RPM SELinux labelling of static codec builds (CentOS)
