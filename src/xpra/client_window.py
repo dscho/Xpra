@@ -501,6 +501,8 @@ class ClientWindow(gtk.Window):
 
     def can_have_spinner(self):
         window_types = self._metadata.get("window-type")
+        if not window_types:
+            return False
         return ("_NET_WM_WINDOW_TYPE_NORMAL" in window_types) or \
                ("_NET_WM_WINDOW_TYPE_DIALOG" in window_types) or \
                ("_NET_WM_WINDOW_TYPE_SPLASH" in window_types)
