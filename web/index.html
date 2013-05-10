@@ -46,7 +46,7 @@
     <li class="selected_false"><a href="/src/">Source</a></li>
     <li class="selected_false"><a href="/dev.html">Build</a></li>
     <li class="selected_false"><a href="/faq.html">FAQ</a></li>
-    <li class="selected_false"><a href="https://www.xpra.org/trac/">Bug Tracker</a></li>
+    <li class="selected_false"><a href="https://www.xpra.org/trac/">Wiki &amp; Bugs</a></li>
     <li>
 		&nbsp;
 		<div id="plusone-div" class="plusone"></div>
@@ -121,6 +121,7 @@
 			<li>Support for <a href="./Xdummy.html">Xdummy</a> and the RandR extension
 				which fixes a number of otherwise unfixable display bugs <span class="smallnote">(ie: <a href="/trac/ticket/1">#1</a>, <a href="/trac/ticket/2">#2</a>)</span></li>
 			<li>Ability to disable pulseaudio and clipboard synchronization, change dpi setting, etc</li>
+			<li>Support for shadowing existing displays (see <code>xpra shadow</code>)</li>
 			<li>Clean client disconnection</li>
 			<li>Lots of small bug fixes, security fixes and portability fixes (IPv6, endianness, platforms, etc)</li>
 		</ul>
@@ -151,7 +152,7 @@ DISPLAY=:100 xterm
 		<pre><code>xpra start :100 --start-child=xterm
 </code></pre></div>
 		
-		For the simple case, we can then attach to this xterm session from the same machine with:
+		For the simple case, we can then attach to this xterm session from the same machine (if it has a desktop session), with:
 		<div class="codebox">
 		<pre><code>xpra attach :100
 </code></pre></div>
@@ -166,12 +167,8 @@ DISPLAY=:100 xterm
 	<div class="box">
 		<h2><img src="/icons/forum.png" alt="forum" /> Help and Discussions</h2>
 		<p>
-			Post your questions <a href="https://winswitch.org/forum/2/">anonymously on the public forum</a>,
-			send them to the <a href="http://lists.devloop.org.uk/mailman/listinfo/shifter-users">mailing list</a>
-			or on the IRC channel: <a href="irc://irc.freenode.net/winswitch">#winswitch on irc.freenode.net</a>.
-		</p>
-		<p class="smallnote">
-			(do not be distracted by the fact that these are named &quot;winswitch&quot; or &quot;shifter&quot;)
+			Send your questions to the <a href="http://lists.devloop.org.uk/mailman/listinfo/shifter-users">mailing list</a>
+			or join us on the IRC channel: <a href="irc://irc.freenode.net/winswitch">#winswitch on irc.freenode.net</a>.
 		</p>
 	</div>
 
@@ -180,7 +177,7 @@ DISPLAY=:100 xterm
 	  <h2><a href="/src/"><img src="/icons/source.png" alt="source" /> Source Releases</a></h2>
 	  You can find source code releases <a href="/src/">here</a>, setup and build instructions <a href="/dev.html">here</a>.
 	  <br />
-	  We try to stick to a monthly release cycle whenever possible.
+	  New major versions are generally released on a bimonthly cycle (more or less - when it is ready).
 	  <p class="smallnote">(for binary packages, see above)</p>
 	</div>
 

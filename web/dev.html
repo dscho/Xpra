@@ -46,7 +46,7 @@
     <li class="selected_false"><a href="/src/">Source</a></li>
     <li class="selected_true"><a href="/dev.html">Build</a></li>
     <li class="selected_false"><a href="/faq.html">FAQ</a></li>
-    <li class="selected_false"><a href="https://www.xpra.org/trac/">Bug Tracker</a></li>
+    <li class="selected_false"><a href="https://www.xpra.org/trac/">Wiki &amp; Bugs</a></li>
     <li>
 		&nbsp;
 		<div id="plusone-div" class="plusone"></div>
@@ -195,13 +195,20 @@
   	<a id="build"></a>
 	<div class="box">
 	  <h2><img src="/icons/gears.png" alt="gears" />  Building and Installing</h2>
-	    For installing into the local <code>./install</code> directory as a normal user,
-	    simply run the <a href="http://xpra.org/trac/browser/trunk/src/do-build">do-build</a> script.
+	    For installing into a local <code>./install</code> directory as a normal user, simply run:
+	    <div class="codebox">
+		  <pre><code>./setup.py install --home=./install</code></pre>
+	    </div>
+	    You then have to add the local installation directory to your <code>PYTHONPATH</code>
+	    whenever you want to use xpra:
+	    <div class="codebox">
+		  <pre><code>PYTHONPATH=./install/lib*/python xpra ...</code></pre>
+	    </div>
 	    <br />
-	    For installing globally via sudo:
+	    To install globally for all users via sudo:
 	    <div class="codebox">
 		  <pre><code>rm -rf build install
-sudo CFLAGS=-O0 python setup.py install</code></pre>
+sudo ./setup.py install</code></pre>
 		</div>
 	</div>
 
@@ -228,32 +235,16 @@ pkg-config --libs --cflags x264 libswscale libavcodec</code></pre>
 		That said, it is generally enough to remove (but you must ensure that these are the correct files
 		as you may damage your system otherwise!):
 		<div class="codebox">
-		  <pre><code>/usr/bin/xpra</code></pre>
+		  <pre><code>/usr/bin/xpra
+/usr/lib*/python*/*-packages/xpra*
+		  </code></pre>
 		</div>
-		And the <code>xpra</code> module and eggs,
-		which is usually located in a python subdirectory named "<code>site-packages</code>" or "<code>dist-packages</code>".
 	</div>
 
   	<a id="bugs"></a>
 	<div class="box">
 	  <h2><img src="/icons/bugs.png" alt="remove" />  Debugging</h2>
-		Debugging generally involves first turning on verbose debugging by adding &quot;<code>-d all</code>&quot; to the xpra command line.
-		<br />
-		However, if the error comes from the X Window system, you may see an error like this one when the application crashes:
-		<div class="codebox">
-		  <pre><code>The program 'xpra' received an X Window System error.
-This probably reflects a bug in the program.
-The error was ...</code></pre>
-		</div>
-		To debug these issues, one must use <code>gdb</code> and ensure that <code>gtk/gdk</code> use synchronous X11 calls.
-		<br />
-		Start xpra with <code>GDK_SYNCHRONIZE</code> set to '1':
-		<div class="codebox">
-		  <pre><code>GDK_SYNCHRONIZE=1 xpra start (...)</code></pre>
-		</div>
-		You can then attach gdb to the process and get a backtrace (&quot;<code>bt</code>&quot;) when the error occurs.
-		<p class="smallnote">(you should not need to set any breakpoints, the exit path should be enough: either <code>exit</code> or <code>_exit</code>.
-		Using a breakpoint on <code>_XError</code> may give a few false positives and cause problems of its own..)</p>
+		Debugging is well documented <a href="/trac/wiki/Debugging">on the wiki</a>
 	</div>
   </div>
 
