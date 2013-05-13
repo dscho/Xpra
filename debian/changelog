@@ -1,3 +1,12 @@
+xpra (0.9.2-1) UNRELEASED; urgency=low
+  * fix double error when loading build information (missing about dialog)
+  * fix and simplify build "clean" subcommand
+  * fix OpenGL rendering alignment for padded rowstrides case
+  * fix potential double error when tray initialization fails
+  * fix window static properties usage
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Mon, 13 May 2013 22:48:41 +0700
+
 xpra (0.9.1-1) UNRELEASED; urgency=low
   * honour initial client window's requested position
   * fix for hidden appindicator
