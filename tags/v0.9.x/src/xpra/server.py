@@ -159,6 +159,7 @@ class XpraServer(gobject.GObject, X11ServerBase):
         }
 
     def __init__(self, clobber, sockets, opts):
+        self._tray = None
         gobject.GObject.__init__(self)
         X11ServerBase.__init__(self, clobber, sockets, opts)
 
@@ -217,8 +218,6 @@ class XpraServer(gobject.GObject, X11ServerBase):
                 self._tray = SystemTray()
             except Exception, e:
                 log.error("cannot setup tray forwarding: %s", e, exc_info=True)
-        else:
-            self._tray = None
 
         ### Create our window managing data structures:
         self._desktop_manager = DesktopManager()
