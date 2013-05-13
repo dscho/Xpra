@@ -7,6 +7,7 @@ include xpra/vpx/vpxlib.c
 include xpra/vpx/vpxlib.h
 include *.desktop
 include *.png
+include xpra/webm/LICENSE
 recursive-include scripts *
 recursive-include man *
 recursive-include patches *
