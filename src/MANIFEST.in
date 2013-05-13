@@ -9,7 +9,7 @@ recursive-include man *
 recursive-include patches *
 recursive-include etc *
 recursive-include icons *
-global-include *.py *.txt
+global-include *.py *.txt *.pyx
 global-exclude *~ #* *.orig *.bak *.rej
 prune build
 prune dist
