@@ -629,7 +629,7 @@ class ServerSource(object):
             except:
                 pass
         props = self.do_make_metadata(window, propname)
-        cache.update(props)
+        props.update(cache)
         return props
 
     def do_make_metadata(self, window, propname):
