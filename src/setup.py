@@ -364,10 +364,14 @@ if 'clean' in sys.argv or 'sdist' in sys.argv:
     CLEAN_FILES = ["xpra/wait_for_x_server.c",
                    "xpra/vpx/codec.c",
                    "xpra/x264/codec.c",
+                   "xpra/stats/cymaths.c",
                    "xpra/rencode/rencode.c",
+                   "xpra/xor/cyxor.c",
                    "etc/xpra/xpra.conf",
+                   "wimpiggy/gdk/gdk_atoms.c",
                    "wimpiggy/lowlevel/constants.pxi",
                    "wimpiggy/lowlevel/bindings.c"]
+
     if 'clean' in sys.argv:
         CLEAN_FILES.append("xpra/build_info.py")
     for x in CLEAN_FILES:
@@ -381,6 +385,10 @@ if "clean" not in sys.argv:
     import add_build_info
     add_build_info.main()
 
+if 'clean' in sys.argv or 'sdist' in sys.argv: 
+    #take shortcut to skip cython/pkgconfig steps:
+    setup(**setup_options)
+    sys.exit(0)
 
 
 #*******************************************************************************
