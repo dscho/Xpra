@@ -1,3 +1,10 @@
+xpra (0.9.3-1) UNRELEASED; urgency=low
+  * fix clipboard for *nix clients
+  * fix pixel area request dimensions for lossless edges
+  * fix advertized tray visual property
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 16 May 2013 13:58:45 +0700
+
 xpra (0.9.2-1) UNRELEASED; urgency=low
   * fix double error when loading build information (missing about dialog)
   * fix and simplify build "clean" subcommand
