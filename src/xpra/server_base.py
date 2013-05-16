@@ -835,12 +835,15 @@ class ServerBase(object):
             ss.updated_desktop_size(root_w, root_h, max_w, max_h)
 
     def get_max_screen_size(self):
+        from xpra.x11.gtk_x11.window import MAX_WINDOW_SIZE
         max_w, max_h = gtk.gdk.get_default_root_window().get_size()
         return max_w, max_h
 
     def _get_desktop_size_capability(self, server_source, root_w, root_h):
         client_size = server_source.desktop_size
         log("client resolution is %s, current server resolution is %sx%s", client_size, root_w, root_h)
+        if max_w>MAX_WINDOW_SIZE or max_h>MAX_WINDOW_SIZE:
+            log.warn("maximum size is very large: %sx%s, you may encounter window sizing problems", max_w, max_h)
         if not client_size:
             """ client did not specify size, just return what we have """
             return    root_w, root_h
