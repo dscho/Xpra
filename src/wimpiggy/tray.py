@@ -73,7 +73,7 @@ def set_tray_visual(tray_window, gdk_visual):
     prop_set(tray_window, TRAY_VISUAL, "visual", gdk_visual)
 
 def set_tray_orientation(tray_window, orientation):
-    prop_set(tray_window, TRAY_VISUAL, "u32", orientation)
+    prop_set(tray_window, TRAY_ORIENTATION, "u32", orientation)
 
 
 class SystemTray(gobject.GObject):
