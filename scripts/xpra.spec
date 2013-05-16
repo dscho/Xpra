@@ -147,6 +147,7 @@ So basically it's screen for remote X apps.
 - fix clipboard for *nix clients
 - fix pixel area request dimensions for lossless edges
 - fix advertized tray visual property
+- workaround invalid window size hints
 
 * Mon May 13 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.2-1
 - fix double error when loading build information (missing about dialog)

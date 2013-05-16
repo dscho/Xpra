@@ -2,6 +2,7 @@ xpra (0.9.3-1) UNRELEASED; urgency=low
   * fix clipboard for *nix clients
   * fix pixel area request dimensions for lossless edges
   * fix advertized tray visual property
+  * workaround invalid window size hints
 
  -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 16 May 2013 13:58:45 +0700
 
