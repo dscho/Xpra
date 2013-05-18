@@ -1082,6 +1082,9 @@ class XpraClient(XpraClientBase, gobject.GObject):
         assert self.toggle_cursors_bell_notify, "cannot toggle cursors: server lacks the feature"
         self.send("set-cursors", self.cursors_enabled)
 
+    def reset_cursor(self): 
+        set_windows_cursor(self._id_to_window.values(), []) 
+
     def set_deflate_level(self, level):
         self.compression_level = level
         self.send_deflate_level()
