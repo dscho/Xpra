@@ -143,10 +143,13 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Thu May 16 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.3-1
+* Sat May 18 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.3-1
 - fix clipboard for *nix clients
 - fix pixel area request dimensions for lossless edges
 - fix advertized tray visual property
+- fix cursors are too small with some applications
+- fix crash when low level debug code is enabled
+- reset cursors when disabling cursor forwarding
 - workaround invalid window size hints
 
 * Mon May 13 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.2-1
