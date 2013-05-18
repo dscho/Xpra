@@ -821,9 +821,8 @@ chcon -t texrel_shlib_t %{python_sitelib}/xpra/x264/codec.so
 chcon -t texrel_shlib_t %{python_sitelib}/xpra/vpx/codec.so
 %endif
 
-%config
-/etc/xpra/xpra.conf
-/etc/xpra/xorg.conf
+%config /etc/xpra/xpra.conf
+%config /etc/xpra/xorg.conf
 
 ###
 ### eof
