@@ -1,8 +1,11 @@
-v0.9.3 (2013-05-16)
+v0.9.3 (2013-05-18)
 ======================
 	-- fix clipboard for *nix clients
 	-- fix pixel area request dimensions for lossless edges
 	-- fix advertized tray visual property
+	-- fix cursors are too small with some applications
+	-- fix crash when low level debug code is enabled
+	-- reset cursors when disabling cursor forwarding
 	-- workaround invalid window size hints
 
 
