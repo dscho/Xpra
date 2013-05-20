@@ -1,5 +1,7 @@
 xpra (0.9.3-1) UNRELEASED; urgency=low
   * fix clipboard for *nix clients
+  * fix selection timestamp parsing
+  * fix crash due to logging code location
   * fix pixel area request dimensions for lossless edges
   * fix advertized tray visual property
   * fix cursors are too small with some applications
@@ -7,7 +9,7 @@ xpra (0.9.3-1) UNRELEASED; urgency=low
   * reset cursors when disabling cursor forwarding
   * workaround invalid window size hints
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 18 May 2013 13:10:08 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Mon, 20 May 2013 16:02:59 +0700
 
 xpra (0.9.2-1) UNRELEASED; urgency=low
   * fix double error when loading build information (missing about dialog)
