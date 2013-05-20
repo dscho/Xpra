@@ -1,6 +1,8 @@
-v0.9.3 (2013-05-18)
+v0.9.3 (2013-05-20)
 ======================
 	-- fix clipboard for *nix clients
+	-- fix selection timestamp parsing
+	-- fix crash due to logging code location
 	-- fix pixel area request dimensions for lossless edges
 	-- fix advertized tray visual property
 	-- fix cursors are too small with some applications
