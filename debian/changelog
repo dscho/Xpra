@@ -1,4 +1,4 @@
-xpra (0.9.3-1) UNRELEASED; urgency=low
+xpra (0.9.3-2) UNRELEASED; urgency=low
   * fix clipboard for *nix clients
   * fix selection timestamp parsing
   * fix crash due to logging code location
