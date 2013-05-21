@@ -18,14 +18,14 @@ cdef extern from "Python.h":
 
 def argb_to_rgba(buf):
     # b is a Python buffer object
-    cdef const unsigned long * cbuf = <unsigned long *> 0
+    cdef unsigned long * cbuf = <unsigned long *> 0
     cdef Py_ssize_t cbuf_len = 0
     assert sizeof(int) == 4
     assert len(buf) % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % len(buf)
     PyObject_AsReadBuffer(buf, <const_void_pp> &cbuf, &cbuf_len)
     return argbdata_to_pixdata(cbuf, cbuf_len)
 
-cdef argbdata_to_pixdata(const unsigned long* data, int dlen):
+cdef argbdata_to_pixdata(unsigned long* data, int dlen):
     if dlen <= 0:
         return None
     assert dlen % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % dlen
@@ -61,7 +61,7 @@ def argb_to_rgb(buf):
     PyObject_AsReadBuffer(buf, <const_void_pp> &cbuf, &cbuf_len)
     return argbdata_to_rgb(cbuf, cbuf_len)
 
-cdef argbdata_to_rgb(const unsigned long* data, int dlen):
+cdef argbdata_to_rgb(unsigned long* data, int dlen):
     if dlen <= 0:
         return None
     assert dlen % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % dlen

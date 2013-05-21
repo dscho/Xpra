@@ -59,7 +59,7 @@ def gdk_atom_objects_from_gdk_atom_array(atom_string):
     # interpret atoms when dealing with the clipboard, therefore, we need to
     # be able to take an array of GDK atom objects (integers) and figure out
     # what they mean.
-    cdef const GdkAtom * array = <GdkAtom*> NULL
+    cdef GdkAtom * array = <GdkAtom*> NULL
     cdef Py_ssize_t array_len_bytes = 0
     cdef long gdk_atom_value = 0
     PyObject_AsReadBuffer(atom_string, <const_void_pp> &array, &array_len_bytes)
