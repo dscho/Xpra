@@ -8,7 +8,7 @@
 # may import gtk.
 
 import sys
-import os
+import os.path
 from wimpiggy.gobject_compat import import_gtk, import_gdk, is_gtk3
 gtk = import_gtk()
 gdk = import_gdk()
@@ -120,9 +120,14 @@ class ClientExtras(ClientExtrasBase):
             self.tray_widget.set_from_file(filename)
         elif hasattr(self.tray_widget, "set_icon_from_file"):
             self.tray_widget.set_icon_from_file(filename)
-        else:
+        elif hasattr(self.tray_widget, "set_from_pixbuf"):
             pixbuf = gdk.pixbuf_new_from_file(filename)
             self.tray_widget.set_from_pixbuf(pixbuf)
+        elif hasattr(self.tray_widget, "set_icon_theme_path") and hasattr(self.tray_widget, "set_icon"):
+            t,i = os.path.split(filename)
+            self.tray_widget.set_icon_theme_path(t)
+            f, _  = os.path.splitext(i)
+            self.tray_widget.set_icon(f)
 
     def setup_statusicon(self, delay_tray, tray_icon_filename):
         self.tray_widget = None
