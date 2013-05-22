@@ -27,7 +27,7 @@ export PYTHONPATH=$PWD/trunk/src/install/lib/python:$PYTHONPATH
 if test $# = 0
 then
 	display=97
-	case "$SESSION_MANAGER" in
+	case "${SESSION_MANAGER:-$(hostname)}" in
 	*iMac*)
 		if fuser $HOME/.xpra/$display.log
 		then
