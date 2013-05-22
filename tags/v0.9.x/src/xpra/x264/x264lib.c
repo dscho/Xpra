@@ -404,11 +404,12 @@ int init_decoder_context(struct x264lib_ctx *ctx, int width, int height, int use
 		fprintf(stderr, "could not open codec\n");
 		return 1;
 	}
-	ctx->frame = avcodec_alloc_frame();
+	ctx->frame = malloc(sizeof(struct AVFrame));
 	if (!ctx->frame) {
 	    fprintf(stderr, "could not allocate an AVFrame for decoding\n");
 	    return 1;
 	}
+	memset(ctx->frame, 0, sizeof(struct AVFrame));
 	return 0;
 }
 struct x264lib_ctx *init_decoder(int width, int height, int use_swscale, int csc_fmt)
@@ -427,7 +428,7 @@ struct x264lib_ctx *init_decoder(int width, int height, int use_swscale, int csc
 void do_clean_decoder(struct x264lib_ctx *ctx)
 {
 	if (ctx->frame) {
-		avcodec_free_frame(&ctx->frame);
+		free(ctx->frame);
 		ctx->frame = NULL;
 	}
 	if (ctx->codec_ctx) {
