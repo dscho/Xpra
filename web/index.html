@@ -42,10 +42,6 @@
   <div id="navigation">
    <ul>
     <li class="selected_true"><a href="/">Xpra</a></li>
-    <li class="selected_false"><a href="/Xdummy.html">Xdummy</a></li>
-    <li class="selected_false"><a href="/src/">Source</a></li>
-    <li class="selected_false"><a href="/dev.html">Build</a></li>
-    <li class="selected_false"><a href="/faq.html">FAQ</a></li>
     <li class="selected_false"><a href="https://www.xpra.org/trac/">Wiki &amp; Bugs</a></li>
     <li>
 		&nbsp;
@@ -71,96 +67,55 @@
 	<div class="box">
 		<h2><img src="/icons/gears.png" alt="gears" /> About</h2>
 		Xpra is 'screen for X': it allows you to run X programs, usually on
-		a remote host, direct their display to your local machine, and then to
-		disconnect from these programs and reconnect from the same or another
-		machine, without losing any state. It gives you remote access
-		to individual applications.
+		a remote host and direct their display to your local machine.
 		<br />
-		Xpra is "rootless" or "seamless": programs you run under it show up on your desktop as regular programs,
-		managed by your regular window manager.
+		Xpra is <a href="/trac/wiki/About">"rootless" or "seamless"</a>, and sessions can be accessed over SSH, or password protected over plain TCP sockets.
 		<br />
-		Sessions can be accessed over SSH, or password protected over plain TCP sockets.
+		Xpra adapts to bandwidth constraints and is fully open-source.
 		<br />
-		Xpra is usable over reasonably slow links and does its best to adapt to changing network bandwidth constraints,
-		especially with x264 and automatic settings.
-		<br />
-		Xpra is open-source (GPLv2+), multi-platform and multi-language, with current clients written in Python and Java.
+		For more details see <a href="/trac/wiki/About">here</a>.
   	</div>
 
 	<a id="features"></a>
 	<div class="box">
 		<h2><img src="/icons/features.png" alt="features" /> Enhancements</h2>
-		This fork adds the following enhancements over the <a class="ext" href="http://partiwm.googlecode.com">original version</a>:
-		<ul>
-			<li>Better platform support: <a href="/dists/osx/x86/Xpra.dmg">Mac OS X</a>,
-				<a href="/dists/windows/Xpra_Setup.exe">Microsoft Windows </a>,
-				<a href="/dists/Android/Xpra.apk">Android APK</a> (beta),
-				<a class="ext" href="http://www.jmcp.homeunix.com/blog/?s=xpra">Solaris</a>,
-				<a class="ext" href="http://www.freshports.org/x11/xpra">FreeBSD</a>,
-				OpenBSD and many more</li>
-			<li>Up to date binary packages and repositories:
-				<a href="https://winswitch.org/downloads/debian-repository.html"><code>DEB</code> (Debian/Ubuntu)</a>
-				/
-				<a href="https://winswitch.org/downloads/rpm-repository.html"><code>RPM</code> (Fedora/CentOS/openSUSE)</a>
-				, and many <a href="/dists/">more</a></li>
-			<li>Concurrent multi-client connections <span class="smallnote">(experimental)</span></li>
-			<li>GUI launcher</li>
-			<li>Supports global configuration file <span class="smallnote">(<code>/etc/xpra/xpra.conf</code>)</span>
-				and per-user overrides <span class="smallnote">(<code>~.xpra/xpra.conf</code>)</span></li>
-			<li>Zero-copy and much lower CPU overhead in network code, faster packet encoder</li>
-			<li>System tray menu for easy disconnection, access to options and statistics</li>
-			<li>Memory-mapped data transfers for local connections - extremelly fast!</li>
-			<li><a class="ext" href="http://www.videolan.org/developers/x264.html">x264</a>,
-				<a class="ext" href="http://www.webmproject.org/tools/vp8-sdk/group__vp8__encoder.html">VPX</a>,
-				JPEG and PNG image compression <span class="smallnote">(all optional, but highly recommended)</span></li>
-			<li>Better client keyboard layout support</li>
-			<li>Handles screen update storms and fast screen refresh rates</li>
-			<li>Support for password protection option for securing plain TCP connections</li>
-			<li>Forwarding of system bell and custom application cursors</li>
-			<li>Forwarding of application notifications <span class="smallnote">(requires its own dbus daemon)</span></li>
-			<li>Support for <a href="./Xdummy.html">Xdummy</a> and the RandR extension
-				which fixes a number of otherwise unfixable display bugs <span class="smallnote">(ie: <a href="/trac/ticket/1">#1</a>, <a href="/trac/ticket/2">#2</a>)</span></li>
-			<li>Ability to disable pulseaudio and clipboard synchronization, change dpi setting, etc</li>
-			<li>Support for shadowing existing displays (see <code>xpra shadow</code>)</li>
-			<li>Clean client disconnection</li>
-			<li>Lots of small bug fixes, security fixes and portability fixes (IPv6, endianness, platforms, etc)</li>
-		</ul>
+		This fork adds many enhancements over the <a class="ext" href="http://partiwm.googlecode.com">original version</a>:
+		better performance and platform support, multi-user support, GUI tools and configuration and options;
+		keyboard and clipboard fixes; cursor, sound, system tray and notifications forwarding;
+		IPv6 support, support for shadowing existing displays, etc; and many bug fixes.
+		<br />
+		For more details see <a href="/trac/wiki/Enhancements">here</a>.
 	</div>
 
 	<a id="winswitch"></a>
 	<div class="box">
-	  <h2><a href="http://winswitch.org/about/"><img src="/icons/winswitch-logo.png" alt="winswitch logo" /> Front End and Binary Packages</a></h2>
-  		There is a front-end for xpra, available <a href="http://winswitch.org/downloads/">here</a>.
+	  <h2><img src="/icons/winswitch-logo.png" alt="winswitch logo" /> Front End and Binary Packages</a></h2>
+  		<a href="http://winswitch.org/about/">Winswitch</a> is a front-end for xpra (and also VNC, NX, RDP, etc),
+  		it is available <a href="http://winswitch.org/downloads/">here</a>.
   		<br />
-  		The installer packages and repositories already contain xpra, amongst other things,
+  		The installer packages and repositories contain xpra and more,
   		follow the <a href="http://winswitch.org/downloads/">download instructions</a> there for installation
-  		and install only the &quot;xpra&quot; package if you do not wish to try the GUI.
+  		and install only the &quot;xpra&quot; package if you do not wish to try the winswitch GUI.
   		<br />
-  		You can also browse the packages directly <a href="/dists/">here</a>.
+  		You can also browse the binary packages directly <a href="/dists/">here</a>.
   	</div>
 
 	<a id="get_started"></a>
 	<div class="box">
-	  <h2><a href="/src/"><img src="/icons/forward.png" alt="forward" /> Get Started</a></h2>
+	  <h2><img src="/icons/forward.png" alt="forward" /> Get started with Xpra</h2>
 		On the machine which will export the application (xterm in this example):
-	    <div class="codebox">
-		<pre><code>xpra start :100
-DISPLAY=:100 xterm
-</code></pre></div>
-		Or more simply (which is also more resilient if running these commands remotely):
 	    <div class="codebox">
 		<pre><code>xpra start :100 --start-child=xterm
 </code></pre></div>
 		
-		For the simple case, we can then attach to this xterm session from the same machine (if it has a desktop session), with:
+		We can then attach to this session from the same machine, with:
 		<div class="codebox">
 		<pre><code>xpra attach :100
 </code></pre></div>
-		If connecting from a remote machine, you would use something like:
+		If connecting from a remote machine, you would use something like (or you can also use the GUI):
 		<div class="codebox">
 		<pre><code>xpra attach ssh:serverhostname:100
 </code></pre></div>
-		One can also use plain TCP sockets and password authentication if desired.
 	</div>
 
 	<a id="help"></a>
@@ -170,26 +125,6 @@ DISPLAY=:100 xterm
 			Send your questions to the <a href="http://lists.devloop.org.uk/mailman/listinfo/shifter-users">mailing list</a>
 			or join us on the IRC channel: <a href="irc://irc.freenode.net/winswitch">#winswitch on irc.freenode.net</a>.
 		</p>
-	</div>
-
-	<a id="source"></a>
-	<div class="box">
-	  <h2><a href="/src/"><img src="/icons/source.png" alt="source" /> Source Releases</a></h2>
-	  You can find source code releases <a href="/src/">here</a>, setup and build instructions <a href="/dev.html">here</a>.
-	  <br />
-	  New major versions are generally released on a bimonthly cycle (more or less - when it is ready).
-	  <p class="smallnote">(for binary packages, see above)</p>
-	</div>
-
-	<a id="repository"></a>
-	<div class="box">
-	  <h2><img src="/icons/repository.png" alt="repository" /> Repository</h2>
-	  The subversion repository is located here: <br />
-	  <a href="http://www.xpra.org/svn/Xpra/"><code>http://xpra.org/svn/Xpra/</code></a>
-	  <br />
-	  For simply browsing the source, the <a href="https://xpra.org/trac/browser/trunk/src">trac source browser</a> is more convenient.
-	  <br />
-	  In between releases, you may find beta builds <a href="/beta/">here</a>.
 	</div>
   </div>
 

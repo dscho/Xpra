@@ -42,10 +42,6 @@
   <div id="navigation">
    <ul>
     <li class="selected_false"><a href="/">Xpra</a></li>
-    <li class="selected_false"><a href="/Xdummy.html">Xdummy</a></li>
-    <li class="selected_false"><a href="/src/">Source</a></li>
-    <li class="selected_true"><a href="/dev.html">Build</a></li>
-    <li class="selected_false"><a href="/faq.html">FAQ</a></li>
     <li class="selected_false"><a href="https://www.xpra.org/trac/">Wiki &amp; Bugs</a></li>
     <li>
 		&nbsp;
@@ -69,182 +65,12 @@
   <div id="fullcontent">
   	<a id="client"></a>
 	<div class="box">
-	  <h2>Building the minimal Python client only</h2>
-	  The client is much more lightweight compared to the server and can be compiled as pure Python code
-	  without needing any extra header files or compilers.
-	  <br />
-	  However, if you want to use <code>x264</code> or <code>vpx</code> video encoding,
-	  you will need many header files and a C compiler.
-	  <br />
-	  To build the client only, without x264 support, apply:
-	  <ul>
-		<li><a href="http://xpra.org/trac/browser/trunk/src/disable-posix-server.patch">disable-posix-server.patch</a></li>
-		<li><a href="http://xpra.org/trac/browser/trunk/src/disable-x264.patch">disable-x264.patch</a></li>
-		<li><a href="http://xpra.org/trac/browser/trunk/src/disable-vpx.patch">disable-vpx.patch</a></li>
-	  </ul>
-	  before building.
-	  <p class="smallnote">(this first patch is not necessary on Microsoft Windows or Mac OS X since they do not support running the server anyway)</p>
-	</div>
-
-  	<a id="fedora"></a>
-	<div class="box">
-	  <h2><img src="/icons/fedora.png" alt="Fedora" /> Fedora and <img src="/icons/centos.png" alt="CentOS" /> CentOS</h2>
-	  For building you will need to install:
-	  <div class="codebox">
-	  	<pre><code>yum install gcc python-devel libXtst-devel libXdamage-devel \
-	  	gtk2-devel pygtk2-devel pygobject2-devel</code></pre>
-	  </div>
-	  Fedora users can install <a class="ext" href="http://cython.org/"><code>Cython</code></a> via yum:
-	  <div class="codebox">
-		<pre><code>yum install Cython</code></pre>
-	  </div>
-	  CentOS users will need to <a class="ext" href="http://cython.org/#download">download</a> and build from source
-	  (which <a href="http://docs.cython.org/src/quickstart/install.html">is trivial</a>),
-	  use <a href="http://fedoraproject.org/wiki/EPEL">EPEL</a> ("<code>Extra Packages for Enterprise Linux</code>")
-	  or rely on third party packages.
-	  <br />
-	  <br />
-	  For running the server, you will also need a <code>Xvfb</code>, <code>xauth</code> and keyboard utilities
-	  - only the keyboard utilities are needed when using the client.
-	  <div class="codebox">
-		<pre><code>yum install xorg-x11-server-Xorg xorg-x11-drv-dummy xorg-x11-xauth xorg-x11-xkb-utils</code></pre>
-	  </div>
-	  <br />
-	  <br />
-	  For x264 support, Fedora users should install the <a class="ext" href="http://rpmfusion.org/">rpmfusion</a> repository then:
-	  <div class="codebox">
-		<pre><code>yum install ffmpeg-devel x264-devel libvpx-devel</code></pre>
-	  </div>
-	  <span class="smallnote">(building x264/vpx on CentOS is out of scope - previous versions used <a class="ext" href="http://atrpms.net/">atrpms</a>)</span>
-	  At runtime, to get optimal support for <code>PNG</code>, <code>JPEG</code> and <code>WEBP</code>, install:
-	  <div class="codebox">
-		<pre><code>yum install python-imaging libwebp</code></pre>
-	  </div>	   
-	</div>
-
-  	<a id="debian"></a>
-	<div class="box">
-	  <h2><img src="/icons/debian.png" alt="Debian" /> Debian and <img src="/icons/ubuntu.png" alt="Ubuntu" /> Ubuntu</h2>
-	  For building you will need to install:
-	  <div class="codebox">
-		<pre><code>apt-get install libx11-dev libxtst-dev libxcomposite-dev libxdamage-dev \
-	  	python-all-dev python-gobject-dev python-gtk2-dev cython</code></pre>
-	  </div>
-	  <p class="smallnote">If you encounter errors on <code>char [32] keys_return</code> .. <code>Expected ')'</code>,
-	  then your version of cython is probably too old, either upgrade it (from <a href="http://backports-master.debian.org/">backports</a>)
-	  or <a href="http://docs.cython.org/src/quickstart/install.html">build it from source</a>.
-	  </p>
-	  <br />
-	  For running the server, you will also need <code>Xvfb</code>, <code>xauth</code> and keyboard utilities
-	  - only the keyboard utilities are needed when using the client.
-	  <div class="codebox">
-		<pre><code>yum install xvfb xauth x11-xkb-utils</code></pre>
-	  </div>
-	  For x264 and vpx support, you should install:
-	  <div class="codebox">
-		<pre><code>apt-get install libx264-dev libvpx-dev libswscale-dev libavcodec-dev</code></pre>
-	  </div>
-	  <b>Notes:</b>
-	  <ul>
-	  	<li>some, generally older, distributions may not have all the development libraries available.</li>
-	  	<li>Many distributions ship incomplete <code>libvpx-dev</code> packages that are missing the crucial <code>vpx.pc</code> package config file,
-	  		you may want to <a href="./vpx.pc">download this copy</a> and place it in your package config directory - at your own risk. (generally <code>/usr/lib/pkgconfig/</code> or <code>/usr/lib64/pkgconfig/</code>)</li>
-	  </ul>
-	</div>
-
-  	<a id="suse"></a>
-	<div class="box">
-	  <h2><img src="/icons/opensuse.png" alt="openSUSE" /> openSUSE</h2>
-	  For building you will need to install:
-	  <div class="codebox">
-		<pre><code>zypper install gcc python-cython python-devel \
-		gtk2-devel python-gtk-devel python-gobject2-devel</code></pre>
-	  </div>
-	  For running the server, you will also need <code>Xvfb</code>, <code>xauth</code> and keyboard utilities
-	  - only the keyboard utilities are needed when using the client.
-	  <div class="codebox">
-		<pre><code>yum install xorg-x11-server-extra xorg-x11-xauth xkeyboard-config</code></pre>
-	  </div>
-	</div>
-
-  	<a id="gentoo"></a>
-	<div class="box">
-	  <h2><img src="/icons/gentoo.png" alt="gentoo" /> Gentoo</h2>
-	  You can find up-to-date ebuilds <a href="/dists/gentoo">here</a>
-	</div>
-
-  	<a id="arch"></a>
-	<div class="box">
-	  <h2><img src="/icons/archlinux.png" alt="arch linux" /> Arch Linux</h2>
-	  Package build for stable versions can be found <a class="ext" href="https://aur.archlinux.org/packages.php?ID=49348">here</a>
-	  <br />
-	  The bleeding edge svn build is <a class="ext" href="https://aur.archlinux.org/packages.php?ID=58161">here</a>
-	</div>
-
-  	<a id="windows"></a>
-	<div class="box">
-	  <h2><img src="/icons/windows.png" alt="windows" /> Microsoft Windows and <img src="/icons/osx.png" alt="osx" /> Mac OS X</h2>
-	  Building on those platforms is totally non-trivial,
-	  please refer to the build instructions for <a href="http://winswitch.org">WindowSwitch</a>:
-	  <ul>
-	  	<li><a href="http://winswitch.org/dev/macosx.html">Mac OS X</a></li>
-	  	<li><a href="http://winswitch.org/dev/win32.html">Microsoft Windows</a></li>
-	  </ul>
-	</div>
-
-  	<a id="build"></a>
-	<div class="box">
-	  <h2><img src="/icons/gears.png" alt="gears" />  Building and Installing</h2>
-	    For installing into a local <code>./install</code> directory as a normal user, simply run:
-	    <div class="codebox">
-		  <pre><code>./setup.py install --home=./install</code></pre>
-	    </div>
-	    You then have to add the local installation directory to your <code>PYTHONPATH</code>
-	    whenever you want to use xpra:
-	    <div class="codebox">
-		  <pre><code>PYTHONPATH=./install/lib*/python xpra ...</code></pre>
-	    </div>
-	    <br />
-	    To install globally for all users via sudo:
-	    <div class="codebox">
-		  <pre><code>rm -rf build install
-sudo ./setup.py install</code></pre>
-		</div>
-	</div>
-
-  	<a id="video"></a>
-	<div class="box">
-	  <h2><img src="/icons/vlc.png" alt="VLC Icon" /> x264/vpx Video Encoding</h2>
-	  	On Unices, you can check if your system has the required development headers by running:
-	    <div class="codebox">
-		  <pre><code>pkg-config --libs --cflags vpx libswscale libavcodec
-pkg-config --libs --cflags x264 libswscale libavcodec</code></pre>
-        </div>
-		On Mac OS X, please follow <a href="https://www.xpra.org/trac/ticket/94#comment:7">these instructions</a>.
-		<br />
-		On Microsoft Windows, you must modify the <a href="https://www.xpra.org/trac/browser/trunk/src/setup.py#L77">disutils setup.py</a>
-		to match the location where you have installed the x264 and vpx library and headers. (more details therein)
-	</div>
-
-  	<a id="uninstall"></a>
-	<div class="box">
-	  <h2><img src="/icons/remove.png" alt="remove" />  Uninstalling</h2>
-		<code>setuptools</code> does not provide any uninstallation mechanism,
-		this has nothing to do with Xpra and affects all python packages on your system.
-		<br />
-		That said, it is generally enough to remove (but you must ensure that these are the correct files
-		as you may damage your system otherwise!):
-		<div class="codebox">
-		  <pre><code>/usr/bin/xpra
-/usr/lib*/python*/*-packages/xpra*
-		  </code></pre>
-		</div>
-	</div>
-
-  	<a id="bugs"></a>
-	<div class="box">
-	  <h2><img src="/icons/bugs.png" alt="remove" />  Debugging</h2>
-		Debugging is well documented <a href="/trac/wiki/Debugging">on the wiki</a>
+	  <h2>Development</h2>
+		This page has been moved to the wiki, see:
+		<ul>
+			<li><a href="/trac/wiki/Building">Building</a>
+			<li><a href="/trac/wiki/Source">Source</a>
+		</ul>
 	</div>
   </div>
 

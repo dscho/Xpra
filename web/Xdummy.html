@@ -41,11 +41,7 @@
 
   <div id="navigation">
    <ul>
-    <li class="selected_false"><a href="/">Xpra</a></li>
-    <li class="selected_true"><a href="/Xdummy.html">Xdummy</a></li>
-    <li class="selected_false"><a href="/src/">Source</a></li>
-    <li class="selected_false"><a href="/dev.html">Build</a></li>
-    <li class="selected_false"><a href="/faq.html">FAQ</a></li>
+    <li class="selected_false"><a href="/">Home</a></li>
     <li class="selected_false"><a href="https://www.xpra.org/trac/">Wiki &amp; Bugs</a></li>
     <li>
 		&nbsp;
@@ -69,92 +65,8 @@
   <div id="fullcontent">
 	<div class="box">
 		<a id="about"></a>
-		<h2><img src="/icons/gears.png" alt="gears" /> About</h2>
-		Xdummy was <a href="http://www.karlrunge.com/x11vnc/Xdummy">originally developed</a> by Karl Runge to allow a standard X11 server to be used by
-		non-root users with the <a href="http://cgit.freedesktop.org/xorg/driver/xf86-video-dummy/">dummy driver</a> &quot;<code>xf86-video-dummy</code>&quot;.
-		<br />
-		The problem with that approach was that it was really just a hack (ie: using <code>LD_SO_PRELOAD</code> tricks to
-		fool the X11 server process) and therefore not suitable for deployment in many environments.
-		<br />
-		<br />
-		In the context of Xpra, this allows us to use a better, more up to date X11 display server, one that supports more extensions,
-		especially the <code>RandR</code> extension. For many display bugs (ie: <a href="http://xpra.org/trac/ticket/1">#1</a>, <a href="http://xpra.org/trac/ticket/2">#2</a>)
-		this is the only workable solution: it allows Xpra to resize the virtual display to match the client's resolution so as to prevent windows and
-		menus from overflowing beyond the edge of the screen.
+		This page has been moved to the wiki: <a href="/trac/wiki/Xdummy">Xdummy</a>.
   	</div>
-
-	<div class="box">
-		<a id="status"></a>
-		<h2><img src="/icons/question.png" alt="question" /> Status</h2>
-		<h3>Versions Required</h3>
-		Most recent distributions now ship compatible packages though some may have issues with non world-readable binaries (see below),
-		for those that ship outdated versions there are two changes to core Xorg code which are needed:
-		<ul>
-			<li><a href="http://cgit.freedesktop.org/xorg/xserver/commit/?id=ead968a4300c0adeff89b9886e888b6d284c75cc">The xserver patch</a>:
-				which is part of the 1.12 xserver.
-			</li>
-			<li><a href="http://cgit.freedesktop.org/xorg/driver/xf86-video-dummy/commit/?id=fb0888f90d5d1c10d69ec2add0a66e88c94f5d5c">This xf86-video-dummy patch</a>:
-				which is part of version 0.3.5.
-				<br />
-				<span class="smallnote">(if your clients' screens are always smaller than 2048x2048, you may not need it)</span>
-			</li>
-		</ul>
-		If your distribution ships older versions of those packages,
-		you may want to try one of <a href="http://xpra.org/src/Xdummy/">our patched binary packages</a>
-		<span class="smallnote">(no warranties given or implied)</span>
-		<br />
-		<br />
-		<h3>non-suid binary</h3>
-		If you distribution ships the newer version but only installs a <code>suid</code> Xorg binary,
-		Xpra should have installed the <code>xpra_Xdummy</code> wrapper script and configured <code>xpra.conf</code> to use it instead
-		of the regular <code>Xorg</code> binary.
-		<br />
-		This script takes care of copying the <code>Xorg</code> binary to a non-suid executable before running it.
-		<br />
-		<b>Note:</b> in some cases, you may need to make the <code>Xorg</code> executable world-readable so that the wrapper can make the non-suid copy when needed:
-	    <div class="codebox">
-		<pre><code>sudo chmod +r /usr/bin/Xorg</code></pre>
-		</div>
-	</div>
-
-	<div class="box">
-	  <a id="usage"></a>
-	  <h2><img src="/icons/gears.png" alt="gears" /> Usage</h2>
-	  	<h3>Xdummy standlone</h3>
-		With this new xserver, you can start a new display using the dummy driver without needing any special privileges
-		whilst still specifying your own log and config files:
-	    <div class="codebox">
-		<pre><code>Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf :10
-</code></pre></div>
-		You can find a sample configuration file for dummy here: <a href="/xorg.conf">xorg.conf</a>.
-		<p class="smallnote">(It contains many of the most common resolutions you are likely to need,
-		including those found on phones and tablets. <br />
-		However if your client uses unusual resolutions, for instance multiple screens of differing sizes,
-		you may need to add new <a class="ext" href="http://en.wikipedia.org/wiki/XFree86_Modeline">Modelines</a>
-		to match your specific resolution)</p>
-		<br />
-		<br />
-		<h3>Xdummy with Xpra</h3>
-		With Xpra, this should all have been configured automatically for you by your package manager (whenever possible..).
-		<br />
-		You can specify this virtual framebuffer alternative using the <code>--xvfb</code> switch:
-		<div class="codebox">
-		<pre><code>xpra --xvfb="Xorg -dpi 96 -noreset -nolisten tcp \
-			+extension GLX +extension RANDR +extension RENDER \
-			-logfile ${HOME}/.xpra/Xvfb-10.log -config ${HOME}/xorg.conf" \
-			start :10</code></pre></div>		
-		or more simply by setting the <code>xvfb</code> option in your <code>/etc/xpra/xpra.conf</code>:
-		<div class="codebox">
-		<pre><code>xvfb=Xorg -dpi 96 -noreset -nolisten tcp \
-			+extension GLX +extension RANDR +extension RENDER \
-			-logfile ${HOME}/.xpra/Xvfb-10.log -config ${HOME}/xorg.conf</code></pre></div>
-		<p class="smallnote">(the <code>-noreset</code> option is only needed if the window manager is not
-		the first application started on the display, for example if you use the <code>--start-child=</code> option,
-		or if you want the display to survive once the window manager exits
-		- generally, this is a good idea since xpra could crash and when it exits cleanly via "xpra stop" it takes care
-		of shutting down the X11 server anyway)</p>
-  	</div>
-
   </div>
 
   <div id="footer">

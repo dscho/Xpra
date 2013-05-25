@@ -247,6 +247,10 @@ div#footer a:hover{
 .codebox code{
 	line-height:1.1em;
 }
+div.box {
+	border-radius: 4px;
+}
+
 div#docnav {
 	clear: both;
 	display: block;
@@ -360,6 +364,9 @@ div.trac-ticket-buttons form {
 }
 div#ticketchange {
 	clear: both;
+}
+div.box h1, div.box h2, div.box h3 {
+	margin-left: 5px;
 }
 
 form.trac-comment-editor, div.ticketdraft  {
