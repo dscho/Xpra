@@ -1,3 +1,10 @@
+xpra (0.9.4-1) UNRELEASED; urgency=low
+  * revert cursor scaling fix which broke other applications
+  * fix auto refresh mis-firing
+  * fix type (atom) of the X11 visual property we expose
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Mon, 27 May 2013 11:17:15 +0700
+
 xpra (0.9.3-2) UNRELEASED; urgency=low
   * fix clipboard for *nix clients
   * fix selection timestamp parsing
