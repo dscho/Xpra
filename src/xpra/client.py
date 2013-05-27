@@ -859,7 +859,7 @@ class XpraClient(XpraClientBase, gobject.GObject):
         self.server_supports_clipboard = capabilities.get("clipboard", False)
         self.clipboard_enabled = self.client_supports_clipboard and self.server_supports_clipboard
         self.mmap_enabled = self.supports_mmap and self.mmap_file and capabilities.get("mmap_enabled")
-        self.server_auto_refresh_delay = capabilities.get("auto_refresh_delay", 0)/1000
+        self.server_auto_refresh_delay = capabilities.get("auto_refresh_delay", 0)/1000.0
         self.change_quality = capabilities.get("change-quality", False)
         self.change_min_quality = capabilities.get("change-min-quality", False)
         self.change_speed = capabilities.get("change-speed", False)
