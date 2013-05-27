@@ -1,3 +1,10 @@
+v0.9.4 (2013-05-27)
+======================
+	-- revert cursor scaling fix which broke other applications
+	-- fix auto refresh mis-firing
+	-- fix type (atom) of the X11 visual property we expose
+
+
 v0.9.3 (2013-05-20)
 ======================
 	-- fix clipboard for *nix clients
