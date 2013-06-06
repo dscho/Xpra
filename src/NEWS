@@ -1,3 +1,12 @@
+v0.9.5 (2013-06-06)
+======================
+	-- fix auto-refresh: don't refresh unnecessarily
+	-- fix wrong initial timeout when ssh takes a long time to connect
+	-- fix client monitor/resolution size change detection
+	-- fix attributes reported to clients when encoding overrides are used
+	-- Gentoo ebuild uses virtual to allow one to choose pillow or PIL
+
+
 v0.9.4 (2013-05-27)
 ======================
 	-- revert cursor scaling fix which broke other applications
