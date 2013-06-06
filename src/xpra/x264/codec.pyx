@@ -241,11 +241,11 @@ cdef class Encoder(xcoder):
                 "csc_pixel_format" : csc_pf,
                 "frame" : self.frames
                 }
-        q = client_options.get("quality", -1)
+        q = options.get("quality", -1)
         if q<0:
             q = get_encoder_quality(self.context)
         client_options["quality"] = q
-        s = client_options.get("speed", -1)
+        s = options.get("speed", -1)
         if s<0:
             s = get_encoder_speed(self.context)
         client_options["speed"] = s
