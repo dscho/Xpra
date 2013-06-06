@@ -63,6 +63,7 @@ class XpraClientBase(gobject.GObject):
         self.min_quality = opts.min_quality
         self.speed = opts.speed
         self.min_speed = opts.min_speed
+        self.pings = opts.pings
         #protocol stuff:
         self._protocol = None
         self._priority_packets = []
@@ -325,6 +326,10 @@ class XpraClientBase(gobject.GObject):
             self.set_server_encryption(capabilities)
         self._protocol.chunked_compression = capabilities.get("chunked_compression", False)
         self._protocol.aliases = capabilities.get("aliases", {})
+        if self.pings:
+            gobject.timeout_add(1000, self.send_ping)
+        else:
+            gobject.timeout_add(10*1000, self.send_ping)
         return True
 
     def _process_set_deflate(self, packet):
