@@ -239,10 +239,6 @@ class XpraClient(XpraClientBase, gobject.GObject):
         if (self.max_bandwidth):
             self.last_input_bytecount = 0
             gobject.timeout_add(2000, compute_receive_bandwidth, 2000)
-        if opts.pings:
-            gobject.timeout_add(1000, self.send_ping)
-        else:
-            gobject.timeout_add(10*1000, self.send_ping)
 
     def init_mmap(self, mmap_group, socket_filename):
         log("init_mmap(%s, %s)", mmap_group, socket_filename)
