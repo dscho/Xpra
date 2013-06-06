@@ -44,8 +44,8 @@ RDEPEND="${COMMON_DEPEND}
 		 dev-python/dbus-python )
 	libnotify? ( dev-python/dbus-python )
 	opengl? ( dev-python/pygtkglext )
-	jpeg? ( dev-python/imaging )
-	png? ( dev-python/imaging )
+	jpeg? ( virtual/python-imaging-1 )
+	png? ( virtual/python-imaging-1 )
 	webp? ( media-libs/libwebp )
 	ssh? ( virtual/ssh )
 	server? ( x11-base/xorg-server[xvfb,-minimal] )"
