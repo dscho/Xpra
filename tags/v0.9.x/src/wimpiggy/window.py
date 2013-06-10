@@ -359,9 +359,8 @@ class BaseWindowModel(AutoPropGObjectMixin, gobject.GObject):
 
     def read_geometry(self, emit):
         def synced_update():
-            xwin = get_xwindow(self.client_window)
-            self._geometry = geometry_with_border(xwin)
-            log("BaseWindowModel.read_geometry(%s) geometry(%s)=%s", emit, hex(xwin), self._geometry)
+            self._geometry = geometry_with_border(self.client_window)
+            log("BaseWindowModel.read_geometry(%s) geometry(%s)=%s", emit, self.client_window, self._geometry)
             if emit:
                 self.emit("geometry")
         try:
