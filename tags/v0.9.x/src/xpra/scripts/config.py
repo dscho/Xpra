@@ -18,7 +18,7 @@ from wimpiggy.util import AdHocStruct
 from wimpiggy.gobject_compat import import_gobject, is_gtk3
 gobject = import_gobject()
 try:
-    import Image
+    from PIL import Image
     assert Image
     _has_PIL = True
 except:

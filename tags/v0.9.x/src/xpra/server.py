@@ -610,7 +610,7 @@ class XpraServer(gobject.GObject, X11ServerBase):
         width = maxx-minx
         height = maxy-miny
         log("screenshot: %sx%s, min x=%s y=%s", width, height, minx, miny)
-        import Image
+        from PIL import Image
         image = Image.new("RGBA", (width, height))
         for wid, x, y, w, h, pixmap in reversed(all_regions):
             _, _, wid, _, _, w, h, _, raw_data, rowstride, _, _ = get_rgb_rawdata(0, 0, wid, pixmap, 0, 0, w, h, "rgb24", -1, None, logger=log.debug)
