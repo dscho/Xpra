@@ -1024,7 +1024,7 @@ class WindowSource(object):
 
     def PIL_encode(self, w, h, coding, data, rowstride, options):
         assert coding in ENCODINGS
-        import Image
+        from PIL import Image
         im = Image.fromstring("RGB", (w, h), data, "raw", "RGB", rowstride)
         buf = StringIO()
         client_options = {}

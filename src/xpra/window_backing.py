@@ -32,7 +32,7 @@ except:
 #have/use PIL?
 has_PIL = False
 try:
-    import Image
+    from PIL import Image                                           #@UnresolvedImport
     has_PIL = True
 except:
     pass
