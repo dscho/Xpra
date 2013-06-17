@@ -272,8 +272,8 @@ class SessionInfo(gtk.Window):
         self.bandwidth_graph = self.add_graph_button(bandwidth_label, self.save_graphs)
         self.latency_graph = self.add_graph_button("The time it takes to send an echo packet and get the reply", self.save_graphs)
         self.pixel_in_data = maxdeque(N_SAMPLES+4)
-        self.net_in_data = maxdeque(N_SAMPLES+4)
-        self.net_out_data = maxdeque(N_SAMPLES+4)
+        self.net_in_bytecount = maxdeque(N_SAMPLES+4)
+        self.net_out_bytecount = maxdeque(N_SAMPLES+4)
 
         self.set_border_width(15)
         self.add(self.tab_box)
@@ -381,15 +381,41 @@ class SessionInfo(gtk.Window):
         self.client.send_ping()
         self.last_populate_time = time.time()
         #record bytecount every second:
-        self.net_in_data.append(self.connection.input_bytecount)
-        self.net_out_data.append(self.connection.output_bytecount)
+        self.net_in_bytecount.append(self.connection.input_bytecount)
+        self.net_out_bytecount.append(self.connection.output_bytecount)
+        #pre-compute for graph:
+        self.net_in_scale, self.net_in_data = values_to_diff_scaled_values(list(self.net_in_bytecount)[1:N_SAMPLES+3], scale_unit=1000, min_scaled_value=50)
+        self.net_out_scale, self.net_out_data = values_to_diff_scaled_values(list(self.net_out_bytecount)[1:N_SAMPLES+3], scale_unit=1000, min_scaled_value=50)
+
         #count pixels in the last second:
         since = time.time()-1
         decoded = [0]+[pixels for _,t,pixels in self.client.pixel_counter if t>since]
         self.pixel_in_data.append(sum(decoded))
         #update latency values
-        self.server_latency = [1000.0*x for _,x in list(self.client.server_ping_latency)[-20:]]
-        self.client_latency = [1000.0*x for _,x in list(self.client.client_ping_latency)[-20:]]
+        #there may be more than one record for each second
+        #so we have to average them to prevent the graph from "jumping":
+        def get_ping_latency_records(src, size=25):
+            recs = {}
+            src_list = list(src)
+            now = int(time.time())
+            while len(src_list)>0 and len(recs)<size:
+                when, value = src_list.pop()
+                if when>=(now-1):           #ignore last second
+                    continue
+                iwhen = int(when)
+                cv = recs.get(iwhen)
+                v = 1000.0*value
+                if cv:
+                    v = (v+cv) / 2.0        #not very fair if more than 2 values... but this shouldn't happen anyway
+                recs[iwhen] = v
+            #ensure we always have a record for the last N seconds, even an empty one
+            for x in range(size):
+                i = now-2-x
+                if i not in recs:
+                    recs[i] = None
+            return [recs.get(x) for x in sorted(recs.keys())]
+        self.server_latency = get_ping_latency_records(self.client.server_ping_latency)
+        self.client_latency = get_ping_latency_records(self.client.client_ping_latency)
         return not self.is_closed
 
     def populate_tab(self, *args):
@@ -559,9 +585,10 @@ class SessionInfo(gtk.Window):
                     regions_per_second[time_in_seconds] = regions+1
                     pixels = pixels_per_second.get(time_in_seconds, 0)
                     pixels_per_second[time_in_seconds] = pixels + size
-                for t in xrange(int(min_time), int(max_time+1)):
-                    rps.append(regions_per_second.get(t, 0))
-                    pps.append(pixels_per_second.get(t, 0))
+                if int(min_time)+1 < int(max_time):
+                    for t in xrange(int(min_time)+1, int(max_time)):
+                        rps.append(regions_per_second.get(t, 0))
+                        pps.append(pixels_per_second.get(t, 0))
             setlabels(self.decoding_labels, decoding_latency)
             setlabels(self.regions_per_second_labels, rps)
             setlabels(self.regions_sizes_labels, region_sizes, rounding=std_unit_dec)
@@ -595,10 +622,7 @@ class SessionInfo(gtk.Window):
         h = max(200, h-bh-20, rect.height-bh-20)
         w = max(360, rect.width-20)
         #bandwidth graph:
-        #Note: we skip the first record because the timing isn't right so the values aren't either..:
-        in_scale, in_data = values_to_diff_scaled_values(list(self.net_in_data)[1:N_SAMPLES+3], scale_unit=1000, min_scaled_value=50)
-        out_scale, out_data = values_to_diff_scaled_values(list(self.net_out_data)[1:N_SAMPLES+3], scale_unit=1000, min_scaled_value=50)
-        if in_data and out_data:
+        if self.net_in_data and self.net_out_data:
             def unit(scale):
                 if scale==1:
                     return ""
@@ -607,8 +631,8 @@ class SessionInfo(gtk.Window):
                     if value==1:
                         return str(unit)
                     return "x%s%s" % (int(value), unit)
-            labels = ["recv %sB/s" % unit(in_scale), "sent %sB/s" % unit(out_scale)]
-            datasets = [in_data, out_data]
+            labels = ["recv %sB/s" % unit(self.net_in_scale), "sent %sB/s" % unit(self.net_out_scale)]
+            datasets = [self.net_in_data, self.net_out_data]
             if SHOW_PIXEL_STATS and self.client.windows_enabled:
                 pixel_scale, in_pixels = values_to_scaled_values(list(self.pixel_in_data)[3:N_SAMPLES+4], min_scaled_value=100)
                 datasets.append(in_pixels)
@@ -626,7 +650,7 @@ class SessionInfo(gtk.Window):
                     l.insert(0, None)
         pixmap = make_graph_pixmap([self.server_latency, self.client_latency], labels=["server", "client"],
                                     width=w, height=h/2,
-                                    title="Latency (ms)", min_y_scale=10, rounding=50,
+                                    title="Latency (ms)", min_y_scale=10, rounding=25,
                                     start_x_offset=start_x_offset)
         self.latency_graph.set_size_request(*pixmap.get_size())
         self.latency_graph.set_from_pixmap(pixmap, None)
