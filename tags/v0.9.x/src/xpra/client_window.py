@@ -207,6 +207,7 @@ class ClientWindow(gtk.Window):
         self._backing = None
         self.new_backing(w, h)
         self._metadata = {}
+        self.button_state = {}
         self._override_redirect = override_redirect
         self._client_properties = client_properties
         self._auto_refresh_delay = auto_refresh_delay
@@ -639,9 +640,17 @@ class ClientWindow(gtk.Window):
         if self._client.readonly:
             return
         pointer, modifiers, buttons = self._pointer_modifiers(event)
-        self._client.send_positional(["button-action", self._id,
-                                      button, depressed,
-                                      pointer, modifiers, buttons])
+        def send_button(pressed):
+            self._client.send_positional(["button-action", self._id,
+                                          button, pressed,
+                                          pointer, modifiers, buttons])
+        pressed_state = self.button_state.get(button, False)
+        if pressed_state is False and depressed is False:
+            #we're getting a mouse-up event for this window but we never got
+            #the mouse-down event, so simulate one (needed for some dialogs on win32):
+            send_button(True)
+        self.button_state[button] = depressed
+        send_button(depressed)
 
     def do_button_press_event(self, event):
         self._button_action(event.button, event, True)
