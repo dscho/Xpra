@@ -511,9 +511,9 @@ class ClientWindow(gtk.Window):
 
     def do_map_event(self, event):
         log("Got map event: %s", event)
-        gtk.Window.do_map_event(self, event)
         if self.group_leader:
             self.window.set_group(self.group_leader)
+        gtk.Window.do_map_event(self, event)
         if not self._override_redirect:
             x, y, w, h = get_window_geometry(self)
             if not self._been_mapped:
