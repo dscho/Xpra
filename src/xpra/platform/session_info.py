@@ -555,14 +555,17 @@ class SessionInfo(gtk.Window):
             setlabels(self.client_latency_labels, cpl)
         if self.client.windows_enabled:
             if self.client.server_info_request:
-                def values_from_info(prefix):
-                    def getv(name):
+                def values_from_info(prefix, alt=None):
+                    def getv(suffix):
                         if self.client.server_last_info is None:
                             return ""
-                        return self.client.server_last_info.get(name, "")
-                    return getv(prefix+".cur"), getv(prefix+".min"), getv(prefix+".avg"), getv(prefix+".90p"), getv(prefix+".max")
-                setall(self.batch_labels, values_from_info("batch_delay"))
-                setall(self.damage_labels, values_from_info("damage_out_latency"))
+                        altv = ""
+                        if alt:
+                            altv = self.client.server_last_info.get(alt+"."+suffix, "")
+                        return self.client.server_last_info.get(prefix+"."+suffix, altv)
+                    return getv("cur"), getv("min"), getv("avg"), getv("90p"), getv("max")
+                setall(self.batch_labels, values_from_info("batch_delay", "batch.delay"))
+                setall(self.damage_labels, values_from_info("damage_out_latency", "damage.out_latency"))
 
             region_sizes = []
             rps = []
