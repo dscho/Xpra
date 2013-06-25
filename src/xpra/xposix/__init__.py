@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # This file is part of Parti.
 # Copyright (C) 2010 Nathaniel Smith <njs@pobox.com>
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
@@ -36,15 +37,15 @@ def get_machine_id():
             f = None
             try:
                 try:
-                    f = open(filename, 'rb', 'utf-8')
+                    f = open(filename, 'rb')
                     v = f.read()
                     break
                 finally:
                     if f:
                         f.close()
-            except:
+            except Exception:
                 pass
-    return  v
+    return  str(v).strip("\n\r")
 
 def get_app_dir():
     return os.path.join(sys.exec_prefix, "share", "xpra")
