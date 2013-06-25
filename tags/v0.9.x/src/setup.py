@@ -447,7 +447,7 @@ if sys.platform.startswith("win"):
     #the path after unzipping may look like this:
     #libav_path="C:\\libav-9.1-win32\\win32\\usr"
     #but we use something more generic, without the version numbers:
-    libav_path="C:\\libav-win32\\win32\\usr"
+    libav_path="C:\\libav-win32"
     libav_include_dir   = os.path.join(libav_path, "include")
     libav_lib_dir       = os.path.join(libav_path, "lib")
     libav_bin_dir       = os.path.join(libav_path, "bin")
