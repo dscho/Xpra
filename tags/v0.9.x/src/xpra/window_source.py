@@ -498,7 +498,7 @@ class WindowSource(object):
         info[prefix+"encoding"+suffix] = self.encoding
         self.statistics.add_stats(info, prefix, suffix)
         #batch stats:
-        if len(self.batch_config.last_actual_delays)>0:
+        if len(self.batch_config.last_delays)>0:
             batch_delays = [x for _,x in list(self.batch_config.last_delays)]
             add_list_stats(info, prefix+"batch_delay"+suffix, batch_delays, show_percentile=[9])
         try:
