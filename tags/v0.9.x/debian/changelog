@@ -1,3 +1,17 @@
+xpra (0.9.6-1) UNRELEASED; urgency=low
+  * fix lost clicks on some popup menus (mostly with MS Windows clients)
+  * fix reading of unique "machine-id" on posix
+  * fix window reference leak for windows we fail to manage
+  * fix compatibility with pillow (PIL fork)
+  * fix session-info window graphs jumping (smoother motion)
+  * fix webp loading code for non-Linux posix systems
+  * fix window group-leader attribute setting
+  * fix man page indentation
+  * fix variable test vs use (correctness only)
+  * forward compatibility with future "xpra info" namespace changes
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 26 Jun 2013 12:18:10 +0700
+
 xpra (0.9.5-1) UNRELEASED; urgency=low
   * fix auto-refresh: don't refresh unnecessarily
   * fix wrong initial timeout when ssh takes a long time to connect
