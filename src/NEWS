@@ -1,3 +1,19 @@
+v0.9.6 (2013-06-26)
+======================
+	-- fix lost clicks on some popup menus (mostly with MS Windows clients)
+	-- fix reading of unique "machine-id" on posix
+	-- fix window reference leak for windows we fail to manage
+	-- fix compatibility with pillow (PIL fork)
+	-- fix session-info window graphs jumping (smoother motion)
+	-- fix webp loading code for non-Linux posix systems
+	-- fix window group-leader attribute setting
+	-- fix man page indentation
+	-- fix variable test vs use (correctness only)
+	-- static binary builds updates: Python 2.7.5, flac 1.3, PyOpenGL 3.1, numpy 1.7.1, webp 0.3.1, libav 9.7
+	-- static binary builds switched to using pillow instead of PIL
+	-- forward compatibility with future "xpra info" namespace changes
+
+
 v0.9.5 (2013-06-06)
 ======================
 	-- fix auto-refresh: don't refresh unnecessarily

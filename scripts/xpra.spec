@@ -3,7 +3,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.9.5
+%define version 0.9.6
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -143,6 +143,17 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Wed Jun 26 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.6-1
+- fix lost clicks on some popup menus (mostly with MS Windows clients)
+- fix reading of unique "machine-id" on posix
+- fix window reference leak for windows we fail to manage
+- fix compatibility with pillow (PIL fork)
+- fix session-info window graphs jumping (smoother motion)
+- fix webp loading code for non-Linux posix systems
+- fix window group-leader attribute setting
+- fix man page indentation
+- fix variable test vs use (correctness only)
+
 * Thu Jun 06 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.5-1
 - fix auto-refresh: don't refresh unnecessarily
 - fix wrong initial timeout when ssh takes a long time to connect
