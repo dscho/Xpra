@@ -143,7 +143,7 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Jun 26 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.6-1
+* Sat Jun 29 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.6-1
 - fix lost clicks on some popup menus (mostly with MS Windows clients)
 - fix reading of unique "machine-id" on posix
 - fix window reference leak for windows we fail to manage

@@ -1,5 +1,6 @@
-v0.9.6 (2013-06-26)
+v0.9.6 (2013-06-29)
 ======================
+	-- fix client exit lockups on MS Windows
 	-- fix lost clicks on some popup menus (mostly with MS Windows clients)
 	-- fix reading of unique "machine-id" on posix
 	-- fix window reference leak for windows we fail to manage
