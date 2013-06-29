@@ -106,15 +106,21 @@ class SessionInfo(gtk.Window):
             from xpra.build_info import BUILD_DATE as cl_date, REVISION as cl_rev, LOCAL_MODIFICATIONS as cl_ch
         except:
             pass
+        def getcap(*names):
+            for x in names:
+                v = scaps.get(x)
+                if v:
+                    return v
+            return "unknown"
         tb.new_row("Revision", label(cl_rev), label(self.client._remote_revision or "unknown"))
-        tb.new_row("Local Changes", label(cl_ch), label(scaps.get("local_modifications", "unknown")))
-        tb.new_row("Build date", label(cl_date), label(scaps.get("build_date", "unknown")))
+        tb.new_row("Local Changes", label(cl_ch), label(getcap("local_modifications", "build.local_modifications")))
+        tb.new_row("Build date", label(cl_date), label(getcap("build_date", "build.date")))
         def make_version_str(version):
             if version and type(version) in (tuple, list):
                 version = ".".join([str(x) for x in version])
             return version or "unknown"
-        def server_version_info(prop_name):
-            return make_version_str(scaps.get(prop_name))
+        def server_version_info(*names):
+            return make_version_str(getcap(*names))
         def client_version_info(prop_name):
             info = "unknown"
             if hasattr(gtk, prop_name):
@@ -123,10 +129,10 @@ class SessionInfo(gtk.Window):
         if is_gtk3():
             tb.new_row("PyGobject", label(gobject._version))
             tb.new_row("Client GDK", label(gdk._version))
-            tb.new_row("GTK", label(gtk._version), label(server_version_info("gtk_version")))
+            tb.new_row("GTK", label(gtk._version), label(server_version_info("gtk_version", "server.gtk.version")))
         else:
-            tb.new_row("PyGTK", label(client_version_info("pygtk_version")), label(server_version_info("pygtk_version")))
-            tb.new_row("GTK", label(client_version_info("gtk_version")), label(server_version_info("gtk_version")))
+            tb.new_row("PyGTK", label(client_version_info("pygtk_version")), label(server_version_info("pygtk_version", "server.pygtk.version")))
+            tb.new_row("GTK", label(client_version_info("gtk_version")), label(server_version_info("gtk_version", "server.gtk.version")))
         tb.new_row("Python", label(platform.python_version()), label(server_version_info("python_version")))
         cl_gst_v, cl_pygst_v = "", ""
         if HAS_SOUND:
