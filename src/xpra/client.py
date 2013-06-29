@@ -63,6 +63,7 @@ import sys
 import os
 import time
 import ctypes
+import thread
 try:
     from queue import Queue     #@UnresolvedImport @UnusedImport (python3)
 except ImportError:
@@ -377,13 +378,13 @@ class XpraClient(XpraClientBase, gobject.GObject):
 
     def cleanup(self):
         log("XpraClient.cleanup() client_extras=%s", self._client_extras)
+        XpraClientBase.cleanup(self)
         if self._client_extras:
             self._client_extras.cleanup()
-        if self.sound_sink:
-            self.stop_receiving_sound()
         if self.sound_source:
-            self.stop_sending_sound()
-        XpraClientBase.cleanup(self)
+            thread.start_new_thread(self.stop_sending_sound, ())
+        if self.sound_sink:
+            thread.start_new_thread(self.stop_receiving_sound, ())
         self.clean_mmap()
         #the protocol has been closed, it is now safe to close all the windows:
         #(cleaner and needed when we run embedded in the client launcher)
