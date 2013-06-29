@@ -316,6 +316,7 @@ class XpraClientBase(gobject.GObject):
     def parse_server_capabilities(self, capabilities):
         self._remote_version = capabilities.get("version")
         self._remote_revision = capabilities.get("revision")
+        self._remote_revision = capabilities.get("build.revision", self._remote_revision)
         if not is_compatible_with(self._remote_version):
             self.warn_and_quit(EXIT_INCOMPATIBLE_VERSION, "incompatible remote version: %s" % self._remote_version)
             return False
