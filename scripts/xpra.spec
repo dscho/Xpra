@@ -143,8 +143,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Sat Jun 29 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.6-1
+* Sun Jun 30 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.6-1
 - fix lost clicks on some popup menus (mostly with MS Windows clients)
+- fix client workarea size change detection
 - fix reading of unique "machine-id" on posix
 - fix window reference leak for windows we fail to manage
 - fix compatibility with pillow (PIL fork)
