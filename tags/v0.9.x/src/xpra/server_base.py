@@ -882,7 +882,7 @@ class ServerBase(object):
                 if not display or type(display) not in (list, tuple):
                     continue
                 #display: [':0.0', 2560, 1600, 677, 423, [['DFP2', 0, 0, 2560, 1600, 646, 406]], 0, 0, 2560, 1574]
-                if len(display)>10:
+                if len(display)>=10:
                     work_x, work_y, work_w, work_h = display[6:10]
                     display_workarea = gtk.gdk.Rectangle(work_x, work_y, work_w, work_h)
                     log("found workarea % for display %s", display_workarea, display[0])
