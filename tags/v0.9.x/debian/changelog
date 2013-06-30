@@ -1,5 +1,6 @@
 xpra (0.9.6-1) UNRELEASED; urgency=low
   * fix lost clicks on some popup menus (mostly with MS Windows clients)
+  * fix client workarea size change detection
   * fix reading of unique "machine-id" on posix
   * fix window reference leak for windows we fail to manage
   * fix compatibility with pillow (PIL fork)
@@ -10,7 +11,7 @@ xpra (0.9.6-1) UNRELEASED; urgency=low
   * fix variable test vs use (correctness only)
   * forward compatibility with future "xpra info" namespace changes
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 29 Jun 2013 22:26:18 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sun, 30 Jun 2013 16:33:26 +0700
 
 xpra (0.9.5-1) UNRELEASED; urgency=low
   * fix auto-refresh: don't refresh unnecessarily
