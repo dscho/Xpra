@@ -1118,7 +1118,7 @@ class XpraClient(XpraClientBase, gobject.GObject):
             #check again soon:
             gobject.timeout_add(1000, update_size, ss)
         #update via idle_add so the data is actually up to date when we query it!
-        self.idle_add(update_size)
+        gobject.idle_add(update_size)
 
     def get_screen_sizes(self):
         screen_sizes = []
