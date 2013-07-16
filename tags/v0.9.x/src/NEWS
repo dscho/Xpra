@@ -1,3 +1,11 @@
+v0.9.7 (2013-07-16)
+======================
+	-- fix error in sound cleanup code
+	-- fix network threads accounting
+	-- fix missing window icons
+	-- fix client availibility of remote session start feature
+
+
 v0.9.6 (2013-06-30)
 ======================
 	-- fix client exit lockups on MS Windows
