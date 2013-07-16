@@ -244,6 +244,13 @@ class ClientWindow(gtk.Window):
         if CAN_SET_WORKSPACE:
             self.connect("property-notify-event", self.property_changed)
 
+    def show(self): 
+        if self.group_leader: 
+            if not self.is_realized(): 
+                 self.realize() 
+            self.window.set_group(self.group_leader) 
+        gtk.Window.show(self) 
+
     def property_changed(self, widget, event):
         log("property_changed: %s", event.atom)
         if event.atom=="_NET_WM_DESKTOP" and self._been_mapped and not self._override_redirect:
@@ -511,8 +518,6 @@ class ClientWindow(gtk.Window):
 
     def do_map_event(self, event):
         log("Got map event: %s", event)
-        if self.group_leader:
-            self.window.set_group(self.group_leader)
         gtk.Window.do_map_event(self, event)
         if not self._override_redirect:
             x, y, w, h = get_window_geometry(self)
