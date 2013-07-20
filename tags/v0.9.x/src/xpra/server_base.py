@@ -223,7 +223,6 @@ class ServerBase(object):
             "set-cursors":                          self._process_set_cursors,
             "set-notify":                           self._process_set_notify,
             "set-bell":                             self._process_set_bell,
-            "info-request":                         self._process_info_request,
                                           }
         self._authenticated_ui_packet_handlers = self._default_packet_handlers.copy()
         self._authenticated_ui_packet_handlers.update({
@@ -257,6 +256,7 @@ class ServerBase(object):
             "sound-control":                        self._process_sound_control,
             "sound-data":                           self._process_sound_data,
             #requests:
+            "info-request":                         self._process_info_request,
             "shutdown-server":                      self._process_shutdown_server,
             "buffer-refresh":                       self._process_buffer_refresh,
             "screenshot":                           self._process_screenshot,
@@ -522,7 +522,7 @@ class ServerBase(object):
             return
         if info_req:
             log.info("processing info request from %s", proto._conn)
-            thread.start_new_thread(self.send_hello_info, (proto,))
+            self.send_hello_info(proto)
             return
 
         # Things are okay, we accept this connection, and may disconnect previous one(s)
