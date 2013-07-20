@@ -1,3 +1,11 @@
+xpra (0.9.8-1) UNRELEASED; urgency=low
+  * fix client workarea size change detection (again)
+  * fix crashes handling info requests
+  * fix Ubuntu raring clients: must use Xvfb
+  * speedup server startup when no XAUTHORITY file exists yet
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 20 Jul 2013 15:33:21 +0700
+
 xpra (0.9.7-1) UNRELEASED; urgency=low
   * fix error in sound cleanup code
   * fix network threads accounting
