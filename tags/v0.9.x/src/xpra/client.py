@@ -1105,7 +1105,7 @@ class XpraClient(XpraClientBase, gobject.GObject):
 
     def _screen_size_changed(self, *args):
         def update_size(current=None):
-            root_w, root_h = self.get_root_size()
+            root_w, root_h = get_root_size()
             ss = self.get_screen_sizes()
             log("update_size(%s) sizes=%s", current, ss)
             if current is not None and current==ss:
