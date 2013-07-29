@@ -244,12 +244,12 @@ class ClientWindow(gtk.Window):
         if CAN_SET_WORKSPACE:
             self.connect("property-notify-event", self.property_changed)
 
-    def show(self): 
-        if self.group_leader: 
-            if not self.is_realized(): 
-                 self.realize() 
-            self.window.set_group(self.group_leader) 
-        gtk.Window.show(self) 
+    def show(self):
+        if self.group_leader:
+            if not self.is_realized():
+                 self.realize()
+            self.window.set_group(self.group_leader)
+        gtk.Window.show(self)
 
     def property_changed(self, widget, event):
         log("property_changed: %s", event.atom)
