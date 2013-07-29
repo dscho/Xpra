@@ -80,10 +80,17 @@ class Backing(object):
         self.draw_needs_refresh = True
 
     def close(self):
+        self._backing = None
         log("%s.close() video_decoder=%s", type(self), self._video_decoder)
-        if self._video_decoder:
+        #try without blocking, if that fails then
+        #the lock is held by the decoding thread,
+        #and it will run the cleanup after releasing the lock
+        #(it checks for self._backing None)
+        self.close_decoder(False)
+
+    def close_decoder(self, blocking=False):
+        if self._video_decoder and self._video_decoder_lock.acquire(blocking):
             try:
-                self._video_decoder_lock.acquire()
                 self._video_decoder.clean()
                 self._video_decoder = None
             finally:
@@ -140,6 +147,10 @@ class Backing(object):
         assert x==0 and y==0
         try:
             self._video_decoder_lock.acquire()
+            if self._backing is None:
+                log("window %s is already gone!", self.wid)
+                fire_paint_callbacks(callbacks, False)
+                return  False
             if self._video_decoder:
                 if self._video_decoder.get_type()!=coding:
                     if DRAW_DEBUG:
@@ -161,6 +172,8 @@ class Backing(object):
             self.do_video_paint(coding, img_data, x, y, width, height, options, callbacks)
         finally:
             self._video_decoder_lock.release()
+            if self._backing is None:
+                self.close_decoder(True)
         return  False
 
     def do_video_paint(self, coding, img_data, x, y, width, height, options, callbacks):
@@ -378,6 +391,8 @@ class PixmapBacking(Backing):
             fire_paint_callbacks(callbacks, False)
 
     def _do_paint_rgb24(self, img_data, x, y, width, height, rowstride, options, callbacks):
+        if self._backing is None:
+            return  False
         gc = self._backing.new_gc()
         self._backing.draw_rgb_image(gc, x, y, width, height, gdk.RGB_DITHER_NONE, img_data, rowstride)
         return True
