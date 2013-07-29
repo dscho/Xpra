@@ -6,6 +6,7 @@
 # Parti is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
+import thread
 import re
 from math import sqrt
 import os
@@ -570,14 +571,18 @@ class ServerSource(object):
             log.error("error setting up sound: %s", e)
 
     def stop_sending_sound(self):
-        if self.sound_source:
-            self.sound_source.stop()
-            self.sound_source.cleanup()
+        ss = self.sound_source
+        log("stop_sending_sound() sound_source=%s", ss)
+        if ss:
             self.sound_source = None
+            def stop_sound(*args):
+                ss.stop()
+                ss.cleanup()
+            thread.start_new_thread(stop_sound, ())
 
     def new_sound_buffer(self, sound_source, data, metadata):
-        assert self.sound_source
-        self.send("sound-data", self.sound_source.codec, Compressed(self.sound_source.codec, data), metadata)
+        if self.sound_source:
+            self.send("sound-data", self.sound_source.codec, Compressed(self.sound_source.codec, data), metadata)
 
     def sound_control(self, action, *args):
         if action=="stop":
