@@ -143,9 +143,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Sat Jul 20 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.8-1
+* Mon Jul 29 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.8-1
 - fix client workarea size change detection (again)
 - fix crashes handling info requests
+- fix server hangs due to sound cleanup deadlock
+- use lockless window video decoder cleanup (much faster)
 - speedup server startup when no XAUTHORITY file exists yet
 
 * Tue Jul 16 2013 Antoine Martin <antoine@devloop.org.uk> 0.9.7-1

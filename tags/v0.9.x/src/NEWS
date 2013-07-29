@@ -1,8 +1,10 @@
-v0.9.8 (2013-07-20)
+v0.9.8 (2013-07-29)
 ======================
 	-- fix client workarea size change detection (again)
 	-- fix crashes handling info requests
 	-- fix Ubuntu raring clients: must use Xvfb
+        -- fix server hangs due to sound cleanup deadlock
+        -- use lockless window video decoder cleanup (much faster)
 	-- speedup server startup when no XAUTHORITY file exists yet
 
 
