@@ -1,0 +1,249 @@
+Index: xpra/gtk_common/gdk_atoms.pyx
+===================================================================
+--- a/xpra/gtk_common/gdk_atoms.pyx	(revision 4166)
++++ b/xpra/gtk_common/gdk_atoms.pyx	(working copy)
+@@ -59,7 +59,7 @@
+     # interpret atoms when dealing with the clipboard, therefore, we need to
+     # be able to take an array of GDK atom objects (integers) and figure out
+     # what they mean.
+-    cdef const GdkAtom * array = <GdkAtom*> NULL
++    cdef GdkAtom * array = <GdkAtom*> NULL
+     cdef Py_ssize_t array_len_bytes = 0
+     cdef long gdk_atom_value = 0
+     assert PyObject_AsReadBuffer(atom_string, <const_void_pp> &array, &array_len_bytes)==0
+Index: xpra/x11/gtk_x11/gdk_bindings.pyx
+===================================================================
+--- a/xpra/x11/gtk_x11/gdk_bindings.pyx	(revision 4166)
++++ b/xpra/x11/gtk_x11/gdk_bindings.pyx	(working copy)
+@@ -44,6 +44,7 @@
+     ctypedef int Py_ssize_t
+     ctypedef object PyObject
+     ctypedef void** const_void_pp "const void**"
++    ctypedef void* const_void_p "const void*"
+     object PyBuffer_FromMemory(void *ptr, Py_ssize_t size)
+     int PyObject_AsReadBuffer(object obj, void ** buffer, Py_ssize_t * buffer_len) except -1
+ 
+@@ -58,8 +59,8 @@
+ 
+ cdef extern from "sys/shm.h":
+     int shmget(key_t __key, size_t __size, int __shmflg)
+-    void *shmat(int __shmid, const void *__shmaddr, int __shmflg)
+-    int shmdt (const void *__shmaddr)
++    void *shmat(int __shmid, const_void_p __shmaddr, int __shmflg)
++    int shmdt (const_void_p __shmaddr)
+ 
+ cdef extern from "errno.h" nogil:
+     int errno
+@@ -739,7 +740,7 @@
+         self.pixel_format = RGB_FORMATS[i]
+ 
+     def set_pixels(self, pixels):
+-        cdef const unsigned char * buf = NULL
++        cdef unsigned char * buf = NULL
+         cdef Py_ssize_t buf_len = 0
+         if self.pixels!=NULL:
+             free(self.pixels)
+Index: xpra/codecs/enc_x264/encoder.pyx
+===================================================================
+--- a/xpra/codecs/enc_x264/encoder.pyx	(revision 4166)
++++ b/xpra/codecs/enc_x264/encoder.pyx	(working copy)
+@@ -32,7 +32,7 @@
+     char * get_preset(enc_x264_ctx *ctx)
+ 
+     enc_x264_ctx *init_encoder(int width, int height,
+-        const char *colorspace, const char *profile,
++        char *colorspace, char *profile,
+         int initial_quality, int initial_speed)
+     void clean_encoder(enc_x264_ctx *)
+     int compress_image(enc_x264_ctx *ctx, uint8_t *input[3], int in_stride[3], uint8_t **out, int *outsz) nogil
+@@ -48,7 +48,7 @@
+ 
+ #copy C list of colorspaces to a python list:
+ cdef do_get_colorspaces():
+-    cdef const char** c_colorspaces
++    cdef char** c_colorspaces
+     cdef int i
+     c_colorspaces = get_supported_colorspaces()
+     i = 0;
+Index: xpra/codecs/xor/cyxor.pyx
+===================================================================
+--- a/xpra/codecs/xor/cyxor.pyx	(revision 4166)
++++ b/xpra/codecs/xor/cyxor.pyx	(working copy)
+@@ -17,10 +17,10 @@
+ 
+ def xor_str(buf, xor_string):
+     assert len(buf)==len(xor_string), "cannot xor strings of different lengths (cyxor)"
+-    cdef const unsigned char * cbuf = <unsigned char *> 0 #@DuplicatedSignature
++    cdef unsigned char * cbuf = <unsigned char *> 0 #@DuplicatedSignature
+     cdef Py_ssize_t cbuf_len = 0                    #@DuplicatedSignature
+     assert PyObject_AsReadBuffer(buf, <const_void_pp> &cbuf, &cbuf_len)==0
+-    cdef const unsigned char * xbuf = <unsigned char *> 0 #@DuplicatedSignature
++    cdef unsigned char * xbuf = <unsigned char *> 0 #@DuplicatedSignature
+     cdef Py_ssize_t xbuf_len = 0                    #@DuplicatedSignature
+     assert PyObject_AsReadBuffer(xor_string, <const_void_pp> &xbuf, &xbuf_len)==0
+     assert cbuf_len == xbuf_len
+Index: xpra/codecs/argb/argb.pxd
+===================================================================
+--- a/xpra/codecs/argb/argb.pxd	(revision 4166)
++++ b/xpra/codecs/argb/argb.pxd	(working copy)
+@@ -5,4 +5,4 @@
+ # later version. See the file COPYING for details.
+ 
+ 
+-cdef argbdata_to_pixdata(const unsigned long* data, int len)
++cdef argbdata_to_pixdata(unsigned long * data, int len)
+Index: xpra/codecs/argb/argb.pyx
+===================================================================
+--- a/xpra/codecs/argb/argb.pyx	(revision 4166)
++++ b/xpra/codecs/argb/argb.pyx	(working copy)
+@@ -17,14 +17,14 @@
+ 
+ def argb_to_rgba(buf):
+     # b is a Python buffer object
+-    cdef const unsigned long * cbuf = <unsigned long *> 0
++    cdef unsigned long * cbuf = <unsigned long *> 0
+     cdef Py_ssize_t cbuf_len = 0
+     assert sizeof(int) == 4
+     assert len(buf) % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % len(buf)
+     assert PyObject_AsReadBuffer(buf, <const_void_pp> &cbuf, &cbuf_len)==0
+     return argbdata_to_pixdata(cbuf, cbuf_len)
+ 
+-cdef argbdata_to_pixdata(const unsigned long* data, int dlen):
++cdef argbdata_to_pixdata(unsigned long * data, int dlen):
+     if dlen <= 0:
+         return None
+     assert dlen % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % dlen
+@@ -60,7 +60,7 @@
+     assert PyObject_AsReadBuffer(buf, <const_void_pp> &cbuf, &cbuf_len)==0
+     return argbdata_to_rgb(cbuf, cbuf_len)
+ 
+-cdef argbdata_to_rgb(const unsigned long* data, int dlen):
++cdef argbdata_to_rgb(unsigned long * data, int dlen):
+     if dlen <= 0:
+         return None
+     assert dlen % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % dlen
+Index: xpra/codecs/dec_avcodec/decoder.pyx
+===================================================================
+--- a/xpra/codecs/dec_avcodec/decoder.pyx	(revision 4178)
++++ b/xpra/codecs/dec_avcodec/decoder.pyx	(working copy)
+@@ -78,8 +78,8 @@
+     #init and free:
+     void avcodec_register_all()
+     AVCodec *avcodec_find_decoder(AVCodecID id)
+-    AVCodecContext *avcodec_alloc_context3(const AVCodec *codec)
+-    int avcodec_open2(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options)
++    AVCodecContext *avcodec_alloc_context3(AVCodec *codec)
++    int avcodec_open2(AVCodecContext *avctx, AVCodec *codec, AVDictionary **options)
+     AVFrame *avcodec_alloc_frame()
+     void avcodec_free_frame(AVFrame **frame)
+     int avcodec_close(AVCodecContext *avctx)
+@@ -88,7 +88,7 @@
+     void av_init_packet(AVPacket *pkt) nogil
+     void avcodec_get_frame_defaults(AVFrame *frame) nogil
+     int avcodec_decode_video2(AVCodecContext *avctx, AVFrame *picture,
+-                                int *got_picture_ptr, const AVPacket *avpkt) nogil
++                                int *got_picture_ptr, AVPacket *avpkt) nogil
+ 
+     #buffer management:
+     int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic)
+@@ -431,7 +431,7 @@
+ 
+     def decompress_image(self, input, options):
+         cdef unsigned char * padded_buf = NULL
+-        cdef const unsigned char * buf = NULL
++        cdef unsigned char * buf = NULL
+         cdef Py_ssize_t buf_len = 0
+         cdef int len = 0
+         cdef int got_picture
+@@ -441,7 +441,7 @@
+         assert self.codec_ctx!=NULL
+         assert self.codec!=NULL
+         #copy input buffer into padded C buffer:
+-        PyObject_AsReadBuffer(input, <const void**> &buf, &buf_len)
++        PyObject_AsReadBuffer(input, <void**> &buf, &buf_len)
+         padded_buf = <unsigned char *> xmemalign(buf_len+128)
+         memcpy(padded_buf, buf, buf_len)
+         memset(padded_buf+buf_len, 0, 128)
+Index: xpra/codecs/csc_swscale/colorspace_converter.pyx
+===================================================================
+--- a/xpra/codecs/csc_swscale/colorspace_converter.pyx	(revision 4166)
++++ b/xpra/codecs/csc_swscale/colorspace_converter.pyx	(working copy)
+@@ -46,12 +46,12 @@
+     SwsContext *sws_getContext(int srcW, int srcH, AVPixelFormat srcFormat,
+                                 int dstW, int dstH, AVPixelFormat dstFormat,
+                                 int flags, SwsFilter *srcFilter,
+-                                SwsFilter *dstFilter, const double *param)
++                                SwsFilter *dstFilter, double *param)
+     void sws_freeContext(SwsContext *context)
+ 
+-    int sws_scale(SwsContext *c, const uint8_t *const srcSlice[],
+-                  const int srcStride[], int srcSliceY, int srcSliceH,
+-                  uint8_t *const dst[], const int dstStride[]) nogil
++    int sws_scale(SwsContext *c, uint8_t * srcSlice[],
++                  int srcStride[], int srcSliceY, int srcSliceH,
++                  uint8_t *dst[], int dstStride[]) nogil
+ 
+ 
+ def get_version():
+@@ -335,7 +335,7 @@
+     def convert_image(self, image):
+         cdef Py_ssize_t pic_buf_len = 0
+         assert self.context!=NULL
+-        cdef const uint8_t *input_image[4]
++        cdef uint8_t *input_image[4]
+         cdef uint8_t *output_image[4]
+         cdef int input_stride[4]
+         cdef int iplanes,oplanes
+Index: xpra/codecs/vpx/encoder.pyx
+===================================================================
+--- a/xpra/codecs/vpx/encoder.pyx	(revision 4166)
++++ b/xpra/codecs/vpx/encoder.pyx	(working copy)
+@@ -20,11 +20,11 @@
+ 
+     int get_vpx_abi_version()
+ 
+-    vpx_codec_ctx_t* init_encoder(int width, int height, const char *colorspace)
++    vpx_codec_ctx_t* init_encoder(int width, int height, char *colorspace)
+     void clean_encoder(vpx_codec_ctx_t *context)
+     int compress_image(vpx_codec_ctx_t *ctx, uint8_t *input[3], int input_stride[3], uint8_t **out, int *outsz) nogil
+ 
+-    vpx_codec_ctx_t* init_decoder(int width, int height, const char *colorspace)
++    vpx_codec_ctx_t* init_decoder(int width, int height, char *colorspace)
+     void clean_decoder(vpx_codec_ctx_t *context)
+     int decompress_image(vpx_codec_ctx_t *context, uint8_t *input, int size, uint8_t *out[3], int outstride[3])
+ 
+@@ -34,7 +34,7 @@
+ 
+ #copy C list of colorspaces to a python list:
+ cdef do_get_colorspaces():
+-    cdef const char** c_colorspaces
++    cdef char** c_colorspaces
+     cdef int i
+     c_colorspaces = get_supported_colorspaces()
+     i = 0;
+Index: xpra/codecs/vpx/decoder.pyx
+===================================================================
+--- a/xpra/codecs/vpx/decoder.pyx	(revision 4166)
++++ b/xpra/codecs/vpx/decoder.pyx	(working copy)
+@@ -25,10 +25,10 @@
+ 
+     int get_vpx_abi_version()
+ 
+-    vpx_codec_ctx_t* init_decoder(int width, int height, const char *colorspace)
++    vpx_codec_ctx_t* init_decoder(int width, int height, char *colorspace)
+     void clean_decoder(vpx_codec_ctx_t *context)
+     int decompress_image(vpx_codec_ctx_t *context, uint8_t *input, int size, uint8_t *out[3], int outstride[3])
+-    const char *get_colorspace(vpx_codec_ctx_t *context)
++    char *get_colorspace(vpx_codec_ctx_t *context)
+ 
+ 
+ def get_version():
+@@ -92,7 +92,7 @@
+     def decompress_image(self, input, options):
+         cdef uint8_t *dout[3]
+         cdef int outstrides[3]
+-        cdef const unsigned char * buf = NULL
++        cdef unsigned char * buf = NULL
+         cdef Py_ssize_t buf_len = 0
+         cdef int i = 0
+         assert self.context!=NULL

@@ -1,0 +1,110 @@
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<app-bundle>
+
+	<meta>
+		<prefix name="default">${env:JHBUILD_PREFIX}</prefix>
+		<destination overwrite="yes">./image</destination>
+		
+		<!-- Comment this out to keep the install names in binaries.  -->
+		<run-install-name-tool/>
+		
+		<launcher-script>${project}/Xpra_Launcher</launcher-script>
+	</meta>
+
+	<plist>${project}/Info.plist</plist>
+	<main-binary>
+		${prefix}/bin/xpra_launcher
+	</main-binary>
+
+	<!-- We need to pack our own Python to avoid compatibility problems. -->
+	<binary>${prefix}/bin/python</binary>
+
+	<data dest="${bundle}/Contents/MacOS/">
+		${project}/Xpra
+	</data>
+
+	<binary>
+		${prefix}/lib/gdk-pixbuf-2.0/2.10.0/loaders/*.so
+	</binary>
+	<!-- Copy in libpyglib, which will pull in other dependencies we need -->
+	<binary>
+		${prefix}/lib/libpyglib-*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libgtk-quartz-*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libgtkglext-quartz-*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libgdkglext-quartz-*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libgtkmacintegration.*.dylib
+	</binary>
+	<binary>
+ 	   ${prefix}/lib/libjpeg.*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libtiff.*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/librsvg*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libx264.*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libavcodec.*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libswscale.*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libvpx.*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libwebp.*dylib
+	</binary>
+	<binary>
+		${prefix}/lib/libgst*.dylib
+	</binary>
+	<binary>
+		${prefix}/lib/pango/${pkg:pango:pango_module_version}/modules/*.so
+	</binary>
+
+	<binary>
+		${prefix}/lib/gstreamer-0.10/*.so
+	</binary>
+
+	<data dest="${bundle}/Contents/Resources/">
+		${project}/dist/Xpra.app/Contents/Resources/
+	</data>
+
+	<data dest="${bundle}/Contents/Helpers/gst-plugin-scanner">
+		${prefix}/libexec/gstreamer-0.10/gst-plugin-scanner
+	</data>
+
+	<data>
+		${prefix}/lib/pygtk/2.0/
+	</data>
+	<data>
+		${prefix}/etc/pango/
+	</data>
+
+	<data>
+		${prefix}/share/themes/Quartz
+	</data>
+	<data dest="${bundle}/Contents/Resources/etc/gtk-2.0/gtkrc">
+		${project}/gtkrc
+	</data>
+
+	<data dest="${bundle}/Contents/Resources">
+		${project}/xpra.icns
+	</data>
+
+	<icon-theme icons="auto">
+		Tango
+	</icon-theme>
+
+</app-bundle>
