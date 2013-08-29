@@ -83,6 +83,10 @@ def encode_int(x, r):
 def encode_string(x, r):
     r.extend((str(len(x)), ':', x))
 
+def encode_unicode(x, r):
+    x = x.encode("utf8")
+    encode_string(x, r)
+
 def encode_list(x, r):
     r.append('l')
     for i in x:
@@ -105,12 +109,12 @@ def encode_dict(x,r):
 
 encode_func = {}
 if sys.version < '3':
-    from types import (StringTypes, IntType, LongType, DictType, ListType,
+    from types import (StringType, UnicodeType, IntType, LongType, DictType, ListType,
                        TupleType, BooleanType)
     encode_func[IntType] = encode_int
     encode_func[LongType] = encode_int
-    for x in StringTypes:
-        encode_func[x] = encode_string
+    encode_func[StringType] = encode_string
+    encode_func[UnicodeType] = encode_unicode
     encode_func[ListType] = encode_list
     encode_func[TupleType] = encode_list
     encode_func[DictType] = encode_dict
