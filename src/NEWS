@@ -1,3 +1,9 @@
+v0.10.4 (2013-09-10)
+======================
+	-- fix modifier key handling (was more noticeable with MS Windows clients)
+	-- fix auto-refresh
+
+
 v0.10.3 (2013-09-06)
 ======================
 	-- fix transient windows with no parent
