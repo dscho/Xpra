@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.10.4
+%define version 0.10.5
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -158,6 +158,15 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Thu Oct 10 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.5-1
+- fix client time out when the initial connection fails
+- fix connection failures when some system information is missing
+- fix client disconnection requests
+- fix encryption cipher error messages
+- fix client errors when some features are disabled
+- fix potential rencode bug with unhandled data types
+- error out if the client requests authentication and none is available
+
 * Tue Sep 10 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.4-2
 - fix modifier key handling (was more noticeable with MS Windows clients)
 - fix auto-refresh
