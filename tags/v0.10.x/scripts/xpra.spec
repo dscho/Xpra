@@ -160,6 +160,7 @@ So basically it's screen for remote X apps.
 %changelog
 * Thu Oct 10 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.5-1
 - fix client time out when the initial connection fails
+- fix shadow mode
 - fix connection failures when some system information is missing
 - fix client disconnection requests
 - fix encryption cipher error messages
