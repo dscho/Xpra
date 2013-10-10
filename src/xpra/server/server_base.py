@@ -603,6 +603,11 @@ class ServerBase(object):
                 return
             if not self._verify_password(proto, client_hash, password):
                 return
+        else:
+            #did the client expect a challenge?
+            if capabilities.get("challenge", False): 
+                self.disconnect_client(proto, "this server does not require authentication") 
+                return False 
 
         screenshot_req = capabilities.get("screenshot_request", False)
         info_req = capabilities.get("info_request", False)
