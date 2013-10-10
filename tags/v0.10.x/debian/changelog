@@ -1,3 +1,14 @@
+xpra (0.10.5-1) UNRELEASED; urgency=low
+  * fix client time out when the initial connection fails
+  * fix connection failures when some system information is missing
+  * fix client disconnection requests
+  * fix encryption cipher error messages
+  * fix client errors when some features are disabled
+  * fix potential rencode bug with unhandled data types
+  * error out if the client requests authentication and none is available
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 10 Oct 2013 15:39:42 +0700
+
 xpra (0.10.4-1) UNRELEASED; urgency=low
   * fix modifier key handling (was more noticeable with MS Windows clients)
   * fix auto-refresh
