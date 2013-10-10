@@ -1,5 +1,6 @@
 xpra (0.10.5-1) UNRELEASED; urgency=low
   * fix client time out when the initial connection fails
+  * fix shadow mode
   * fix connection failures when some system information is missing
   * fix client disconnection requests
   * fix encryption cipher error messages
