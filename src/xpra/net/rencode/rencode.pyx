@@ -307,7 +307,7 @@ cdef encode(char **buf, int *pos, data):
         encode_dict(buf, pos, data)
 
     else:
-        raise Exception("type %s not handled" % t)
+        print("BUG: rencode does not handle type %s" % t)
 
 def dumps(data, float_bits=DEFAULT_FLOAT_BITS):
     """
