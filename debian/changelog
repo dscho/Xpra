@@ -1,3 +1,10 @@
+xpra (0.10.6-1) UNRELEASED; urgency=low
+  * fix window titles reverting to "unknown host"
+  * fix tray forwarding bug causing client disconnections
+  * replace previous rencode fix with warning
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 15 Oct 2013 10:29:54 +0700
+
 xpra (0.10.5-1) UNRELEASED; urgency=low
   * fix client time out when the initial connection fails
   * fix shadow mode
