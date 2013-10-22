@@ -706,6 +706,8 @@ class ServerBase(object):
 
         ss.startup_complete()
 
+    def update_server_settings(self, settings):
+        log("server settings ignored: ", settings)
 
     def set_keyboard_repeat(self, key_repeat):
         pass
