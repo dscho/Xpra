@@ -158,7 +158,7 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Tue Oct 22 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.7-1
+* Tue Oct 22 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.8-1
 - fix misapplied patch breaking all windows with transparency
 
 * Tue Oct 22 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.7-1
