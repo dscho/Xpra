@@ -9,10 +9,10 @@ log = Logger()
 
 from xpra.server.gtk_server_base import GTKServerBase
 from xpra.server.shadow_server_base import ShadowServerBase, RootWindowModel
-from xpra.codecs.argb.argb import argb_to_rgb   #@UnresolvedImport
 from xpra.codecs.image_wrapper import ImageWrapper
 from xpra.os_util import StringIOClass
 
+import gtk.gdk
 import Quartz.CoreGraphics as CG    #@UnresolvedImport
 
 ALPHA = {
@@ -28,7 +28,7 @@ ALPHA = {
 
 class OSXRootWindowModel(RootWindowModel):
 
-    def get_image(self, x, y, width, height):
+    def get_image(self, x, y, width, height, logger=None):
         #region = CG.CGRectMake(0, 0, 100, 100)
         region = CG.CGRectInfinite
         image = CG.CGWindowListCreateImage(region,
@@ -42,11 +42,11 @@ class OSXRootWindowModel(RootWindowModel):
         rowstride = CG.CGImageGetBytesPerRow(image)
         alpha = CG.CGImageGetAlphaInfo(image)
         alpha_str = ALPHA.get(alpha, alpha)
-        log("OSXRootWindowModel.get_image(..) image size: %sx%s, bpc=%s, bpp=%s, rowstride=%s, alpha=%s", width, height, bpc, bpp, rowstride, alpha_str)
+        if logger:
+            logger("OSXRootWindowModel.get_image(..) image size: %sx%s, bpc=%s, bpp=%s, rowstride=%s, alpha=%s", width, height, bpc, bpp, rowstride, alpha_str)
         prov = CG.CGImageGetDataProvider(image)
         argb = CG.CGDataProviderCopyData(prov)
-        rgba = argb_to_rgb(argb)
-        return ImageWrapper(0, 0, width, height, rgba, "RGB", 24, width*3)
+        return ImageWrapper(0, 0, width, height, argb, "BGRX", 24, rowstride)
 
     def take_screenshot(self):
         log("grabbing screenshot")
@@ -71,7 +71,7 @@ class ShadowServer(ShadowServerBase, GTKServerBase):
                     CG.kCGWindowImageDefault)
         if image is None:
             raise Exception("cannot grab test screenshot - maybe you need to run this command whilst logged in via the UI")
-        ShadowServerBase.__init__(self)
+        ShadowServerBase.__init__(self, gtk.gdk.get_default_root_window())
         GTKServerBase.__init__(self)
 
     def init(self, sockets, opts):
