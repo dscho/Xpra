@@ -16,10 +16,11 @@ from xpra.client.gtk2.window_backing import GTK2WindowBacking
 
 """
 Backing using a gdk.Pixmap
-
-#don't bother trying gtk2 transparencyon on MS Windows:
-HAS_RGBA = not sys.platform.startswith("win")
 """
+
+#don't bother trying gtk2 transparency on on MS Windows:
+HAS_RGBA = not sys.platform.startswith("win")
+
 class PixmapBacking(GTK2WindowBacking):
 
     def __str__(self):
