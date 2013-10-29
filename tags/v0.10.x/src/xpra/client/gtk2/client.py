@@ -195,14 +195,7 @@ class XpraClient(GTKXpraClient):
     def clipboard_notify(self, n):
         if not self.tray:
             return
-        if n>0:
-            self.tray.set_icon("clipboard")
-            self.tray.set_tooltip("%s clipboard requests in progress" % n)
-            self.tray.set_blinking(True)
-        else:
-            self.tray.set_icon("xpra")
-            self.tray.set_tooltip("Xpra")
-            self.tray.set_blinking(False)
+        self.tray.set_blinking(n>0)
 
 
     def make_hello(self, challenge_response=None):
