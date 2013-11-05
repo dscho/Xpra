@@ -158,7 +158,7 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Tue Oct 22 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.9-1
+* Tue Nov 05 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.9-1
 - fix h264 decoding of padded images
 - fix plain RGB encoding with very old clients
 - fix "xpra info" error when old clients are connected
