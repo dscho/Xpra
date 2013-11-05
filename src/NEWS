@@ -1,3 +1,11 @@
+v0.10.9 (2013-11-05)
+======================
+	-- fix h264 decoding of padded images
+	-- fix plain RGB encoding with very old clients
+	-- fix "xpra info" error when old clients are connected
+	-- remove warning when "help" is specified as encoding
+
+
 v0.10.8 (2013-10-22)
 ======================
 	-- fix misapplied patch breaking all windows with transparency
