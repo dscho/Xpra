@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.10.8
+%define version 0.10.9
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -158,6 +158,12 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Tue Oct 22 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.9-1
+- fix h264 decoding of padded images
+- fix plain RGB encoding with very old clients
+- fix "xpra info" error when old clients are connected
+- remove warning when "help" is specified as encoding
+
 * Tue Oct 22 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.8-1
 - fix misapplied patch breaking all windows with transparency
 
