@@ -299,9 +299,13 @@ cdef class Decoder:
     cdef object weakref_images
     cdef AVFrame *frame                             #@DuplicatedSignature
     cdef int frames
+    cdef int width
+    cdef int height
 
     def init_context(self, int width, int height, colorspace):
         init_colorspaces()
+        self.width = width
+        self.height = height
         assert colorspace in COLORSPACES, "invalid colorspace: %s" % colorspace
         self.colorspace = NULL
         for x in COLORSPACES:
@@ -403,11 +407,14 @@ cdef class Decoder:
                 "colorspace": self.get_colorspace(),
                 "actual_colorspace": self.get_actual_colorspace(),
                 "frames"    : self.frames,
-                "buffers"   : len(self.framewrappers),
+                "width"     : self.width,
+                "height"    : self.height,
                 }
+        if self.framewrappers is not None:
+            info["buffers"] = len(self.framewrappers)
         if not self.is_closed():
-            info["width"] = self.get_width()
-            info["height"] = self.get_height()
+            info["decoder_width"] = self.codec_ctx.width
+            info["decoder_height"] = self.codec_ctx.height
         else:
             info["closed"] = True
         return info
@@ -419,12 +426,10 @@ cdef class Decoder:
         self.clean()
 
     def get_width(self):
-        assert self.codec_ctx!=NULL
-        return self.codec_ctx.width
+        return self.width
 
     def get_height(self):
-        assert self.codec_ctx!=NULL
-        return self.codec_ctx.height
+        return self.height
 
     def get_type(self):
         return "x264"
