@@ -1,4 +1,5 @@
 xpra (0.10.10-1) UNRELEASED; urgency=low
+  * fix h264 decoding with old versions of avcodec
   * support for video encoding of windows bigger than 4k
   * support video encoders that re-start the stream
   * fix crash in decoding error path
