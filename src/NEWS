@@ -1,3 +1,11 @@
+v0.10.10 (2013-11-17)
+======================
+	-- support for video encoding of windows bigger than 4k
+	-- support video encoders that re-start the stream
+	-- fix crash in decoding error path
+	-- forward compatibility with namespace changes
+
+
 v0.10.9 (2013-11-05)
 ======================
 	-- fix h264 decoding of padded images
