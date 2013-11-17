@@ -590,6 +590,7 @@ class UIXpraClient(XpraClientBase):
         capabilities["encoding_client_options"] = True
         capabilities["encoding.csc_atoms"] = True
         #TODO: check for csc support (swscale only?)
+        capabilities["encoding.video_reinit"] = True
         capabilities["encoding.video_scaling"] = True
         capabilities["encoding.transparency"] = self.has_transparency()
         #TODO: check for csc support (swscale only?)
