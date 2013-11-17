@@ -613,7 +613,7 @@ class SessionInfo(gtk.Window):
                     return getv("cur"), getv("min"), getv("avg"), getv("90p"), getv("max")
                 setall(self.batch_labels, values_from_info("batch_delay", "batch.delay"))
                 setall(self.damage_labels, values_from_info("damage_out_latency", "damage.out_latency"))
-                def all_values_from_info(window_prop):
+                def all_values_from_info(*window_props):
                     def avg(values):
                         if not values:
                             return ""
@@ -623,17 +623,19 @@ class SessionInfo(gtk.Window):
                             return ""
                         values = []
                         for wid in self.client._window_to_id.values():
-                            v = self.client.server_last_info.get("window[%s].%s.%s" % (wid, window_prop, suffix))
-                            if v is not None:
-                                values.append(v)
+                            for window_prop in window_props:
+                                v = self.client.server_last_info.get("window[%s].%s.%s" % (wid, window_prop, suffix))
+                                if v is not None:
+                                    values.append(v)
+                                    break
                         try:
                             return op(values)
                         except:
                             #no values?
                             return ""
                     return getv("cur", avg), getv("min", min), getv("avg", avg), getv("90p", avg), getv("max", max)
-                setall(self.quality_labels, all_values_from_info("quality"))
-                setall(self.speed_labels, all_values_from_info("speed"))
+                setall(self.quality_labels, all_values_from_info("quality", "encoding.quality"))
+                setall(self.speed_labels, all_values_from_info("speed", "encoding.speed"))
 
             region_sizes = []
             rps = []
