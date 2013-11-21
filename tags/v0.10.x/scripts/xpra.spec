@@ -158,7 +158,8 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Tue Nov 05 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
+* Thu Nov 21 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
+- fix focus regression
 - support for video encoding of windows bigger than 4k
 - support video encoders that re-start the stream
 - fix crash in decoding error path

@@ -1,11 +1,12 @@
 xpra (0.10.10-1) UNRELEASED; urgency=low
+  * fix focus regression
   * fix h264 decoding with old versions of avcodec
   * support for video encoding of windows bigger than 4k
   * support video encoders that re-start the stream
   * fix crash in decoding error path
   * forward compatibility with namespace changes
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Sun, 17 Nov 2013 14:56:53 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 21 Nov 2013 14:56:53 +0700
 
 xpra (0.10.9-1) UNRELEASED; urgency=low
   * fix h264 decoding of padded images
