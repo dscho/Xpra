@@ -16,11 +16,13 @@ except:
     pass
 import gtk
 from gtk import gdk
+gtk.threads_init()
 
 from xpra.os_util import thread
 from xpra.client.gtk_base.gtk_client_base import GTKXpraClient, xor_str
 from xpra.client.gtk2.tray_menu import GTK2TrayMenu
 from xpra.gtk_common.cursor_names import cursor_names
+from xpra.gtk_common.gtk2common import gtk2main
 from xpra.log import Logger
 log = Logger()
 
@@ -61,6 +63,9 @@ class XpraClient(GTKXpraClient):
         else:
             self.ClientWindowClass = ClientWindow
         log("init(..) ClientWindowClass=%s", self.ClientWindowClass)
+
+    def gtk_main(self):
+        gtk2main()
 
     def client_type(self):
         return "Python/Gtk2"
