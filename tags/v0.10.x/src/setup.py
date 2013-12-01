@@ -129,6 +129,10 @@ dec_avcodec_ENABLED = True
 
 
 
+dec_avcodec2_ENABLED = False
+
+
+
 csc_swscale_ENABLED = True
 
 
@@ -138,7 +142,7 @@ csc_nvcuda_ENABLED = False
 
 
 #allow some of these flags to be modified on the command line:
-SWITCHES = ("enc_x264", "nvenc", "dec_avcodec", "csc_swscale", "csc_nvcuda", "vpx", "webp", "rencode", "clipboard",
+SWITCHES = ("enc_x264", "nvenc", "dec_avcodec", "dec_avcodec2", "csc_swscale", "csc_nvcuda", "vpx", "webp", "rencode", "clipboard",
             "server", "client", "x11",
             "gtk2", "gtk3", "qt4",
             "sound", "cyxor", "cymaths", "opengl", "argb",
@@ -534,6 +538,8 @@ if 'clean' in sys.argv or 'sdist' in sys.argv:
                    "xpra/codecs/enc_x264/encoder.c",
                    "xpra/codecs/dec_avcodec/decoder.c",
                    "xpra/codecs/dec_avcodec/constants.pxi",
+                   "xpra/codecs/dec_avcodec2/decoder.c",
+                   "xpra/codecs/dec_avcodec2/constants.pxi",
                    "xpra/codecs/csc_swscale/colorspace_converter.c",
                    "xpra/codecs/csc_swscale/constants.pxi",
                    "xpra/codecs/csc_nvcuda/colorspace_converter.c",
@@ -1028,6 +1034,14 @@ if dec_avcodec_ENABLED:
     cython_add(Extension("xpra.codecs.dec_avcodec.decoder",
                 ["xpra/codecs/dec_avcodec/decoder.pyx", "xpra/codecs/dec_avcodec/dec_avcodec.c", "xpra/codecs/memalign/memalign.c"],
                 **avcodec_pkgconfig), min_version=(0, 19))
+
+toggle_packages(dec_avcodec2_ENABLED, "xpra.codecs.dec_avcodec2")
+if dec_avcodec2_ENABLED:
+    make_constants("xpra", "codecs", "dec_avcodec2", "constants")
+    avcodec2_pkgconfig = pkgconfig("libavcodec")
+    cython_add(Extension("xpra.codecs.dec_avcodec2.decoder",
+                ["xpra/codecs/dec_avcodec2/decoder.pyx", "xpra/codecs/dec_avcodec2/dec_avcodec.c", "xpra/codecs/memalign/memalign.c"],
+                **avcodec2_pkgconfig), min_version=(0, 19))
 
 toggle_packages(csc_swscale_ENABLED, "xpra.codecs.csc_swscale")
 if csc_swscale_ENABLED:

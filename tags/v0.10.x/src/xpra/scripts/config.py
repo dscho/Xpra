@@ -71,8 +71,12 @@ has_csc_nvcuda = csc_nvcuda is not None
 add_codec_version("nvcuda", "xpra.codecs.csc_nvcuda.colorspace_converter", "get_version", True)
 
 dec_avcodec = codec_import_check("avcodec decoder", "xpra.codecs.dec_avcodec", "xpra.codecs.dec_avcodec.decoder", "Decoder")
+if dec_avcodec is not None:
+    add_codec_version("avcodec", "xpra.codecs.dec_avcodec.decoder", "get_version", True)
+else:
+    dec_avcodec = codec_import_check("avcodec decoder", "xpra.codecs.dec_avcodec2", "xpra.codecs.dec_avcodec2.decoder", "Decoder")
+    add_codec_version("avcodec", "xpra.codecs.dec_avcodec2.decoder", "get_version", True)
 has_dec_avcodec = dec_avcodec is not None
-add_codec_version("avcodec", "xpra.codecs.dec_avcodec.decoder", "get_version", True)
 
 enc_webp, enc_webp, has_enc_webp_lossless, webp_handlers = None, None, False, None
 try:
