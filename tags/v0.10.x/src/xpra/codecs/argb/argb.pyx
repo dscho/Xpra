@@ -15,75 +15,69 @@ cdef extern from "Python.h":
                               Py_ssize_t * buffer_len) except -1
 
 
-def argb_to_rgba(buf):
-    # b is a Python buffer object
-    cdef const unsigned long * cbuf = <unsigned long *> 0
-    cdef Py_ssize_t cbuf_len = 0
-    assert sizeof(int) == 4
-    assert len(buf) % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % len(buf)
-    assert PyObject_AsReadBuffer(buf, <const_void_pp> &cbuf, &cbuf_len)==0
-    return argbdata_to_pixdata(cbuf, cbuf_len)
+#test for availability of bytearray
+#in a way that does not cause Cython to fail to compile:
+import __builtin__
+_bytearray =  __builtin__.__dict__.get("bytearray")
+if _bytearray is not None:
+    def make_byte_buffer(len):
+        return _bytearray(len)
+else:
+    #python 2.4 and older do not have bytearray, use array:
+    import array
+    def make_byte_buffer(len):              #@DuplicatedSignature
+        return array.array('b', '\0' * len)
 
-cdef argbdata_to_pixdata(const unsigned long* data, int dlen):
+
+def argb_to_rgba(buf):
+    assert len(buf) % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % len(buf)
+    # buf is a Python buffer object
+    cdef const unsigned char * cbuf = <unsigned char *> 0
+    cdef Py_ssize_t cbuf_len = 0
+    assert PyObject_AsReadBuffer(buf, <const_void_pp> &cbuf, &cbuf_len)==0
+    return argbdata_to_rgba(cbuf, cbuf_len)
+
+cdef argbdata_to_rgba(const unsigned char* data, int dlen):
     if dlen <= 0:
         return None
     assert dlen % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % dlen
-    import array
-    # Create byte array
-    b = array.array('b', '\0'* dlen)
-    cdef int offset = 0
+    b = make_byte_buffer(dlen)
+    #number of pixels:
+    cdef int mi = dlen/4
     cdef int i = 0
-    cdef unsigned long rgba
-    cdef unsigned long argb
-    cdef char b1, b2, b3, b4
-    while i < dlen/4:
-        argb = data[i] & 0xffffffff
-        rgba = <unsigned long> ((argb << 8) | (argb >> 24)) & 0xffffffff
-        b1 = (rgba >> 24) & 0xff
-        b2 = (rgba >> 16) & 0xff
-        b3 = (rgba >> 8) & 0xff
-        b4 = rgba & 0xff
-        b[offset] = b1
-        b[offset+1] = b2
-        b[offset+2] = b3
-        b[offset+3] = b4
-        offset = offset + 4
-        i = i + 1
+    while i < mi:
+        b[i]    = data[i+1]             #R
+        b[i+1]  = data[i+2]             #G
+        b[i+2]  = data[i+3]             #B
+        b[i+3]  = data[i]               #A
+        i = i + 4
     return b
 
 def argb_to_rgb(buf):
-    # b is a Python buffer object
-    cdef unsigned long * cbuf = <unsigned long *> 0     #@DuplicateSignature
-    cdef Py_ssize_t cbuf_len = 0                        #@DuplicateSignature
-    assert sizeof(int) == 4
     assert len(buf) % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % len(buf)
+    # buf is a Python buffer object
+    cdef unsigned char * cbuf = <unsigned char *> 0     #@DuplicateSignature
+    cdef Py_ssize_t cbuf_len = 0                        #@DuplicateSignature
     assert PyObject_AsReadBuffer(buf, <const_void_pp> &cbuf, &cbuf_len)==0
     return argbdata_to_rgb(cbuf, cbuf_len)
 
-cdef argbdata_to_rgb(const unsigned long* data, int dlen):
+cdef argbdata_to_rgb(const unsigned char *data, int dlen):
     if dlen <= 0:
         return None
     assert dlen % 4 == 0, "invalid buffer size: %s is not a multiple of 4" % dlen
-    import array
-    # Create byte array
-    b = array.array('b', '\0'* (dlen/4*3))
-    cdef int offset = 0                     #@DuplicateSignature
-    cdef int i = 0                          #@DuplicateSignature
-    cdef unsigned long rgba                 #@DuplicateSignature
-    cdef unsigned long argb                 #@DuplicateSignature
-    cdef char b1, b2, b3                    #@DuplicateSignature
-    while i < dlen/4:
-        argb = data[i] & 0xffffffff
-        rgba = <unsigned long> ((argb << 8) | (argb >> 24)) & 0xffffffff
-        b1 = (rgba >> 24) & 0xff
-        b2 = (rgba >> 16) & 0xff
-        b3 = (rgba >> 8) & 0xff
-        b[offset] = b1
-        b[offset+1] = b2
-        b[offset+2] = b3
-        offset = offset + 3
-        i = i + 1
-    return b
+    #number of pixels:
+    cdef int mi = dlen/4                #@DuplicateSignature
+    #3 bytes per pixel:
+    buf = make_byte_buffer(mi*3)
+    cdef int di = 0
+    cdef int si = 0
+    while si < mi:
+        buf[di]   = data[si+1]            #R
+        buf[di+1] = data[si+2]            #G
+        buf[di+2] = data[si+3]            #B
+        di += 3
+        si += 4
+    return buf
 
 
 def premultiply_argb_in_place(buf):
