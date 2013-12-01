@@ -332,6 +332,12 @@ When unspecified, all the available codecs are allowed and the first one is used
         if not hasattr(options, k):
             setattr(options, k, v)
 
+    #forward compatibility for correct encoding names:
+    if options.encoding=="h264":
+        options.encoding = "x264"
+    elif options.encoding=="vp8":
+        options.encoding = "vpx"
+
     #special handling for URL mode:
     #xpra attach xpra://[mode:]host:port/?param1=value1&param2=value2
     if len(args)==2 and args[0]=="attach" and args[1].startswith("xpra://"):
