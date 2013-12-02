@@ -146,18 +146,6 @@ def get_colorspaces():
     init_colorspaces()
     return COLORSPACES
 
-_CODECS = None
-def get_codecs():
-    global _CODECS
-    if _CODECS is None:
-        avcodec_register_all()
-        _CODECS = []
-        if avcodec_find_decoder(CODEC_ID_H264)!=NULL:
-            _CODECS.append("h264")
-        if avcodec_find_decoder(CODEC_ID_VP8)!=NULL:
-            _CODECS.append("vp8")
-    return _CODECS
-
 
 cdef void clear_frame(AVFrame *frame):
     assert frame!=NULL, "frame is not set!"
@@ -244,13 +232,10 @@ cdef class Decoder:
     cdef int frames
     cdef int width
     cdef int height
-    cdef object encoding
 
-    def init_context(self, encoding, int width, int height, colorspace):
+    def init_context(self, int width, int height, colorspace):
         cdef int r
         init_colorspaces()
-        assert encoding in ("vp8", "h264")
-        self.encoding = encoding
         self.width = width
         self.height = height
         assert colorspace in COLORSPACES, "invalid colorspace: %s" % colorspace
@@ -270,17 +255,10 @@ cdef class Decoder:
 
         avcodec_register_all()
 
-        if self.encoding=="h264":
-            self.codec = avcodec_find_decoder(CODEC_ID_H264)
-            if self.codec==NULL:
-                error("codec H264 not found!")
-                return  False
-        else:
-            assert self.encoding=="vp8"
-            self.codec = avcodec_find_decoder(CODEC_ID_VP8)
-            if self.codec==NULL:
-                error("codec VP8 not found!")
-                return  False
+        self.codec = avcodec_find_decoder(CODEC_ID_H264)
+        if self.codec==NULL:
+            error("codec H264 not found!")
+            return  False
 
         #from here on, we have to call clean_decoder():
         self.codec_ctx = avcodec_alloc_context3(self.codec)
@@ -392,7 +370,7 @@ cdef class Decoder:
         return self.height
 
     def get_encoding(self):
-        return "h264"
+        return "x264"
 
     def get_type(self):                             #@DuplicatedSignature
         return "avcodec"
