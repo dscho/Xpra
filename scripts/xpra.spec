@@ -11,6 +11,7 @@
 %define include_egg 1
 %define old_xdg 0
 %define PIL_bug 1
+%define avcodec_build_args %{nil}
 
 #if building a generic rpm: exclude anything that requires cython modules:
 %if 0%{?generic}
@@ -45,6 +46,9 @@
 # Fedora 19 onwards ship with Pillow in place of PIL, which has the bug fix:
 %if %(egrep -vq 'release 18' /etc/redhat-release && echo 1 || echo 0)
 %define PIL_bug 0
+%endif
+%if %(egrep -vq 'release 20|release 21' /etc/redhat-release && echo 1 || echo 0)
+%define avcodec_build_args --without-dec_avcodec --with-dec_avcodec2
 %endif
 %endif
 
@@ -158,7 +162,7 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Thu Nov 21 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
+* Sun Dec 01 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
 - fix focus regression
 - support for video encoding of windows bigger than 4k
 - support video encoders that re-start the stream
@@ -909,7 +913,7 @@ cd xpra-all-%{version}
 %build
 cd xpra-all-%{version}
 rm -rf build install
-CFLAGS=-O2 python setup.py build
+CFLAGS=-O2 python setup.py build %{avcodec_build_args}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -958,7 +962,7 @@ mv -f "${RPM_BUILD_ROOT}/usr/lib64" "${RPM_BUILD_ROOT}/usr/lib"
 %if 0%{?no_video}
 rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/vpx
 rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/enc_x264
-rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/dec_avcodec
+rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/dec_avcodec*
 %endif
 %if 0%{?no_webp}
 rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/webm
