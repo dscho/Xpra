@@ -1,12 +1,19 @@
 xpra (0.10.10-1) UNRELEASED; urgency=low
   * fix focus regression
+  * fix MS Windows clipboard copy including null byte
   * fix h264 decoding with old versions of avcodec
+  * fix potential invalid read past the end of the buffer
+  * fix static vpx build arguments
+  * fix RGB modes exposed for transparent windows
+  * fix crash on clipboard loops: detect and disable clipboard
+  * support for ffmpeg version 2.x
   * support for video encoding of windows bigger than 4k
   * support video encoders that re-start the stream
   * fix crash in decoding error path
   * forward compatibility with namespace changes
+  * forward compatibility with the new generic encoding names
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 21 Nov 2013 14:56:53 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 04 Dec 2013 18:53:44 +0700
 
 xpra (0.10.9-1) UNRELEASED; urgency=low
   * fix h264 decoding of padded images
