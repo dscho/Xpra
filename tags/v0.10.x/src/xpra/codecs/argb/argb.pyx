@@ -45,7 +45,7 @@ cdef argbdata_to_rgba(const unsigned char* data, int dlen):
     #number of pixels:
     cdef int mi = dlen/4
     cdef int i = 0
-    while i < mi:
+    while i < dlen:
         b[i]    = data[i+1]             #R
         b[i+1]  = data[i+2]             #G
         b[i+2]  = data[i+3]             #B
@@ -71,7 +71,7 @@ cdef argbdata_to_rgb(const unsigned char *data, int dlen):
     buf = make_byte_buffer(mi*3)
     cdef int di = 0
     cdef int si = 0
-    while si < mi:
+    while si < dlen:
         buf[di]   = data[si+1]            #R
         buf[di+1] = data[si+2]            #G
         buf[di+2] = data[si+3]            #B
