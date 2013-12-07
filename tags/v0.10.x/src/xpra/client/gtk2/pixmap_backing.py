@@ -84,11 +84,13 @@ class PixmapBacking(GTK2WindowBacking):
         #log.info("data head=%s", [hex(ord(v))[2:] for v in list(img_data[:500])])
         if self._backing is None:
             return  False
-        #FIXME: slow, we create a bytearray and then convert it back to a string!
-        img_data = bytearray(img_data)
-        from xpra.codecs.argb.argb import unpremultiply_argb_in_place   #@UnresolvedImport
-        unpremultiply_argb_in_place(img_data)
-        img_data = str(img_data)
+        from xpra.codecs.argb.argb import unpremultiply_argb, unpremultiply_argb_in_place, byte_buffer_to_buffer   #@UnresolvedImport
+        if type(img_data)==str or not hasattr(img_data, "raw"):
+            #cannot do in-place:
+            img_data = byte_buffer_to_buffer(unpremultiply_argb(img_data))
+        else:
+            #assume this is a writeable buffer (ie: ctypes from mmap):
+            unpremultiply_argb_in_place(img_data)
         pixbuf = gdk.pixbuf_new_from_data(img_data, gtk.gdk.COLORSPACE_RGB, True, 8, width, height, rowstride)
         cr = self._backing.cairo_create()
         cr.rectangle(x, y, width, height)
@@ -96,3 +98,4 @@ class PixmapBacking(GTK2WindowBacking):
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
         return True
+
