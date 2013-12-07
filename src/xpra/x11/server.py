@@ -398,7 +398,7 @@ class XpraServer(gobject.GObject, X11ServerBase):
         if self.cursor_data:
             pixels = self.cursor_data[7]
             log("send_cursor() cursor=%s", self.cursor_data[:7]+["%s bytes" % len(pixels)]+self.cursor_data[8:])
-            if self.default_cursor_data and pixels==self.default_cursor_data[7]:
+            if self.default_cursor_data and str(pixels)==str(self.default_cursor_data[7]):
                 log("send_cursor(): default cursor - clearing it")
                 self.cursor_data = None
             elif pixels is not None:
