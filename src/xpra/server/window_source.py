@@ -977,7 +977,9 @@ class WindowSource(object):
             return  zlib, {}, image.get_width(), image.get_height(), image.get_rowstride(), bpp
         #wrap it using "Compressed" so the network layer receiving it
         #won't decompress it (leave it to the client's draw thread)
-        return Compressed(coding, cdata), {"zlib" : level}, image.get_width(), image.get_height(), image.get_rowstride(), bpp
+        options = {"rgb_format" : pixel_format,
+                   "zlib"       : level}
+        return Compressed(coding, cdata), options, image.get_width(), image.get_height(), image.get_rowstride(), bpp
 
     def PIL_encode(self, coding, image, options):
         #for more information on pixel formats supported by PIL / Pillow, see:
@@ -1047,19 +1049,26 @@ class WindowSource(object):
     def rgb_reformat(self, image):
         #need to convert to a supported format!
         pixel_format = image.get_pixel_format()
-        target_format = {
-                 "XRGB"   : "RGB",
-                 "BGRX"   : "RGB",
-                 "BGRA"   : "RGBA"}.get(pixel_format)
-        if target_format not in self.rgb_formats:
+        modes = {
+                 #source  : [(PIL input format, output format), ..]
+                 "XRGB"   : [("XRGB", "RGB")],
+                 "BGRX"   : [("BGRX", "RGB")],
+                 #try with alpha first:
+                 "BGRA"   : [("BGRA", "RGBA"), ("BGRX", "RGB")]}.get(pixel_format)
+        target_rgb = [(im,om) for (im,om) in modes if om in self.rgb_formats]
+        if len(target_rgb)==0:
+            #try argb module:
+            if self.argb_swap(image):
+                return True
             warning_key = "rgb_reformats(%s)" % pixel_format
             self.warn_encoding_once(warning_key, "cannot convert %s to one of: %s" % (pixel_format, self.rgb_formats))
             return False
+        input_format, target_format = target_rgb[0]
         start = time.time()
         w = image.get_width()
         h = image.get_height()
         pixels = image.get_pixels()
-        img = PIL.Image.frombuffer(target_format, (w, h), pixels, "raw", pixel_format, image.get_rowstride())
+        img = PIL.Image.frombuffer(target_format, (w, h), pixels, "raw", input_format, image.get_rowstride())
         rowstride = w*len(target_format)    #number of characters is number of bytes per pixel!
         data = img.tostring("raw", target_format)
         assert len(data)==rowstride*h, "expected %s bytes in %s format but got %s" % (rowstride*h, len(data))
