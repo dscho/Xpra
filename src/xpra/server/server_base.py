@@ -761,6 +761,7 @@ class ServerBase(object):
         capabilities["cursors"] = self.cursors
         capabilities["raw_packets"] = True
         capabilities["chunked_compression"] = True
+        capabilities["bencode"] = True
         capabilities["rencode"] = has_rencode
         if has_rencode:
             capabilities["rencode.version"] = rencode_version
