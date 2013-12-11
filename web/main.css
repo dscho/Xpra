@@ -147,15 +147,11 @@ form#search input.submit {
 }
 
 /* main body */
-div#content {
-	width: 90%;
-}
 #content,#fullcontent,#subcontent{
 	display: table-cell;
 	float:left;
 	font-size:0.9em;
-	padding:30px 10px 20px 30px;
-	width: 90%;
+	padding: 10px 10px 20px 10px;
 }
 div.buttons {
 	clear: both;
@@ -363,10 +359,26 @@ li.a {
 	width: auto;
 	min-width: 58em;
 }
+div.trac-content {
+	border: 0px solid black;
+}
+.wikipage .trac-content {
+	margin-left: 0px;
+	padding-left: 0px;
+}
+.wikipage h1, .wikipage h2, .wikipage h3 {
+	margin-left: 0px;
+}
+div.trac-content {
+	box-shadow: 0em 0em 0em #eee;
+}
 div.trac-ticket-buttons {
 	height: 1.5em;
 }
 div.trac-ticket-buttons form {
+}
+div#ticket {
+	border-radius: 10px;
 }
 div#ticketchange {
 	clear: both;
