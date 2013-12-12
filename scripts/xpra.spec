@@ -162,7 +162,7 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Dec 04 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
+* Thu Dec 12 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
 - fix focus regression
 - fix MS Windows clipboard copy including null byte
 - fix h264 decoding with old versions of avcodec
@@ -170,6 +170,7 @@ So basically it's screen for remote X apps.
 - fix static vpx build arguments
 - fix RGB modes exposed for transparent windows
 - fix crash on clipboard loops: detect and disable clipboard
+- fix for clients supporting more RGB formats
 - support for ffmpeg version 2.x
 - support for video encoding of windows bigger than 4k
 - support video encoders that re-start the stream
