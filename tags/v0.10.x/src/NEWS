@@ -7,9 +7,11 @@ v0.10.10 (2013-12-04)
 	-- fix static vpx build arguments
 	-- fix RGB modes exposed for transparent windows
 	-- fix crash on clipboard loops: detect and disable clipboard
+	-- fix for clients supporting more RGB formats
 	-- support for ffmpeg version 2.x
 	-- support for video encoding of windows bigger than 4k
 	-- support video encoders that re-start the stream
+	-- support for latest 0.10 gstreamer modules on OSX
 	-- fix crash in decoding error path
 	-- forward compatibility with namespace changes
 	-- forward compatibility with the new generic encoding names
