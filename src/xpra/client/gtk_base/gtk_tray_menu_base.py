@@ -145,6 +145,8 @@ def make_encodingsmenu(get_current_encoding, set_encoding, encodings, server_enc
     encodings_submenu.encoding_to_index = {}
     NAME_TO_ENCODING = {}
     i = 0
+    cur = get_current_encoding()
+    cur = {"h264" : "x264", "vp8" : "vpx"}.get(cur, cur)
     for encoding in encodings:
         name = ENCODINGS_TO_NAME.get(encoding, encoding)
         descr = ENCODINGS_HELP.get(encoding)
@@ -161,7 +163,7 @@ def make_encodingsmenu(get_current_encoding, set_encoding, encodings, server_enc
             if enc is not None and encodings_submenu.get_current_encoding()!=enc:
                 encodings_submenu.set_encoding(enc)
         debug("make_encodingsmenu(..) encoding=%s, current=%s, active=%s", encoding, get_current_encoding(), encoding==get_current_encoding())
-        encoding_item.set_active(encoding==get_current_encoding())
+        encoding_item.set_active(encoding==cur)
         encoding_item.set_sensitive(encoding in server_encodings)
         encoding_item.set_draw_as_radio(True)
         encoding_item.connect("toggled", encoding_changed)
