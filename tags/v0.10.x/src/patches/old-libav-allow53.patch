@@ -1,0 +1,13 @@
+Index: xpra/codecs/dec_avcodec/decoder.pyx
+===================================================================
+--- a/xpra/codecs/dec_avcodec/decoder.pyx	(revision 4990)
++++ b/xpra/codecs/dec_avcodec/decoder.pyx	(working copy)
+@@ -101,7 +101,7 @@
+     return (LIBAVCODEC_VERSION_MAJOR, LIBAVCODEC_VERSION_MINOR, LIBAVCODEC_VERSION_MICRO)
+ 
+ 
+-MIN_AVCODEC_VERSION = 54
++MIN_AVCODEC_VERSION = 53
+ COLORSPACES = None
+ FORMAT_TO_ENUM = {}
+ ENUM_TO_FORMAT = {}
