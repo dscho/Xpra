@@ -5,7 +5,7 @@ Description: Build csc_swscale as a static library.
  
 --- a/setup.py	(revision 3545)
 +++ b/setup.py	(working copy)
-@@ -1012,7 +1012,11 @@
+@@ -1033,7 +1033,11 @@
  toggle_packages(csc_swscale_ENABLED, "xpra.codecs.csc_swscale")
  if csc_swscale_ENABLED:
      make_constants("xpra", "codecs", "csc_swscale", "constants")
@@ -16,5 +16,5 @@ Description: Build csc_swscale as a static library.
 +                                      "-lswscale", "-Wl,-Bdynamic"]
 +                      }
      cython_add(Extension("xpra.codecs.csc_swscale.colorspace_converter",
-                 ["xpra/codecs/csc_swscale/colorspace_converter.pyx", "xpra/codecs/csc_swscale/csc_swscale.c", "xpra/codecs/memalign/memalign.c"],
+                 ["xpra/codecs/csc_swscale/colorspace_converter.pyx", "xpra/codecs/memalign/memalign.c", "xpra/codecs/inline.c"],
                  **swscale_pkgconfig), min_version=(0, 19))
