@@ -1,4 +1,6 @@
 xpra (0.10.10-1) UNRELEASED; urgency=low
+  * fix server crash on window resize
+  * fix leak of X11 shared memory segments
   * fix focus regression
   * fix MS Windows clipboard copy including null byte
   * fix h264 decoding with old versions of avcodec
@@ -7,14 +9,17 @@ xpra (0.10.10-1) UNRELEASED; urgency=low
   * fix RGB modes exposed for transparent windows
   * fix crash on clipboard loops: detect and disable clipboard
   * fix for clients supporting more RGB formats
+  * fix auto-refresh for downscaled windows
   * support for ffmpeg version 2.x
   * support for video encoding of windows bigger than 4k
   * support video encoders that re-start the stream
+  * disable unsupported libavcodec versions
+  * remove broken modules: nvenc and nvcuda
   * fix crash in decoding error path
   * forward compatibility with namespace changes
   * forward compatibility with the new generic encoding names
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 12 Dec 2013 15:48:39 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 19 Dec 2013 16:04:31 +0700
 
 xpra (0.10.9-1) UNRELEASED; urgency=low
   * fix h264 decoding of padded images
