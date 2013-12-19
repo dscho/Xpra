@@ -3,6 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
+import os
 import weakref
 from xpra.log import Logger, debug_if_env
 log = Logger()
@@ -31,9 +32,10 @@ cdef extern from "string.h":
     void free(void * ptr) nogil
 
 
-cdef extern from "dec_avcodec.h":
-    char *get_avcodec_version()
-    char **get_supported_colorspaces()
+cdef extern from "libavcodec/version.h":
+    int LIBAVCODEC_VERSION_MAJOR
+    int LIBAVCODEC_VERSION_MINOR
+    int LIBAVCODEC_VERSION_MICRO
 
 cdef extern from "../memalign/memalign.h":
     void *xmemalign(size_t size)
@@ -96,9 +98,10 @@ cdef extern from "libavcodec/avcodec.h":
 
 
 def get_version():
-    return get_avcodec_version()
+    return (LIBAVCODEC_VERSION_MAJOR, LIBAVCODEC_VERSION_MINOR, LIBAVCODEC_VERSION_MICRO)
 
 
+MIN_AVCODEC_VERSION = 54
 COLORSPACES = None
 FORMAT_TO_ENUM = {}
 ENUM_TO_FORMAT = {}
@@ -109,6 +112,12 @@ def init_colorspaces():
         return
     #populate mappings:
     COLORSPACES = []
+    if LIBAVCODEC_VERSION_MAJOR<MIN_AVCODEC_VERSION and os.environ.get("XPRA_FORCE_AVCODEC", "0")!="1":
+        log.warn("buggy avcodec version detected: %s", get_version())
+        log.warn("cowardly refusing to use it to avoid crashes, set the environment variable:")
+        log.warn("XPRA_FORCE_AVCODEC=1")
+        log.warn("to use it anyway, at your own risk")
+        return
     for pix_fmt, av_enum_str in {
             "YUV420P"   : "AV_PIX_FMT_YUV420P",
             "YUV422P"   : "AV_PIX_FMT_YUV422P",
