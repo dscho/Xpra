@@ -394,7 +394,12 @@ class UIXpraClient(XpraClientBase):
         menu = None
         if self.menu_helper:
             menu = self.menu_helper.build()
-        return self.make_tray(menu, "Xpra", tray_icon_filename, None, xpra_tray_click, xpra_tray_mouseover, xpra_tray_exit)
+        return self.make_tray(menu, self.get_tray_title(), tray_icon_filename, None, xpra_tray_click, xpra_tray_mouseover, xpra_tray_exit)
+
+    def get_tray_title(self):
+        if self._protocol._conn:
+            return self._protocol._conn.target
+        return "Xpra"
 
     def setup_system_tray(self, client, wid, w, h):
         def tray_resized(*args):
