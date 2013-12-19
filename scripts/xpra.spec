@@ -162,7 +162,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Thu Dec 12 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
+* Thu Dec 19 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
+- fix server crash on window resize
+- fix leak of X11 shared memory segments
 - fix focus regression
 - fix MS Windows clipboard copy including null byte
 - fix h264 decoding with old versions of avcodec
@@ -171,9 +173,12 @@ So basically it's screen for remote X apps.
 - fix RGB modes exposed for transparent windows
 - fix crash on clipboard loops: detect and disable clipboard
 - fix for clients supporting more RGB formats
+- fix auto-refresh for downscaled windows
 - support for ffmpeg version 2.x
 - support for video encoding of windows bigger than 4k
 - support video encoders that re-start the stream
+- disable unsupported libavcodec versions
+- remove broken modules: nvenc and nvcuda
 - fix crash in decoding error path
 - forward compatibility with namespace changes
 - forward compatibility with the new generic encoding names
