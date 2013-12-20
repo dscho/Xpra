@@ -1464,6 +1464,7 @@ class ServerBase(object):
     def process_packet(self, proto, packet):
         try:
             handler = None
+            packet_type = None
             packet_type = packet[0]
             if type(packet_type)==int:
                 packet_type = self._aliases.get(packet_type)
