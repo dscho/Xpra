@@ -829,7 +829,8 @@ class ServerSource(object):
                 log("sound capabilities: %s", [(k,v) for k,v in capabilities.items() if k.startswith("sound.")])
             except Exception, e:
                 log.error("failed to setup sound: %s", e)
-        capabilities["encoding"] = self.encoding
+        if self.send_windows:
+            capabilities["encoding"] = self.encoding
         capabilities["mmap_enabled"] = self.mmap_size>0
         if self.mmap_client_token:
             capabilities["mmap_token"] = self.mmap_client_token
