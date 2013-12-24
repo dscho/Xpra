@@ -1,3 +1,11 @@
+v0.10.11 (2013-12-24)
+======================
+	-- fix server backtrace in error handler
+	-- restore server target information in tray tooltip
+	-- fix bencoder error with no-windows switch (missing encoding)
+	-- add support for RGBX pixel format required by some clients
+
+
 v0.10.10 (2013-19-04)
 ======================
 	-- fix server crash on window resize
