@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.10.10
+%define version 0.10.11
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -162,6 +162,12 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Tue Dec 24 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.11-1
+- fix server backtrace in error handler
+- restore server target information in tray tooltip
+- fix bencoder error with no-windows switch (missing encoding)
+- add support for RGBX pixel format required by some clients
+
 * Thu Dec 19 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
 - fix server crash on window resize
 - fix leak of X11 shared memory segments
