@@ -107,7 +107,7 @@ PREFERED_ENCODING_ORDER = ["x264", "vpx", "webp", "png", "png/P", "png/L", "rgb"
 
 ENCODINGS_TO_NAME = {
                   "x264"    : "H.264",
-                  "vpx"     : "VPx",
+                  "vpx"     : "VP8",
                   "png"     : "PNG (24/32bpp)",
                   "png/P"   : "PNG (8bpp colour)",
                   "png/L"   : "PNG (8bpp grayscale)",
@@ -118,7 +118,7 @@ ENCODINGS_TO_NAME = {
 
 ENCODINGS_HELP = {
                   "x264"    : "H.264 video codec",
-                  "vpx"     : "VPx video codec",
+                  "vpx"     : "VP8 video codec",
                   "png"     : "Portable Network Graphics (24 or 32bpp for transparency)",
                   "png/P"   : "Portable Network Graphics (8bpp colour)",
                   "png/L"   : "Portable Network Graphics (8bpp grayscale)",
