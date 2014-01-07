@@ -857,6 +857,8 @@ if WIN32:
         data_files.append(('webm', ["xpra/codecs/webm/LICENSE"]))
 
 
+    if enc_x264_ENABLED:
+        data_files.append(('', ['%s\\libx264.dll' % x264_bin_dir]))
 #*******************************************************************************
 else:
     scripts = ["scripts/xpra", "scripts/xpra_launcher"]
