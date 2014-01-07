@@ -109,10 +109,10 @@ COLORSPACES = None
 FORMAT_TO_ENUM = {}
 ENUM_TO_FORMAT = {}
 if LIBAVCODEC_VERSION_MAJOR<MIN_AVCODEC_VERSION and os.environ.get("XPRA_FORCE_AVCODEC", "0")!="1":
-    log.warn("buggy avcodec version detected: %s", get_version())
-    log.warn("cowardly refusing to use it to avoid crashes, set the environment variable:")
-    log.warn("XPRA_FORCE_AVCODEC=1")
-    log.warn("to use it anyway, at your own risk")
+    #print("buggy avcodec version detected: %s", get_version())
+    #print("cowardly refusing to use it to avoid crashes, set the environment variable:")
+    #print("XPRA_FORCE_AVCODEC=1")
+    #print("to use it anyway, at your own risk")
     raise ImportError("unsupported avcodec version: %s" % str(get_version()))
 def init_colorspaces():
     global COLORSPACES
