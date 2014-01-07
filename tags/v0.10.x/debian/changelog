@@ -1,10 +1,13 @@
 xpra (0.10.11-1) UNRELEASED; urgency=low
+  * fix popup windows focus issue
+  * fix "xpra upgrade" subcommand
   * fix server backtrace in error handler
   * restore server target information in tray tooltip
   * fix bencoder error with no-windows switch (missing encoding)
   * add support for RGBX pixel format required by some clients
+  * avoid ffmpeg "data is not aligned" warning on client
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 24 Dec 2013 12:41:09 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 07 Jan 2014 12:41:09 +0700
 
 xpra (0.10.10-1) UNRELEASED; urgency=low
   * fix server crash on window resize
