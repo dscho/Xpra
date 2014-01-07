@@ -162,11 +162,14 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Tue Dec 24 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.11-1
+* Tue Jan 07 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.11-1
+- fix popup windows focus issue
+- fix "xpra upgrade" subcommand
 - fix server backtrace in error handler
 - restore server target information in tray tooltip
 - fix bencoder error with no-windows switch (missing encoding)
 - add support for RGBX pixel format required by some clients
+- avoid ffmpeg "data is not aligned" warning on client
 
 * Thu Dec 19 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
 - fix server crash on window resize

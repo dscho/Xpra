@@ -1,9 +1,13 @@
-v0.10.11 (2013-12-24)
+v0.10.11 (2014-01-07)
 ======================
+	-- fix popup windows focus issue
+	-- fix "xpra upgrade" subcommand
 	-- fix server backtrace in error handler
 	-- restore server target information in tray tooltip
 	-- fix bencoder error with no-windows switch (missing encoding)
 	-- add support for RGBX pixel format required by some clients
+	-- avoid ffmpeg "data is not aligned" warning on client
+	-- ensure x264 encoding is supported on MS Windows shadow servers
 
 
 v0.10.10 (2013-19-04)
