@@ -113,10 +113,6 @@ def get_colorspace_str(colorspace):
     return None
 
 
-
-cdef int align4(int i):
-    return (i+3) & ~3
-
 cdef class SWSFlags:
     cdef int flags
     cdef char* flags_strs[3]
@@ -223,6 +219,9 @@ class CSCImageWrapper(ImageWrapper):
             self.csc_image.free()
             self.csc_image = None
 
+cdef int roundup(int n, int m):
+    return (n + m - 1) & ~(m - 1)
+
 
 cdef class ColorspaceConverter:
     cdef int src_width
@@ -261,8 +260,8 @@ cdef class ColorspaceConverter:
         #pre-calculate plane heights:
         self.buffer_size = 0
         for i in range(4):
-            self.out_height[i] = (int) (dst_height * dst.height_mult[i])
-            self.out_stride[i] = align4((int) (dst_width * dst.width_mult[i]))
+            self.out_height[i] = <int> (dst_height * dst.height_mult[i])
+            self.out_stride[i] = <int> roundup(<int> (dst_width * dst.width_mult[i]), 16)
             #add one extra line to height so we can read a full rowstride
             #no matter where we start to read on the last line.
             #MEMALIGN may be redundant here but it is very cheap
