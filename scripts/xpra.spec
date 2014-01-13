@@ -932,6 +932,7 @@ cd xpra-all-%{version}
 (echo "xpra/server/window_source.py" > %{S:ignored_changed_files.txt})
 %endif
 
+%debug_package
 
 %build
 cd xpra-all-%{version}
