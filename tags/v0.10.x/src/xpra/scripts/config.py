@@ -103,7 +103,7 @@ has_enc_webp = enc_webp is not None
 has_dec_webp = dec_webp is not None
 
 
-PREFERED_ENCODING_ORDER = ["x264", "vpx", "webp", "png", "png/P", "png/L", "rgb", "jpeg"]
+PREFERED_ENCODING_ORDER = ["x264", "vpx", "png", "png/P", "png/L", "rgb", "jpeg" "webp"]
 
 ENCODINGS_TO_NAME = {
                   "x264"    : "H.264",
@@ -122,12 +122,12 @@ ENCODINGS_HELP = {
                   "png"     : "Portable Network Graphics (24 or 32bpp for transparency)",
                   "png/P"   : "Portable Network Graphics (8bpp colour)",
                   "png/L"   : "Portable Network Graphics (8bpp grayscale)",
-                  "webp"    : "WebP compression (lossless or lossy)",
+                  "webp"    : "WebP compression (lossless or lossy) - leaks memory, do not use!",
                   "jpeg"    : "JPEG lossy compression",
                   "rgb"     : "Raw RGB pixels, lossless, compressed using zlib (24 or 32bpp for transparency)",
                   }
 
-HELP_ORDER = ("x264", "vpx", "webp", "png", "png/P", "png/L", "rgb", "jpeg")
+HELP_ORDER = ("x264", "vpx", "png", "png/P", "png/L", "rgb", "jpeg", "webp")
 
 def encodings_help(encodings):
     h = []
