@@ -1,3 +1,12 @@
+v0.10.12 (2014-01-13)
+======================
+	-- fix missing auto-refresh with lossy colourspace conversion
+	-- fix spurious warning from Nvidia OpenGL driver
+	-- fix crash in bencoder caused by empty data to encode
+	-- big warnings about webp leaking memory
+	-- generated debuginfo RPMs
+
+
 v0.10.11 (2014-01-07)
 ======================
 	-- fix popup windows focus issue
