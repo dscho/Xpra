@@ -258,9 +258,9 @@ class WindowSource(object):
         #no suffix for metadata (as it is the same for all clients):
         info[prefix+"dimensions"] = self.window_dimensions
         info[prefix+"encoding"+suffix] = self.encoding
-        info[prefix+"suspended"+suffix] = self.suspended
-        info[prefix+"property.scaling"+suffix] = self.scaling
-        info[prefix+"property.fullscreen"+suffix] = self.fullscreen
+        info[prefix+"suspended"+suffix] = self.suspended or False
+        info[prefix+"property.scaling"+suffix] = self.scaling or (1, 1)
+        info[prefix+"property.fullscreen"+suffix] = self.fullscreen or False
         self.statistics.add_stats(info, prefix, suffix)
 
         #batch delay stats:
