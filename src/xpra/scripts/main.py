@@ -336,6 +336,9 @@ When unspecified, all the available codecs are allowed and the first one is used
         options.encoding = "x264"
     elif options.encoding=="vp8":
         options.encoding = "vpx"
+    elif options.encoding=="webp":
+        #warn that webp should not be used:
+        print("Warning: webp encoding may leak memory!")
 
     #special handling for URL mode:
     #xpra attach xpra://[mode:]host:port/?param1=value1&param2=value2
