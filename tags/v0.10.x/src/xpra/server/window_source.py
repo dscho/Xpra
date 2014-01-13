@@ -56,6 +56,7 @@ try:
 except:
     xor_str = None
 from xpra.os_util import StringIOClass
+from xpra.codecs.codec_constants import LOSSY_PIXEL_FORMATS
 from xpra.scripts.config import enc_webp, has_enc_webp_lossless, webp_handlers, PIL
 
 
@@ -718,7 +719,8 @@ class WindowSource(object):
         #and if not batching,
         #we would then do a full_quality_refresh when we should not...
         actual_quality = client_options.get("quality")
-        if actual_quality is None:
+        lossy_csc = client_options.get("csc") in LOSSY_PIXEL_FORMATS
+        if actual_quality is None and not lossy_csc:
             debug("schedule_auto_refresh: was a lossless %s packet, ignoring", coding)
             #lossless already: small region sent lossless or encoding is lossless
             #don't change anything: if we have a timer, keep it
@@ -728,7 +730,7 @@ class WindowSource(object):
         if len(self.auto_refresh_encodings)==0:
             return
         ww, wh = window.get_dimensions()
-        if client_options.get("scaled_size") is None:
+        if client_options.get("scaled_size") is None and not lossy_csc:
             if actual_quality>=AUTO_REFRESH_THRESHOLD:
                 if w*h>=ww*wh:
                     debug("schedule_auto_refresh: high quality (%s%%) full frame (%s pixels), cancelling refresh timer %s", actual_quality, w*h, self.refresh_timer)
