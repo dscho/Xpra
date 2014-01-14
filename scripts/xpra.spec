@@ -167,6 +167,7 @@ So basically it's screen for remote X apps.
 - fix spurious warning from Nvidia OpenGL driver
 - fix OpenGL client crash with some drivers (ie: VirtualBox)
 - fix crash in bencoder caused by empty data to encode
+- fix ffmpeg2 h264 decoding (ie: Fedora 20+)
 - big warnings about webp leaking memory
 - generated debuginfo RPMs
 
