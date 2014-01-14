@@ -97,9 +97,9 @@
 %define static_swscale 1
 %endif
 
-%if 0%{?no_webp}
+
+#remove dependency on webp for now since it leaks memory:
 %define requires_webp %{nil}
-%endif
 %if 0%{?no_sound}
 %define requires_sound %{nil}
 %endif
