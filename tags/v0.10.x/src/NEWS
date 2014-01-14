@@ -1,7 +1,8 @@
-v0.10.12 (2014-01-13)
+v0.10.12 (2014-01-14)
 ======================
 	-- fix missing auto-refresh with lossy colourspace conversion
 	-- fix spurious warning from Nvidia OpenGL driver
+	-- fix OpenGL client crash with some drivers (ie: VirtualBox)
 	-- fix crash in bencoder caused by empty data to encode
 	-- fix OSX popup focus issue
 	-- big warnings about webp leaking memory

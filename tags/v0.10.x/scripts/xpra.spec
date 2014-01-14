@@ -162,9 +162,10 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Mon Jan 13 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.12-1
+* Tue Jan 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.12-1
 - fix missing auto-refresh with lossy colourspace conversion
 - fix spurious warning from Nvidia OpenGL driver
+- fix OpenGL client crash with some drivers (ie: VirtualBox)
 - fix crash in bencoder caused by empty data to encode
 - big warnings about webp leaking memory
 - generated debuginfo RPMs
