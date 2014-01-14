@@ -372,11 +372,8 @@ cdef class Decoder:
     def get_height(self):
         return self.height
 
-    def get_encoding(self):
-        return "x264"
-
     def get_type(self):                             #@DuplicatedSignature
-        return "avcodec"
+        return "x264"
 
     def decompress_image(self, input, options):
         cdef unsigned char * padded_buf = NULL
