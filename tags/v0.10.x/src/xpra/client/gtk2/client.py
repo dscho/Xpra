@@ -16,7 +16,6 @@ except:
     pass
 import gtk
 from gtk import gdk
-gtk.threads_init()
 
 from xpra.os_util import thread
 from xpra.client.gtk_base.gtk_client_base import GTKXpraClient, xor_str
