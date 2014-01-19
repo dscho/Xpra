@@ -7,7 +7,7 @@
 <meta http-equiv="P3P" content='CP="IDC DSP COR CURa ADMa OUR IND PHY ONL COM 
 STA"'>
 <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-<title>SOFA Statistics Report 2014-01-19_14:31:36</title>
+<title>SOFA Statistics Report 2014-01-19_14:47:03</title>
 
 <link rel='stylesheet' type='text/css' 
 href="sofastats_report_extras/tundra.css" />
@@ -29,7 +29,7 @@ if(dojo.isIE){
 makeObjects = function(){
 
     //n_charts_start
-    var n_charts = 3;
+    var n_charts = 6;
     //n_charts_end
     for(var i=0;i<n_charts;i++){
         try{
@@ -366,14 +366,19 @@ dojo_style_end
 
 
 
+
+
 <br><br>
 <hr style="clear: both; ">
 
 <!--VISUAL_DIVIDER_BEFORE_THIS-->
 <table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
 <span class='tbltitle0'>
+Average Damage Latency
 </span>
+<br>
 <span class='tblsubtitle0'>
+The time it takes to process a frame is generally about the same, but under stress (x11perf) it is much improved.
 </span>
 </th></tr></thead></table>
 <script type="text/javascript">
@@ -434,7 +439,7 @@ makechart00 = function(){
     chartconf["axisLabelRotate"] = 0;
     chartconf["yTitleOffset"] = 57.5;
     chartconf["marginOffsetL"] = 30.5;
-    chartconf["yTitle"] = "Mean Avg_Damage_Latency_(Ms)";
+    chartconf["yTitle"] = "Avg_Damage_Latency_(Ms)";
     chartconf["tooltipBorderColour"] = "#736354";
     chartconf["connectorStyle"] = "defbrown";
     chartconf["ymax"] = 113.3;
@@ -451,7 +456,7 @@ makechart00 = function(){
 
         <p style="float: left; font-weight: bold; margin-right: 12px; 
                 margin-top: 9px;">
-            _Custom_Params:
+            Custom_Params:
         </p>
         <div id="legendMychart00">
             </div>
@@ -470,8 +475,11 @@ makechart00 = function(){
 <!--VISUAL_DIVIDER_BEFORE_THIS-->
 <table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
 <span class='tbltitle0'>
+Average Batch Delay
 </span>
+<br>
 <span class='tblsubtitle0'>
+Under stress (high fps), lz4 allows us to push the data out more quickly and batch less.
 </span>
 </th></tr></thead></table>
 <script type="text/javascript">
@@ -531,7 +539,7 @@ makechart01 = function(){
     chartconf["axisLabelRotate"] = 0;
     chartconf["yTitleOffset"] = 51.0;
     chartconf["marginOffsetL"] = 24.0;
-    chartconf["yTitle"] = "Mean Avg_Batch_Delay_(Ms)";
+    chartconf["yTitle"] = "Avg_Batch_Delay_(Ms)";
     chartconf["tooltipBorderColour"] = "#736354";
     chartconf["connectorStyle"] = "defbrown";
     chartconf["ymax"] = 33.0;
@@ -548,11 +556,11 @@ makechart01 = function(){
 
         <p style="float: left; font-weight: bold; margin-right: 12px; 
                 margin-top: 9px;">
-            _Custom_Params:
+            Custom_Params:
         </p>
         <div id="legendMychart01">
             </div>
-</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg _Avg_Batch_Delay_(Ms) By Test_Command By _Cus--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg _Avg_Batch_Delay_(Ms) By Test_Command By Cus--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
 
 
 
@@ -567,8 +575,11 @@ makechart01 = function(){
 <!--VISUAL_DIVIDER_BEFORE_THIS-->
 <table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
 <span class='tbltitle0'>
+Regions per second
 </span>
+<br>
 <span class='tblsubtitle0'>
+Just like the batch delay, this shows how we manage to increase the number of frames per second.
 </span>
 </th></tr></thead></table>
 <script type="text/javascript">
@@ -628,7 +639,7 @@ makechart02 = function(){
     chartconf["axisLabelRotate"] = 0;
     chartconf["yTitleOffset"] = 51.0;
     chartconf["marginOffsetL"] = 24.0;
-    chartconf["yTitle"] = "Mean Regions/S";
+    chartconf["yTitle"] = "Regions/S";
     chartconf["tooltipBorderColour"] = "#736354";
     chartconf["connectorStyle"] = "defbrown";
     chartconf["ymax"] = 24.2;
@@ -645,11 +656,286 @@ makechart02 = function(){
 
         <p style="float: left; font-weight: bold; margin-right: 12px; 
                 margin-top: 9px;">
-            _Custom_Params:
+            Custom_Params:
         </p>
         <div id="legendMychart02">
             </div>
-</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg _Regions/S By Test_Command By _Custom_Params --><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg _Regions/S By Test_Command By Custom_Params --><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Bytes per packet
+</span>
+<br>
+<span class='tblsubtitle0'>
+lz4 is much faster than zlib, but overall the packets aren't bigger.
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl03 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart03 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = " zlib";
+    series0["yVals"] = [39749.0, 49276.0, 32743.0, 1788.0, 61583.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: [' glxgears,  zlib<br>39749.0', ' moebiusgears,  zlib<br>49276.0', ' polytopes,  zlib<br>32743.0', ' x11perf,  zlib<br>1788.0', ' xterm,  zlib<br>61583.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "lz4";
+    series1["yVals"] = [42057.0, 49992.0, 14264.0, 1313.0, 82085.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: [' glxgears, lz4<br>42057.0', ' moebiusgears, lz4<br>49992.0', ' polytopes, lz4<br>14264.0', ' x11perf, lz4<br>1313.0', ' xterm, lz4<br>82085.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "glxgears"},
+            {value: 2, text: "moebiusgears"},
+            {value: 3, text: "polytopes"},
+            {value: 4, text: "x11perf"},
+            {value: 5, text: "xterm"}];
+    chartconf["xgap"] = 10;
+    chartconf["xfontsize"] = 10;
+    chartconf["sofaHl"] = sofaHl03;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "_Test_Command";
+    chartconf["axisLabelDrop"] = 15;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 70.5;
+    chartconf["marginOffsetL"] = 43.5;
+    chartconf["yTitle"] = "Bytes_Per_Packet";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 90293.5;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart03", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+
+<div id="mychart03" 
+    style="width: 608.5px; height: 325px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart03">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Avg Bytes_Per_Packet By _Test_Command By Custom_P--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+xonotic
+</span>
+<br>
+<span class='tblsubtitle0'>
+As above (only shown separately because of the difference in scale).
+<br>
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl04 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart04 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = " zlib";
+    series0["yVals"] = [1218941.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: [' xonotic-linux64-glx,  zlib<br>1218941.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "lz4";
+    series1["yVals"] = [1556935.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: [' xonotic-linux64-glx, lz4<br>1556935.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "                 " + labelLineBreak + "xonotic-linux64-glx"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl04;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "_Test_Command";
+    chartconf["axisLabelDrop"] = 22;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 83.5;
+    chartconf["marginOffsetL"] = 71.5;
+    chartconf["yTitle"] = "Bytes_Per_Packet";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 1712628.5;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart04", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Encoding:  rgb</b></p>
+<div id="mychart04" 
+    style="width: 431.5px; height: 332px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart04">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_xonotic_Encoding:  rgb--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl05 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart05 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = " zlib";
+    series0["yVals"] = [207266.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: [' xonotic-linux64-glx,  zlib<br>207266.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "lz4";
+    series1["yVals"] = [150816.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: [' xonotic-linux64-glx, lz4<br>150816.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "                 " + labelLineBreak + "xonotic-linux64-glx"}];
+    chartconf["xgap"] = 16.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl05;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "_Test_Command";
+    chartconf["axisLabelDrop"] = 22;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 83.5;
+    chartconf["marginOffsetL"] = 71.5;
+    chartconf["yTitle"] = "Bytes_Per_Packet";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 1712628.5;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart05", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Encoding:  h264</b></p>
+<div id="mychart05" 
+    style="width: 431.5px; height: 332px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart05">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_xonotic_Encoding:  h264--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
 
 
 
