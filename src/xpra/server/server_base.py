@@ -479,7 +479,7 @@ class ServerBase(ServerCore):
         from xpra.server.source import ServerSource
         ss = ServerSource(proto, drop_client,
                           self.idle_add, self.timeout_add, self.source_remove,
-                          self.get_transient_for,
+                          self.get_transient_for, self.get_focus,
                           get_window_id,
                           self.supports_mmap,
                           self.core_encodings, self.encodings, self.default_encoding,
@@ -643,7 +643,8 @@ class ServerBase(ServerCore):
                     "compression", "encoder",
                     "sound-output",
                     "scaling",
-                    "suspend", "resume", "name")
+                    "suspend", "resume", "name",
+                    "client")
         if command=="help":
             return respond(0, "control supports: %s" % (", ".join(commands)))
 
@@ -660,6 +661,14 @@ class ServerBase(ServerCore):
         elif len(sss)>1:
             return respond(3, "more than one client connected")
         cproto, csource = sss[0]
+
+        def may_forward_client_command(client_command):
+            if client_command[0] not in csource.control_commands:
+                log.info("not forwarded to client (not supported)")
+                return  False
+            csource.send_client_command(*client_command)
+            return True
+
         log("handle_command_request will apply to client: %s", csource)
         if command=="compression":
             if len(args)!=2:
@@ -668,9 +677,11 @@ class ServerBase(ServerCore):
             opts = ("lz4", "zlib")
             if compression=="lz4":
                 cproto.enable_lz4()
+                may_forward_client_command(["enable_lz4"])
                 return success()
             elif compression=="zlib":
                 cproto.enable_zlib()
+                may_forward_client_command(["enable_zlib"])
                 return success()
             return arg_err(1, "must be one of: %s" % (", ".join(opts)))
         elif command=="encoder":
@@ -680,9 +691,11 @@ class ServerBase(ServerCore):
             opts = ("bencode", "rencode")
             if encoder=="bencode":
                 cproto.enable_bencode()
+                may_forward_client_command(["enable_bencode"])
                 return success()
             elif encoder=="rencode":
                 cproto.enable_rencode()
+                may_forward_client_command(["enable_rencode"])
                 return success()
             return arg_err(1, "must be one of: %s" % (", ".join(opts)))
         elif command=="sound-output":
@@ -727,7 +740,16 @@ class ServerBase(ServerCore):
                 return argn_err(1)
             self.session_name = args[1]
             log.info("changed session name: %s", self.session_name)
+            may_forward_client_command(["name"])
             return respond(0, "session name set")
+        elif command=="client":
+            if len(args)<2:
+                return argn_err("at least 2")
+            client_command = args[1:]
+            if client_command[0] not in csource.control_commands:
+                return respond(12, "client does not support control command '%s'" % client_command[0])
+            csource.send_client_command(*client_command)
+            return respond(0, "client control command '%s' forwarded" % (client_command[0]))
         else:
             return respond(9, "internal state error: invalid command '%s'", command)
 
@@ -885,6 +907,11 @@ class ServerBase(ServerCore):
     def _focus(self, server_source, wid, modifiers):
         log("_focus(%s,%s)", wid, modifiers)
 
+    def get_focus(self):
+        #can be overriden by subclasses that do manage focus
+        #(ie: not shadow servers which only have a single window)
+        #default: no focus
+        return -1
 
     def _add_new_window_common(self, window):
         wid = self._max_window_id
@@ -1260,7 +1287,7 @@ class ServerBase(ServerCore):
         ss.user_event()
 
 
-    def _move_pointer(self, pos):
+    def _move_pointer(self, wid, pos):
         raise NotImplementedError()
 
     def _process_mouse_common(self, proto, wid, pointer, modifiers):

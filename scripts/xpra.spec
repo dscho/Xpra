@@ -131,7 +131,7 @@
 %define vpx_build_args --without-vpx
 %else
 %if 0%{?static_ffmpeg}
-%define ffmpeg_build_args --with-dec_avcodec --with-avcodec_static --with-csc_swscale --with-swscale_static
+%define ffmpeg_build_args --without-dec_avcodec --with-dec_avcodec2 --with-avcodec2_static --with-csc_swscale --with-swscale_static
 %endif
 %if 0%{?static_vpx}
 %define vpx_build_args --with-vpx --with-vpx_static
@@ -142,6 +142,8 @@
 %endif
 
 
+#remove dependency on webp for now since it leaks memory:
+%define requires_webp %{nil}
 %if 0%{?no_sound}
 %define requires_sound %{nil}
 %endif
@@ -194,23 +196,47 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Dec 04 2013 Antoine Martin <antoine@devloop.org.uk> 0.11.0-1
+* Mon Jan 20 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.0-1
 - NVENC hardware h264 encoding acceleration
 - OpenCL and CUDA colourspace conversion acceleration
 - proxy server mode for serving multiple sessions through one port
+- support for sharing a TCP port with a web server
 - server control command for modifying settings at runtime
 - server exit command, which leaves Xvfb running
 - publish session via mDNS
 - OSX client two way clipboard support
-- support for transparency in 8-bit PNG modes
+- support for transparency with OpenGL window rendering
+- support for transparency with 8-bit PNG modes
 - support for more authentication mechanisms
-- lz4 compression
+- support remote shadow start via ssh
+- support faster lz4 compression
+- faster bencoder, rewritten in Cython
+- builtin fallback colourspace conversion module
 - real time frame latency graphs
-- improved system tray forwarding support
+- improved system tray forwarding support and native integration
 - removed most of the Cython/C code duplication
 - stricter and safer value parsing
 - more detailed status information via UI and "xpra info"
+- experimental HTML5 client
 - drop non xpra clients with a more friendly response
+
+* Tue Jan 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.12-1
+- fix missing auto-refresh with lossy colourspace conversion
+- fix spurious warning from Nvidia OpenGL driver
+- fix OpenGL client crash with some drivers (ie: VirtualBox)
+- fix crash in bencoder caused by empty data to encode
+- fix ffmpeg2 h264 decoding (ie: Fedora 20+)
+- big warnings about webp leaking memory
+- generated debuginfo RPMs
+
+* Tue Jan 07 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.11-1
+- fix popup windows focus issue
+- fix "xpra upgrade" subcommand
+- fix server backtrace in error handler
+- restore server target information in tray tooltip
+- fix bencoder error with no-windows switch (missing encoding)
+- add support for RGBX pixel format required by some clients
+- avoid ffmpeg "data is not aligned" warning on client
 
 * Wed Dec 04 2013 Antoine Martin <antoine@devloop.org.uk> 0.10.10-1
 - fix focus regression
@@ -907,9 +933,9 @@ So basically it's screen for remote X apps.
 - first rpm spec file
 
 %prep
-rm -rf $RPM_BUILD_DIR/xpra-all-%{version}
-zcat $RPM_SOURCE_DIR/xpra-all-%{version}.tar.gz | tar -xvf -
-cd xpra-all-%{version}
+rm -rf $RPM_BUILD_DIR/xpra-%{version}
+zcat $RPM_SOURCE_DIR/xpra-%{version}.tar.gz | tar -xvf -
+cd xpra-%{version}
 %if 0%{?no_strict}
 (sed -e -i s'/strict_ENABLED = True/strict_ENABLED = False/g' setup.py)
 (echo "setup.py" >> %{S:ignored_changed_files.txt})
@@ -940,15 +966,16 @@ cd xpra-all-%{version}
 (echo "xpra/server/window_source.py" >> %{S:ignored_changed_files.txt})
 %endif
 
+%debug_package
 
 %build
-cd xpra-all-%{version}
+cd xpra-%{version}
 rm -rf build install
 CFLAGS=-O2 python setup.py build %{ffmpeg_build_args} %{vpx_build_args} %{x264_build_args} %{webp_build_args} %{server_build_args} %{avcodec_build_args}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-cd xpra-all-%{version}
+cd xpra-%{version}
 %{__python} setup.py install -O1 %{dummy} --prefix /usr --skip-build --root %{buildroot}
 
 #we should pass arguments to setup.py but rpm macros make this too difficult
@@ -1023,7 +1050,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/xpra.desktop
 %post
 %if 0%{?static_ffmpeg}
 chcon -t texrel_shlib_t %{python_sitelib}/xpra/codecs/csc_swscale/colorspace_converter.so
-chcon -t texrel_shlib_t %{python_sitelib}/xpra/codecs/dec_avcodec/decoder.so
+chcon -t texrel_shlib_t %{python_sitelib}/xpra/codecs/dec_avcodec*/decoder.so
 %endif
 %if 0%{?static_vpx}
 chcon -t texrel_shlib_t %{python_sitelib}/xpra/codecs/vpx/encoder.so

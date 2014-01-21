@@ -21,7 +21,6 @@ import gtk
 from gtk import gdk
 import gobject
 gobject.threads_init()
-gtk.threads_init()
 import pango
 
 
@@ -289,7 +288,7 @@ class ApplicationWindow:
     def get_icon(self, icon_name):
         icon_filename = os.path.join(get_icon_dir(), icon_name)
         if os.path.exists(icon_filename):
-            return gtk.gdk.pixbuf_new_from_file(icon_filename)
+            return gdk.pixbuf_new_from_file(icon_filename)
         return None
 
     def mode_changed(self, *args):

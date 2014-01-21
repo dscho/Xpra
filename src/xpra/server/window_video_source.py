@@ -69,7 +69,8 @@ class WindowVideoSource(WindowSource):
         #0.10 onwards should have specified csc_modes:
         self.csc_modes = self.encoding_options.get("csc_modes", def_csc_modes)
 
-        for x in ("vp8", "h264"):
+        self.video_encodings = ("vp8", "vp9", "h264")
+        for x in self.video_encodings:
             if x in self.server_core_encodings:
                 self._encoders[x] = self.video_encode
 
@@ -186,7 +187,7 @@ class WindowVideoSource(WindowSource):
         #now figure out if we need to send edges separately:
         dw = w - (w & self.width_mask)
         dh = h - (h & self.height_mask)
-        if coding in ("vp8", "h264") and (dw>0 or dh>0):
+        if coding in self.video_encodings and (dw>0 or dh>0):
             if dw>0:
                 lossless = self.find_common_lossless_encoder(window.has_alpha(), coding, dw*h)
                 WindowSource.process_damage_region(self, damage_time, window, x+w-dw, y, dw, h, lossless, options)
@@ -194,6 +195,9 @@ class WindowVideoSource(WindowSource):
                 lossless = self.find_common_lossless_encoder(window.has_alpha(), coding, w*dh)
                 WindowSource.process_damage_region(self, damage_time, window, x, y+h-dh, x+w, dh, lossless, options)
 
+
+    def must_encode_full_frame(self, window, encoding):
+        return WindowSource.must_encode_full_frame(self, window, encoding) or (encoding in self.video_encodings)
 
     def do_get_best_encoding(self, batching, has_alpha, is_tray, is_OR, pixel_count, ww, wh, current_encoding):
         """
@@ -204,7 +208,7 @@ class WindowVideoSource(WindowSource):
         if encoding is not None:
             #superclass knows best (usually a tray or transparent window):
             return encoding
-        if current_encoding not in ("h264", "vp8"):
+        if current_encoding not in self.video_encodings:
             return None
         if ww<self.min_w or ww>self.max_w or wh<self.min_h or wh>self.max_h:
             #video encoder cannot handle this size!
@@ -532,7 +536,6 @@ class WindowVideoSource(WindowSource):
             Checks that the current pipeline is still valid
             for the given input. If not, close it and make a new one.
         """
-        debug("check_pipeline%s", (encoding, width, height, src_format))
         #must be called with video lock held!
         if self.do_check_pipeline(encoding, width, height, src_format):
             return True  #OK!
@@ -552,7 +555,6 @@ class WindowVideoSource(WindowSource):
             Checks that the current pipeline is still valid
             for the given input. If not, close it and make a new one.
         """
-        debug("do_check_pipeline%s", (encoding, width, height, src_format))
         #must be called with video lock held!
         if self._video_encoder is None:
             return False
@@ -573,20 +575,20 @@ class WindowVideoSource(WindowSource):
                                             self._csc_encoder.get_dst_format(), self._video_encoder.get_src_format(), self._csc_encoder.get_info())
                 return False
 
-            encoder_src_format = self._csc_encoder.get_dst_format()
+            #encoder will take its input from csc:
             encoder_src_width = self._csc_encoder.get_dst_width()
             encoder_src_height = self._csc_encoder.get_dst_height()
         else:
             #direct to video encoder without csc:
-            encoder_src_format = src_format
             encoder_src_width = width & self.width_mask
             encoder_src_height = height & self.height_mask
 
-        if self._video_encoder.get_src_format()!=encoder_src_format:
-            debug("check_pipeline video: invalid source format %s, expected %s",
-                                            self._video_encoder.get_src_format(), encoder_src_format)
-            return False
-        elif self._video_encoder.get_encoding()!=encoding:
+            if self._video_encoder.get_src_format()!=src_format:
+                debug("check_pipeline video: invalid source format %s, expected %s",
+                                                self._video_encoder.get_src_format(), src_format)
+                return False
+
+        if self._video_encoder.get_encoding()!=encoding:
             debug("check_pipeline video: invalid encoding %s, expected %s",
                                             self._video_encoder.get_encoding(), encoding)
             return False
@@ -604,6 +606,7 @@ class WindowVideoSource(WindowSource):
             we try to create a working pipeline, trying each option
             until one succeeds.
         """
+        assert width>0 and height>0, "invalid dimensions: %sx%s" % (width, height)
         start = time.time()
         debug("setup_pipeline%s", (scores, width, height, src_format))
         for option in scores:
@@ -654,6 +657,9 @@ class WindowVideoSource(WindowSource):
                     if encoder_scaling!=(1,1) and not encoder_spec.can_scale:
                         debug("scaling is now enabled, so skipping %s", encoder_spec)
                         continue
+                if width<=0 or height<=0:
+                    #log.warn("skipping invalid dimensions..")
+                    continue
                 enc_start = time.time()
                 self._video_encoder = encoder_spec.codec_class()
                 self._video_encoder.init_context(enc_width, enc_height, enc_in_format, encoder_spec.encoding, quality, speed, encoder_scaling, self.encoding_options)
@@ -680,7 +686,7 @@ class WindowVideoSource(WindowSource):
 
     def video_encode(self, encoding, image, options):
         """
-            This method is used by make_data_packet to encode frames using h264 or vp8.
+            This method is used by make_data_packet to encode frames using video encoders.
             Video encoders only deal with fixed dimensions,
             so we must clean and reinitialize the encoder if the window dimensions
             has changed.

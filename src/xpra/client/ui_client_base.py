@@ -91,6 +91,7 @@ class UIXpraClient(XpraClientBase):
         self.server_last_info = None
         self.info_request_pending = False
         self.screen_size_change_pending = False
+        self.core_encodings = None
         self.encoding = self.get_encodings()[0]
 
         #sound:
@@ -311,7 +312,7 @@ class UIXpraClient(XpraClientBase):
         log("UIXpraClient.cleanup() done")
 
 
-    def show_session_info(self):
+    def show_session_info(self, *args):
         log.warn("show_session_info() is not implemented in %s", self)
 
 
@@ -328,34 +329,43 @@ class UIXpraClient(XpraClientBase):
         return [x for x in PREFERED_ENCODING_ORDER if x in cenc and x not in ("rgb32", "rgb24")]
 
     def get_core_encodings(self):
+        if self.core_encodings is None:
+            self.core_encodings = self.do_get_core_encodings()
+        return self.core_encodings
+
+    def do_get_core_encodings(self):
         """
             This method returns the actual encodings supported.
             ie: ["rgb24", "vp8", "webp", "png", "png/L", "png/P", "jpeg", "h264", "vpx"]
             It is often overriden in the actual client class implementations,
-            where extra encodings can be added (generally just 'rgb32' for transparency).
+            where extra encodings can be added (generally just 'rgb32' for transparency),
+            or removed if the toolkit implementation class is more limited.
         """
         #we always support rgb24:
         core_encodings = ["rgb24"]
         for modules, encodings in {
-              ("dec_vpx", "csc_swscale")        : ["vp8"],
               ("dec_webp",)                     : ["webp"],
               ("PIL",)                          : ["png", "png/L", "png/P", "jpeg"],
                }.items():
             missing = [x for x in modules if not has_codec(x)]
             if len(missing)>0:
-                log("get_core_encodings() not adding %s because of missing modules: %s", encodings, missing)
+                log("do_get_core_encodings() not adding %s because of missing modules: %s", encodings, missing)
                 continue
             core_encodings += encodings
-        #special case for avcodec which may be able to decode both 'vp8' and 'h264':
-        #(both of which "need" swscale - until we get more clever
-        # and test the availibility of GL windows)
-        if has_codec("csc_swscale"):        #or has_codec("csc_opencl"): (see window_backing_base)
-            avcodec_module = get_codec("dec_avcodec")
-            if avcodec_module:
-                encodings = avcodec_module.get_codecs()
-                log("avcodec supports %s", encodings)
-                core_encodings += encodings
-        log("get_core_encodings()=%s", core_encodings)
+        #special case for "dec_avcodec" which may be able to decode both 'vp8' and 'h264':
+        #and for "dec_vpx" which may be able to decode both 'vp8' and 'vp9':
+        #(both may "need" some way of converting YUV data to RGB - at least until we get more clever
+        # and test the availibility of GL windows... but those aren't always applicable..
+        # or test if the codec can somehow gives us plain RGB out)
+        if has_codec("csc_swscale"):    # or has_codec("csc_opencl"): (see window_backing_base)
+            for module in ("dec_avcodec", "dec_avcodec2", "dec_vpx"):
+                decoder = get_codec(module)
+                log("decoder(%s)=%s", module, decoder)
+                if decoder:
+                    for encoding in decoder.get_encodings():
+                        if encoding not in core_encodings:
+                            core_encodings.append(encoding)
+        log("do_get_core_encodings()=%s", core_encodings)
         #remove duplicates and use prefered encoding order:
         return [x for x in PREFERED_ENCODING_ORDER if x in set(core_encodings)]
 
@@ -693,8 +703,17 @@ class UIXpraClient(XpraClientBase):
             "generic-rgb-encodings"     : True,
             "encodings"                 : self.get_encodings(),
             "encodings.core"            : self.get_core_encodings(),
-            "encodings.rgb_formats"     : ["RGB", "RGBA"]
+            "encodings.rgb_formats"     : ["RGB", "RGBA"],
             })
+        control_commands = ["show_session_info", "enable_bencode", "enable_zlib"]
+        from xpra.net.protocol import use_bencode, use_rencode
+        if use_lz4:
+            control_commands.append("enable_lz4")
+        if use_bencode:
+            control_commands.append("enable_bencode")
+        if use_rencode:
+            control_commands.append("enable_rencode")
+        capabilities["control_commands"] = control_commands
         for k,v in codec_versions.items():
             capabilities["encoding.%s.version" % k] = v
         if self.encoding:
@@ -1084,6 +1103,33 @@ class UIXpraClient(XpraClientBase):
             log.warn("error processing rpc reply handler %s(%s) : %s", rh, args, e)
 
 
+    def _process_control(self, packet):
+        command = packet[1]
+        if command=="show_session_info":
+            args = packet[2:]
+            log("calling show_session_info%s on server request", args)
+            self.show_session_info(*args)
+        elif command=="enable_zlib":
+            log.info("switching to zlib on server request")
+            self._protocol.enable_zlib()
+        elif command=="enable_lz4":
+            log.info("switching to lz4 on server request")
+            self._protocol.enable_lz4()
+        elif command=="enable_bencode":
+            log.info("switching to bencode on server request")
+            self._protocol.enable_bencode()
+        elif command=="enable_rencode":
+            log.info("switching to rencode on server request")
+            self._protocol.enable_rencode()
+        elif command=="name":
+            assert len(args)>=3
+            self.session_name = args[2]
+            log.info("session name updated from server: %s", self.session_name)
+            #TODO: reset tray tooltip, session info title, etc..
+        else:
+            log.warn("received invalid control command from server: %s", command)
+
+
     def start_sending_sound(self):
         """ (re)start a sound source and emit client signal """
         soundlog("start_sending_sound()")
@@ -1384,6 +1430,20 @@ class UIXpraClient(XpraClientBase):
     def make_new_window(self, wid, x, y, w, h, metadata, override_redirect, client_properties, auto_refresh_delay):
         client_window_classes = self.get_client_window_classes(metadata, override_redirect)
         group_leader_window = self.get_group_leader(metadata, override_redirect)
+        #horrendous OSX workaround for OR windows to prevent them from being pushed under other windows:
+        #find a "transient-for" value using the pid to find a suitable window
+        #if possible, choosing the currently focused window (if there is one..)
+        pid = metadata.get("pid", 0)
+        if override_redirect and sys.platform=="darwin" and pid>0 and metadata.get("transient-for") is None:
+            tfor = None
+            for twid, twin in self._id_to_window.items():
+                if not twin._override_redirect and twin._metadata.get("pid")==pid:
+                    tfor = twin
+                    if twid==self._focused or self._focused is None:
+                        break
+            if tfor:
+                log("%s: forcing transient for %s", sys.platform, twid)
+                metadata["transient-for"] = twid
         window = None
         for cwc in client_window_classes:
             try:
@@ -1582,7 +1642,8 @@ class UIXpraClient(XpraClientBase):
             self.destroy_window(wid, window)
         if len(self._id_to_window)==0:
             log("last window gone, clearing key repeat")
-            self.keyboard_helper.clear_repeat()
+            if self.keyboard_helper:
+                self.keyboard_helper.clear_repeat()
 
     def destroy_window(self, wid, window):
         log("destroy_window(%s, %s)", wid, window)
@@ -1630,6 +1691,7 @@ class UIXpraClient(XpraClientBase):
             "desktop_size":         self._process_desktop_size,
             "window-icon":          self._process_window_icon,
             "rpc-reply":            self._process_rpc_reply,
+            "control" :             self._process_control,
             "draw":                 self._process_draw,
             # "clipboard-*" packets are handled by a special case below.
             }.items():

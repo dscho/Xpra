@@ -15,7 +15,7 @@ import gobject
 from xpra.log import Logger, debug_if_env
 log = Logger()
 debug = debug_if_env(log, "XPRA_OPENGL_DEBUG")
-OPENGL_DEBUG = os.environ.get("XPRA_OPENGL_DEBUG", "1")=="1"
+OPENGL_DEBUG = os.environ.get("XPRA_OPENGL_DEBUG", "0")=="1"
 
 
 from xpra.codecs.codec_constants import get_subsampling_divs
@@ -31,6 +31,7 @@ from OpenGL.GL import GL_PROJECTION, GL_MODELVIEW, \
     GL_RGB, GL_RGBA, GL_BGR, GL_BGRA, \
     GL_BLEND, GL_ZERO, GL_ONE, \
     GL_FUNC_ADD, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, \
+    GL_TEXTURE_MAX_LEVEL, GL_TEXTURE_2D, \
     glBlendEquationSeparate, glBlendFuncSeparate, \
     glActiveTexture, glTexSubImage2D, \
     glGetString, glViewport, glMatrixMode, glLoadIdentity, glOrtho, \
@@ -251,6 +252,8 @@ class GLPixmapBacking(GTK2WindowBacking):
             # Define empty FBO texture and set rendering to FBO
             glEnable(GL_FRAGMENT_PROGRAM_ARB)
             glBindTexture(GL_TEXTURE_RECTANGLE_ARB, self.textures[TEX_FBO])
+            # nvidia needs this even though we don't use mipmaps (repeated through this file):
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
             glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
             glBindFramebuffer(GL_FRAMEBUFFER, self.offscreen_fbo)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE_ARB, self.textures[TEX_FBO], 0)
@@ -384,10 +387,10 @@ class GLPixmapBacking(GTK2WindowBacking):
         #FIXME: we ought to be able to use
         #OpenGL blending and use premultiplied pixels directly... beats me!
         rgba = self.unpremultiply(img_data)
-        self._do_paint_rgb(32, rgba, x, y, width, height, rowstride, options, callbacks)
+        return self._do_paint_rgb(32, rgba, x, y, width, height, rowstride, options, callbacks)
 
     def _do_paint_rgb24(self, img_data, x, y, width, height, rowstride, options, callbacks):
-        self._do_paint_rgb(24, img_data, x, y, width, height, rowstride, options, callbacks)
+        return self._do_paint_rgb(24, img_data, x, y, width, height, rowstride, options, callbacks)
 
     def _do_paint_rgb(self, bpp, img_data, x, y, width, height, rowstride, options, callbacks):
         debug("%s._do_paint_rgb(%s, %s bytes, x=%d, y=%d, width=%d, height=%d, rowstride=%d)", self, bpp, len(img_data), x, y, width, height, rowstride)
@@ -435,6 +438,7 @@ class GLPixmapBacking(GTK2WindowBacking):
             glPixelStorei(GL_UNPACK_ALIGNMENT, alignment)
             glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
             glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
             glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, pformat, GL_UNSIGNED_BYTE, img_data)
 
             # Draw textured RGB quad at the right coordinates
@@ -511,6 +515,7 @@ class GLPixmapBacking(GTK2WindowBacking):
                     mag_filter = GL_LINEAR
                 glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, mag_filter)
                 glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
                 glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_LUMINANCE, width/div_w, height/div_h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, None)
 
 

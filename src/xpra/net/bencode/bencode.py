@@ -9,6 +9,8 @@
 
 # Original version written by Petru Paler
 
+__version__ = ("Python", 0, 11)
+
 import sys
 if sys.version > '3':
     long = int              #@ReservedAssignment
@@ -122,13 +124,7 @@ def encode_list(x, r):
 
 def encode_dict(x,r):
     r.append('d')
-    ilist = list(x.items())
-    try:
-        #this may fail with python3
-        ilist.sort()
-    except:
-        pass
-    for k, v in ilist:
+    for k, v in x.items():
         encode_func[type(k)](k, r)
         encode_func[type(v)](v, r)
     r.append('e')

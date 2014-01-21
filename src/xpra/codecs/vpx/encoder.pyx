@@ -3,6 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
+import time
 import os
 from xpra.codecs.codec_constants import codec_spec
 
@@ -10,6 +11,12 @@ from xpra.log import Logger, debug_if_env
 log = Logger()
 debug = debug_if_env(log, "XPRA_VPX_DEBUG")
 error = log.error
+
+VPX_THREADS = os.environ.get("XPRA_VPX_THREADS", "2")
+
+DEF ENABLE_VP8 = True
+DEF ENABLE_VP9 = False
+
 
 from libc.stdint cimport int64_t
 
@@ -29,6 +36,12 @@ cdef extern from "Python.h":
 ctypedef unsigned char uint8_t
 ctypedef long vpx_img_fmt_t
 ctypedef void vpx_codec_iface_t
+
+USAGE_STREAM_FROM_SERVER    = 0x0
+USAGE_LOCAL_FILE_PLAYBACK   = 0x1
+USAGE_CONSTRAINED_QUALITY   = 0x2
+USAGE_CONSTANT_QUALITY      = 0x3
+
 
 cdef extern from "vpx/vpx_codec.h":
     ctypedef const void *vpx_codec_iter_t
@@ -55,19 +68,65 @@ cdef extern from "vpx/vpx_image.h":
         unsigned int y_chroma_shift
 
 cdef extern from "vpx/vp8cx.h":
-    const vpx_codec_iface_t  *vpx_codec_vp8_cx()
+    IF ENABLE_VP8 == True:
+        const vpx_codec_iface_t *vpx_codec_vp8_cx()
+    IF ENABLE_VP9 == True:
+        const vpx_codec_iface_t *vpx_codec_vp9_cx()
 
 cdef extern from "vpx/vpx_encoder.h":
     int VPX_ENCODER_ABI_VERSION
+    #vpx_rc_mode
+    int VPX_VBR         #Variable Bit Rate (VBR) mode
+    int VPX_CBR         #Constant Bit Rate (CBR) mode
+    int VPX_CQ          #Constant Quality (CQ) mode
+    #vpx_enc_pass:
+    int VPX_RC_ONE_PASS
+    int VPX_RC_FIRST_PASS
+    int VPX_RC_LAST_PASS
+    #vpx_kf_mode:
+    int VPX_KF_FIXED
+    int VPX_KF_AUTO
+    int VPX_KF_DISABLED
+    long VPX_EFLAG_FORCE_KF
+    ctypedef struct vpx_rational_t:
+        int num     #fraction numerator
+        int den     #fraction denominator
     ctypedef struct vpx_codec_enc_cfg_t:
+        unsigned int g_usage
         unsigned int g_threads
-        unsigned int rc_target_bitrate
+        unsigned int g_profile
+        unsigned int g_w
+        unsigned int g_h
+        vpx_rational_t g_timebase
+        unsigned int g_error_resilient
+        unsigned int g_pass
         unsigned int g_lag_in_frames
         unsigned int rc_dropframe_thresh
         unsigned int rc_resize_allowed
-        unsigned int g_w
-        unsigned int g_h
-        unsigned int g_error_resilient
+        unsigned int rc_resize_up_thresh
+        unsigned int rc_resize_down_thresh
+        int rc_end_usage
+        #struct vpx_fixed_buf rc_twopass_stats_in
+        unsigned int rc_target_bitrate
+        unsigned int rc_min_quantizer
+        unsigned int rc_max_quantizer
+        unsigned int rc_undershoot_pct
+        unsigned int rc_overshoot_pct
+        unsigned int rc_buf_sz
+        unsigned int rc_buf_initial_sz
+        unsigned int rc_buf_optimal_sz
+        #we don't use 2pass:
+        #unsigned int rc_2pass_vbr_bias_pct
+        #unsigned int rc_2pass_vbr_minsection_pct
+        #unsigned int rc_2pass_vbr_maxsection_pct
+        unsigned int kf_mode
+        unsigned int kf_min_dist
+        unsigned int kf_max_dist
+        unsigned int ts_number_layers
+        unsigned int[5] ts_target_bitrate
+        unsigned int[5] ts_rate_decimator
+        unsigned int ts_periodicity
+        unsigned int[16] ts_layer_id
     ctypedef int vpx_codec_cx_pkt_kind
     ctypedef int64_t vpx_codec_pts_t
     ctypedef long vpx_enc_frame_flags_t
@@ -102,8 +161,24 @@ def get_version():
 def get_type():
     return "vpx"
 
+CODECS = []
+IF ENABLE_VP8 == True:
+    CODECS.append("vp8")
+IF ENABLE_VP9 == True:
+    CODECS.append("vp9")
+
 def get_encodings():
-    return ["vp8"]
+    return CODECS
+
+
+cdef const vpx_codec_iface_t  *make_codec_cx(encoding):
+    IF ENABLE_VP8 == True:
+        if encoding=="vp8":
+            return vpx_codec_vp8_cx()
+    IF ENABLE_VP9 == True:
+        if encoding=="vp9":
+            return vpx_codec_vp9_cx()
+    raise Exception("unsupported encoding: %s" % encoding)
 
 
 #https://groups.google.com/a/webmproject.org/forum/?fromgroups#!msg/webm-discuss/f5Rmi-Cu63k/IXIzwVoXt_wJ
@@ -113,7 +188,7 @@ def get_colorspaces():
     return COLORSPACES
 
 def get_spec(encoding, colorspace):
-    assert encoding in get_encodings(), "invalid encoding: %s (must be one of %s" % (encoding, get_encodings())
+    assert encoding in CODECS, "invalid encoding: %s (must be one of %s" % (encoding, get_encodings())
     assert colorspace in COLORSPACES, "invalid colorspace: %s (must be one of %s)" % (colorspace, COLORSPACES)
     #quality: we only handle YUV420P but this is already accounted for by get_colorspaces() based score calculations
     #setup cost is reasonable (usually about 5ms)
@@ -127,8 +202,6 @@ def init_module():
     #nothing to do!
     pass
 
-VPX_THREADS = os.environ.get("XPRA_VPX_THREADS", "2")
-
 
 cdef class Encoder:
     cdef int frames
@@ -138,12 +211,14 @@ cdef class Encoder:
     cdef int width
     cdef int height
     cdef int max_threads
+    cdef object encoding
     cdef char* src_format
 
     def init_context(self, int width, int height, src_format, encoding, int quality, int speed, scaling, options):    #@DuplicatedSignature
-        assert encoding=="vp8", "invalid encoding: %s" % encoding
-        assert scaling==(1,1), "vp8 does not handle scaling"
-        cdef const vpx_codec_iface_t *codec_iface
+        assert encoding in CODECS, "invalid encoding: %s" % encoding
+        assert scaling==(1,1), "vpx does not handle scaling"
+        cdef const vpx_codec_iface_t *codec_iface = make_codec_cx(encoding)
+        self.encoding = encoding
         self.width = width
         self.height = height
         self.frames = 0
@@ -156,7 +231,6 @@ cdef class Encoder:
             log.warn("error parsing number of threads: %s", e)
             self.max_threads =2
 
-        codec_iface = vpx_codec_vp8_cx()
         self.cfg = <vpx_codec_enc_cfg_t *> xmemalign(sizeof(vpx_codec_enc_cfg_t))
         if self.cfg==NULL:
             raise Exception("failed to allocate memory for vpx encoder config")
@@ -171,27 +245,39 @@ cdef class Encoder:
         memset(self.context, 0, sizeof(vpx_codec_ctx_t))
 
         self.cfg.rc_target_bitrate = width * height * self.cfg.rc_target_bitrate / self.cfg.g_w / self.cfg.g_h
+        self.cfg.g_usage = USAGE_STREAM_FROM_SERVER
         self.cfg.g_threads = self.max_threads
+        self.cfg.g_profile = 0                      #use 1 for YUV444P and RGB support
         self.cfg.g_w = width
         self.cfg.g_h = height
-        self.cfg.g_error_resilient = 0
-        self.cfg.g_lag_in_frames = 0
-        self.cfg.rc_dropframe_thresh = 0
+        cdef vpx_rational_t timebase
+        timebase.num = 1
+        timebase.den = 1000
+        self.cfg.g_timebase = timebase
+        self.cfg.g_error_resilient = 0              #we currently use TCP, guaranteed delivery
+        self.cfg.g_pass = VPX_RC_ONE_PASS
+        self.cfg.g_lag_in_frames = 0                #always give us compressed output for each frame without delay
         self.cfg.rc_resize_allowed = 1
+        self.cfg.rc_end_usage = VPX_VBR
+        self.cfg.kf_mode = VPX_KF_AUTO    #VPX_KF_DISABLED
         if vpx_codec_enc_init_ver(self.context, codec_iface, self.cfg, 0, VPX_ENCODER_ABI_VERSION)!=0:
             free(self.context)
             raise Exception("failed to initialized vpx encoder: %s", vpx_codec_error(self.context))
+        debug("vpx_codec_enc_init_ver for %s succeeded", encoding)
 
+    def __str__(self):
+        return "vpx.Encoder(%s)" % self.encoding
 
     def get_info(self):
         return {"frames"    : self.frames,
                 "width"     : self.width,
                 "height"    : self.height,
+                "encoding"  : self.encoding,
                 "src_format": self.src_format,
                 "max_threads": self.max_threads}
 
     def get_encoding(self):
-        return "vp8"
+        return self.encoding
 
     def get_width(self):
         return self.width
@@ -258,27 +344,38 @@ cdef class Encoder:
         image.stride[3] = 0
         image.d_w = self.width
         image.d_h = self.height
-        image.x_chroma_shift = 0
-        image.y_chroma_shift = 0
-        image.bps = 8
+        #this is the chroma shift for YUV420P:
+        #both X and Y are downscaled by 2^1
+        image.x_chroma_shift = 1
+        image.y_chroma_shift = 1
+        image.bps = 0
+        if self.frames==0:
+            flags |= VPX_EFLAG_FORCE_KF
+        start = time.time()
         with nogil:
-            i = vpx_codec_encode(self.context, image, frame_cnt, 1, flags, VPX_DL_REALTIME)
+            i = vpx_codec_encode(self.context, image, self.frames, 1, flags, VPX_DL_REALTIME)
         if i!=0:
             free(image)
-            log.error("vp8 codec encoding error: %s", vpx_codec_destroy(self.context))
+            log.error("%s codec encoding error: %s", self.encoding, vpx_codec_destroy(self.context))
             return None
+        end = time.time()
+        debug("vpx_codec_encode for %s took %.1f", self.encoding, 1000.0*(end-start))
         with nogil:
             pkt = vpx_codec_get_cx_data(self.context, &iter)
+        end = time.time()
         if get_packet_kind(pkt) != VPX_CODEC_CX_FRAME_PKT:
             free(image)
-            log.error("vp8 invalid packet type: %s", get_packet_kind(pkt))
+            log.error("%s invalid packet type: %s", self.encoding, get_packet_kind(pkt))
             return None
         self.frames += 1
-        #FIXME: we copy the pixels here, we could manage the buffer instead
+        #we copy the compressed data here, we could manage the buffer instead
+        #using vpx_codec_set_cx_data_buf every time with a wrapper for freeing it,
+        #but since this is compressed data, no big deal
         coutsz = get_frame_size(pkt)
         cout = get_frame_buffer(pkt)
         img = cout[:coutsz]
         free(image)
+        debug("vpx returning %s image: %s bytes", self.encoding, len(img))
         return img
 
     def set_encoding_speed(self, int pct):

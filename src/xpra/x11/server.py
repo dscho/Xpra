@@ -467,6 +467,9 @@ class XpraServer(gobject.GObject, X11ServerBase):
             server_source.make_keymask_match(modifiers)
         self._has_focus = wid
 
+    def get_focus(self):
+        return self._has_focus
+
 
     def _send_new_window_packet(self, window):
         geometry = self._desktop_manager.window_geometry(window)
@@ -580,19 +583,15 @@ class XpraServer(gobject.GObject, X11ServerBase):
         if visible:
             self._damage(window, 0, 0, w, h)
 
-    def _process_mouse_common(self, proto, wid, pointer, modifiers):
-        ss = self._server_sources.get(proto)
-        if ss is None:
-            return      #gone already!
-        ss.make_keymask_match(modifiers)
+    """ override so we can raise the window under the cursor
+        (gtk raise does not change window stacking, just focus) """
+    def _move_pointer(self, wid, pos):
         window = self._id_to_window.get(wid)
         if not window:
             log("_process_mouse_common() invalid window id: %s", wid)
-            return
-        def raise_and_move():
+        else:
             window.raise_window()
-            self._move_pointer(pointer)
-        trap.swallow_synced(raise_and_move)
+        X11ServerBase._move_pointer(self, wid, pos)
 
 
     def _process_close_window(self, proto, packet):

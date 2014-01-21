@@ -174,7 +174,7 @@ class ServerSource(object):
     """
 
     def __init__(self, protocol, disconnect_cb, idle_add, timeout_add, source_remove,
-                 get_transient_for,
+                 get_transient_for, get_focus,
                  get_window_id,
                  supports_mmap,
                  core_encodings, encodings, default_encoding,
@@ -183,7 +183,7 @@ class ServerSource(object):
                  default_quality, default_min_quality,
                  default_speed, default_min_speed):
         log("ServerSource%s", (protocol, disconnect_cb, idle_add, timeout_add, source_remove,
-                 get_transient_for,
+                 get_transient_for, get_focus,
                  get_window_id,
                  supports_mmap,
                  core_encodings, encodings, default_encoding,
@@ -199,6 +199,7 @@ class ServerSource(object):
         self.timeout_add = timeout_add
         self.source_remove = source_remove
         self.get_transient_for = get_transient_for
+        self.get_focus = get_focus
         self.get_window_id = get_window_id
         # mmap:
         self.supports_mmap = supports_mmap
@@ -270,6 +271,7 @@ class ServerSource(object):
         self.system_tray = False
         self.generic_window_types = False
         self.notify_startup_complete = False
+        self.control_commands = []
         #sound props:
         self.pulseaudio_id = None
         self.pulseaudio_server = None
@@ -317,6 +319,7 @@ class ServerSource(object):
             return
         self.statistics.update_averages()
         wids = list(self.calculate_window_ids)  #make a copy so we don't clobber new wids
+        focus = self.get_focus()
         for wid in wids:
             self.calculate_window_ids.remove(wid)
             ws = self.window_sources.get(wid)
@@ -324,12 +327,15 @@ class ServerSource(object):
                 continue
             try:
                 ws.statistics.update_averages()
-                ws.calculate_batch_delay()
+                ws.calculate_batch_delay(wid==focus)
                 ws.reconfigure()
             except:
                 log.error("error on window %s", wid, exc_info=True)
             if self.is_closed():
                 return
+            #allow other threads to run
+            #(ideally this would be a low priority thread)
+            time.sleep(0)
         #calculate weighted average as new global default delay:
         now = time.time()
         wdimsum, wdelay = 0, 0
@@ -361,7 +367,7 @@ class ServerSource(object):
         if delta>RECALCULATE_DELAY:
             add_work_item(recalculate_work)
         else:
-            self.timeout_add(int(1000*(RECALCULATE_DELAY-delta)), recalculate_work)
+            self.timeout_add(int(1000*(RECALCULATE_DELAY-delta)), add_work_item, recalculate_work)
 
     def close(self):
         self.close_event.set()
@@ -470,6 +476,7 @@ class ServerSource(object):
         self.generic_window_types = c.boolget("generic_window_types")
         self.notify_startup_complete = c.boolget("notify-startup-complete")
         self.namespace = c.boolget("namespace")
+        self.control_commands = c.strlistget("control_commands")
 
         self.desktop_size = c.intpair("desktop_size")
         self.set_screen_sizes(c.listget("screen_sizes"))
@@ -1119,6 +1126,10 @@ class ServerSource(object):
 
     def set_deflate(self, level):
         self.send("set_deflate", level)
+
+
+    def send_client_command(self, *args):
+        self.send("control", *args)
 
 
     def rpc_reply(self, *args):

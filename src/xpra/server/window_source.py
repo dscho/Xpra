@@ -56,6 +56,7 @@ except Exception, e:
     bgra_to_rgb, bgra_to_rgba, argb_to_rgb, argb_to_rgba = (None,)*4
 from xpra.os_util import StringIOClass
 from xpra.codecs.loader import get_codec, has_codec, NEW_ENCODING_NAMES_TO_OLD
+from xpra.codecs.codec_constants import LOSSY_PIXEL_FORMATS
 
 
 class WindowSource(object):
@@ -92,7 +93,7 @@ class WindowSource(object):
         self.encoding = encoding                        #the current encoding
         self.encodings = encodings                      #all the encodings supported by the client
         self.encoding_last_used = None
-        refresh_encodings = [x for x in self.encodings if x in ("png", "rgb", "jpeg", "webp")]
+        refresh_encodings = [x for x in self.encodings if x in ("png", "rgb", "jpeg")]
         client_refresh_encodings = encoding_options.strlistget("auto_refresh_encodings", refresh_encodings)
         self.auto_refresh_encodings = [x for x in client_refresh_encodings if x in self.encodings and x in self.server_core_encodings]
         self.core_encodings = core_encodings            #the core encodings supported by the client
@@ -121,6 +122,7 @@ class WindowSource(object):
         self.timeout_timer = None
         self.expire_timer = None
 
+        self.is_OR = window.get_property("override-redirect")
         self.window_dimensions = 0, 0
         self.fullscreen = window.get_property("fullscreen")
         self.scaling = window.get_property("scaling")
@@ -274,9 +276,9 @@ class WindowSource(object):
         info[prefix+"encoding.mmap"+suffix] = bool(self._mmap) and (self._mmap_size>0)
         if self.encoding_last_used:
             info[prefix+"encoding.last_used"+suffix] = self.encoding_last_used
-        info[prefix+"suspended"+suffix] = self.suspended
-        info[prefix+"property.scaling"+suffix] = self.scaling
-        info[prefix+"property.fullscreen"+suffix] = self.fullscreen
+        info[prefix+"suspended"+suffix] = self.suspended or False
+        info[prefix+"property.scaling"+suffix] = self.scaling or (1, 1)
+        info[prefix+"property.fullscreen"+suffix] = self.fullscreen or False
         self.statistics.add_stats(info, prefix, suffix)
 
         #batch delay stats:
@@ -302,8 +304,8 @@ class WindowSource(object):
             add_last_rec_info(sp, self._encoding_speed)
         self.batch_config.add_stats(info, prefix, suffix)
 
-    def calculate_batch_delay(self):
-        calculate_batch_delay(self.window_dimensions, self.wid, self.batch_config, self.global_statistics, self.statistics)
+    def calculate_batch_delay(self, has_focus):
+        calculate_batch_delay(self.wid, self.window_dimensions, has_focus, self.is_OR, self.batch_config, self.global_statistics, self.statistics)
 
     def update_speed(self):
         if self.suspended:
@@ -311,11 +313,11 @@ class WindowSource(object):
         speed = self.default_encoding_options.get("speed", -1)
         if speed<0:
             min_speed = self.get_min_speed()
-            info, target_speed = get_target_speed(self.wid, self.window_dimensions, self.batch_config, self.global_statistics, self.statistics, min_speed)
             #make a copy to work on (and discard "info")
-            ves_copy = [(event_time, speed) for event_time, _, speed in list(self._encoding_speed)]
-            ves_copy.append((time.time(), target_speed))
-            speed = max(min_speed, time_weighted_average(ves_copy, min_offset=0.1, rpow=1.2))
+            speed_data = [(event_time, speed) for event_time, _, speed in list(self._encoding_speed)]
+            info, target_speed = get_target_speed(self.wid, self.window_dimensions, self.batch_config, self.global_statistics, self.statistics, min_speed, speed_data)
+            speed_data.append((time.time(), target_speed))
+            speed = max(min_speed, time_weighted_average(speed_data, min_offset=0.1, rpow=1.2))
             speed = min(99, speed)
         else:
             info = {}
@@ -440,7 +442,7 @@ class WindowSource(object):
             actual_encoding = options.get("encoding")
             if actual_encoding is None:
                 actual_encoding = self.get_best_encoding(False, window, w*h, ww, wh, self.encoding)
-            if actual_encoding in ("h264", "vp8") or window.is_tray() or self.full_frames_only:
+            if self.must_encode_full_frame(window, actual_encoding):
                 x, y = 0, 0
                 w, h = ww, wh
             self.batch_config.last_delays.append((now, delay))
@@ -569,7 +571,7 @@ class WindowSource(object):
             return
 
         actual_encoding = self.get_best_encoding(True, window, pixel_count, ww, wh, coding)
-        if actual_encoding in ("h264", "vp8"):
+        if self.must_encode_full_frame(window, actual_encoding):
             #use full screen dimensions:
             self.process_damage_region(damage_time, window, 0, 0, ww, wh, actual_encoding, options)
             return
@@ -579,6 +581,14 @@ class WindowSource(object):
             x, y, w, h = region
             self.process_damage_region(damage_time, window, x, y, w, h, actual_encoding, options)
 
+
+    def must_encode_full_frame(self, window, encoding):
+        if self.full_frames_only:
+            return True
+        if window.is_tray():
+            return True
+        #video encoders will override this
+        return False
 
     def get_best_encoding(self, batching, window, pixel_count, ww, wh, current_encoding):
         e = self.do_get_best_encoding(batching, window.has_alpha(), window.is_tray(), window.is_OR(), pixel_count, ww, wh, current_encoding)
@@ -721,7 +731,8 @@ class WindowSource(object):
         #and if not batching,
         #we would then do a full_quality_refresh when we should not...
         actual_quality = client_options.get("quality")
-        if actual_quality is None:
+        lossy_csc = client_options.get("csc") in LOSSY_PIXEL_FORMATS
+        if actual_quality is None and not lossy_csc:
             debug("schedule_auto_refresh: was a lossless %s packet, ignoring", coding)
             #lossless already: small region sent lossless or encoding is lossless
             #don't change anything: if we have a timer, keep it
@@ -731,7 +742,7 @@ class WindowSource(object):
         if len(self.auto_refresh_encodings)==0:
             return
         ww, wh = window.get_dimensions()
-        if client_options.get("scaled_size") is None:
+        if client_options.get("scaled_size") is None and not lossy_csc:
             if actual_quality>=AUTO_REFRESH_THRESHOLD:
                 if w*h>=ww*wh:
                     debug("schedule_auto_refresh: high quality (%s%%) full frame (%s pixels), cancelling refresh timer %s", actual_quality, w*h, self.refresh_timer)
@@ -860,8 +871,9 @@ class WindowSource(object):
             #will modify the pixel array in-place!
             dpixels = image.get_pixels()[:]
             store = sequence
-            if self.last_pixmap_data is not None:
-                lw, lh, lcoding, lsequence, ldata = self.last_pixmap_data
+            lpd = self.last_pixmap_data
+            if lpd is not None:
+                lw, lh, lcoding, lsequence, ldata = lpd
                 if lw==w and lh==h and lcoding==coding and len(ldata)==len(dpixels):
                     #xor with the last frame:
                     delta = lsequence

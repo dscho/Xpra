@@ -44,6 +44,8 @@ qt4_ENABLED = client_ENABLED
 opengl_ENABLED = client_ENABLED
 html5_ENABLED = True
 
+bencode_ENABLED = True
+cython_bencode_ENABLED = True
 rencode_ENABLED = True
 cymaths_ENABLED = True
 cyxor_ENABLED = True
@@ -81,7 +83,9 @@ SWITCHES = ("enc_x264", "x264_static",
             "csc_swscale", "swscale_static",
             "csc_nvcuda", "csc_opencl", "csc_cython",
             "vpx", "vpx_static",
-            "webp", "rencode", "clipboard",
+            "webp",
+            "rencode", "bencode", "cython_bencode",
+            "clipboard",
             "server", "client", "x11",
             "gtk2", "gtk3", "qt4", "html5",
             "sound", "cyxor", "cymaths", "opengl", "argb",
@@ -153,12 +157,6 @@ if "clean" not in sys.argv:
         exit(1)
 
 
-
-STATIC_INCLUDE_DIRS = ["/usr/local/include"]
-STATIC_LIB_DIRS = ["/usr/local/lib"]
-STATIC_COMMON_DEFS = {'include_dirs': STATIC_INCLUDE_DIRS,
-                      'library_dirs': STATIC_LIB_DIRS}
-
 #*******************************************************************************
 # build options, these may get modified further down..
 #
@@ -227,6 +225,11 @@ def add_to_keywords(kw, key, *args):
     values = kw.setdefault(key, [])
     for arg in args:
         values.append(arg)
+def remove_from_keywords(kw, key, value):
+    values = kw.get(key)
+    if values and value in values:
+        values.remove(value)
+
 
 PYGTK_PACKAGES = ["pygobject-2.0", "pygtk-2.0"]
 
@@ -306,16 +309,6 @@ def make_constants(*paths):
             print("(re)generating %s (%s):" % (pxi_file, reason))
         make_constants_pxi(constants_file, pxi_file)
 
-#Don't ask: somehow we seem to need this despite setting
-#PKG_CONFIG_PATH=/usr/local/lib[64]/pkgconfig before running rpmbuild sometimes?
-#but only do this if we are doing a static build
-if x264_static_ENABLED or vpx_static_ENABLED or avcodec_static_ENABLED or avcodec2_static_ENABLED or swscale_static_ENABLED:
-    pkgcp = os.environ.get("PKG_CONFIG_PATH", "").split(":")
-    for x in ("/usr/local/lib64/pkgconfig", "/usr/local/lib/pkgconfig"):
-        if x not in pkgcp and os.path.exists(x):
-            pkgcp.append(x)
-    os.environ["PKG_CONFIG_PATH"] = ":".join(pkgcp)
-
 # Tweaked from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/502261
 def pkgconfig(*packages_options, **ekw):
     kw = dict(ekw)
@@ -376,7 +369,7 @@ def pkgconfig(*packages_options, **ekw):
     if debug_ENABLED:
         add_to_keywords(kw, 'extra_compile_args', '-g')
         add_to_keywords(kw, 'extra_compile_args', '-ggdb')
-        kw['pyrex_gdb'] = True
+        kw['cython_gdb'] = True
         if get_gcc_version()>=4.8:
             add_to_keywords(kw, 'extra_compile_args', '-fsanitize=address')
             add_to_keywords(kw, 'extra_link_args', '-fsanitize=address')
@@ -609,7 +602,14 @@ if WIN32:
     cuda_bin_dir       = os.path.join(cuda_path, "bin")
 
     #ffmpeg is needed for both swscale and x264:
-    libffmpeg_path = "C:\\ffmpeg-win32-bin"
+    if dec_avcodec_ENABLED:
+        assert not dec_avcodec2_ENABLED, "cannot enable both dec_avcodec and dec_avcodec2"
+        libffmpeg_path = "C:\\ffmpeg-win32-bin"
+    elif dec_avcodec2_ENABLED:
+        assert not dec_avcodec_ENABLED, "cannot enable both dec_avcodec and dec_avcodec2"
+        libffmpeg_path = "C:\\ffmpeg2-win32-bin"
+    else:
+        libffmpeg_path = "UNUSED"
     libffmpeg_include_dir   = os.path.join(libffmpeg_path, "include")
     libffmpeg_lib_dir       = os.path.join(libffmpeg_path, "lib")
     libffmpeg_bin_dir       = os.path.join(libffmpeg_path, "bin")
@@ -624,13 +624,15 @@ if WIN32:
     #vpx_PATH="C:\\vpx-vp8-debug-src-x86-win32mt-vs9-v1.1.0"
     #but we use something more generic, without the version numbers:
     vpx_path = ""
-    for p in ("C:\\vpx-1.2", "C:\\vpx-1.1", "C:\\vpx-vp8"):
+    for p in ("C:\\vpx-1.3", "C:\\vpx-1.2", "C:\\vpx-1.1", "C:\\vpx-vp8"):
         if os.path.exists(p) and os.path.isdir(p):
             vpx_path = p
             break
     vpx_include_dir     = os.path.join(vpx_path, "include")
     vpx_lib_dir         = os.path.join(vpx_path, "lib", "Win32")
-    if os.path.exists(os.path.join(vpx_lib_dir, "vpxmd.lib")):
+    if os.path.exists(os.path.join(vpx_lib_dir, "vpx.lib")):
+        vpx_lib_names = ["vpx"]               #for libvpx 1.3.0
+    elif os.path.exists(os.path.join(vpx_lib_dir, "vpxmd.lib")):
         vpx_lib_names = ["vpxmd"]             #for libvpx 1.2.0
     else:
         vpx_lib_names = ["vpxmt", "vpxmtd"]   #for libvpx 1.1.0
@@ -720,6 +722,7 @@ if WIN32:
             for flag in ('/Od', '/Zi', '/DEBUG', '/RTC1', '/GS'):
                 add_to_keywords(kw, 'extra_compile_args', flag)
             add_to_keywords(kw, 'extra_link_args', "/DEBUG")
+            kw['cython_gdb'] = True
         print("pkgconfig(%s,%s)=%s" % (packages, ekw, kw))
         return kw
 
@@ -853,6 +856,8 @@ if WIN32:
                    ('Microsoft.VC90.MFC', glob.glob('%s\\Microsoft.VC90.MFC\\*.*' % C_DLLs)),
                    ('', glob.glob('%s\\bin\\*.dll' % libffmpeg_path)),
                    ]
+    if enc_x264_ENABLED:
+        data_files.append(('', ['%s\\libx264.dll' % x264_bin_dir]))
     html5_dir = ''
 
     if webp_ENABLED:
@@ -925,6 +930,13 @@ else:
             etc_files.append(xorg_conf)
         data_files.append((etc_prefix, etc_files))
     setup_options["scripts"] = scripts
+
+
+STATIC_COMMON_DEFS = pkgconfig()
+remove_from_keywords(STATIC_COMMON_DEFS, 'extra_compile_args', '-fsanitize=address')
+if os.name=="posix":
+    STATIC_COMMON_DEFS.update({'include_dirs': ["/usr/local/include"],
+                               'library_dirs': ["/usr/local/lib"]})
 
 
 if html5_ENABLED:
@@ -1126,6 +1138,19 @@ if rencode_ENABLED:
     cython_add(Extension("xpra.net.rencode._rencode",
                 ["xpra/net/rencode/rencode.pyx"],
                 **rencode_pkgconfig))
+
+
+toggle_packages(bencode_ENABLED, "xpra.net.bencode")
+if cython_bencode_ENABLED:
+    bencode_pkgconfig = pkgconfig()
+    if not debug_ENABLED:
+        if WIN32:
+            add_to_keywords(bencode_pkgconfig, 'extra_compile_args', "/Ox")
+        else:
+            add_to_keywords(bencode_pkgconfig, 'extra_compile_args', "-O3")
+    cython_add(Extension("xpra.net.bencode.cython_bencode",
+                ["xpra/net/bencode/cython_bencode.pyx"],
+                **bencode_pkgconfig))
 
 
 if ext_modules:

@@ -7,6 +7,7 @@
 
 import sys
 import os
+import stat
 import socket
 import time
 from optparse import OptionParser, OptionGroup
@@ -94,7 +95,7 @@ def parse_cmdline(cmdline):
                            ] + command_options
     if supports_shadow:
         server_modes.append("shadow")
-        command_options.append("\t%prog shadow DISPLAY\n")
+        command_options.append("\t%prog shadow [DISPLAY]\n")
     if not supports_server:
         command_options.append("(This xpra installation does not support starting local servers.)")
 
@@ -309,7 +310,6 @@ When unspecified, all the available codecs are allowed and the first one is used
     group.add_option("--no-keyboard-sync", action="store_false",
                       dest="keyboard_sync", default=defaults.keyboard_sync,
                       help="Disable keyboard state synchronization, prevents keys from repeating on high latency links but also may disrupt applications which access the keyboard directly")
-    parser.add_option_group(group)
 
     group = OptionGroup(parser, "Advanced Options",
                 "These options apply to both client and server. Please refer to the man page for details.")
@@ -372,6 +372,14 @@ When unspecified, all the available codecs are allowed and the first one is used
     for k,v in hidden_options.items():
         if not hasattr(options, k):
             setattr(options, k, v)
+
+    if options.encoding:
+        #fix old encoding names if needed:
+        from xpra.codecs.loader import ALL_OLD_ENCODING_NAMES_TO_NEW
+        options.encoding = ALL_OLD_ENCODING_NAMES_TO_NEW.get(options.encoding, options.encoding)
+        if options.encoding=="webp":
+            #warn that webp should not be used:
+            print("Warning: webp encoding may leak memory!")
 
     #special handling for URL mode:
     #xpra attach xpra://[mode:]host:port/?param1=value1&param2=value2
@@ -474,9 +482,10 @@ def run_mode(script_file, parser, options, args, mode):
     configure_logging(options, mode)
 
     try:
-        if mode=="start" and len(args)>0 and (args[0].startswith("ssh/") or args[0].startswith("ssh:")):
+        ssh_display = len(args)>0 and (args[0].startswith("ssh/") or args[0].startswith("ssh:"))
+        if mode in ("start", "shadow") and ssh_display:
             #ie: "xpra start ssh:HOST:DISPLAY --start-child=xterm"
-            return run_remote_server(parser, options, args)
+            return run_remote_server(parser, options, args, mode)
         elif (mode in ("start", "upgrade", "proxy") and supports_server) or (mode=="shadow" and supports_shadow):
             nox()
             from xpra.scripts.server import run_server
@@ -488,9 +497,9 @@ def run_mode(script_file, parser, options, args, mode):
             return run_stopexit(mode, parser, options, args)
         elif mode == "list" and (supports_server or supports_shadow):
             return run_list(parser, options, args)
-        elif mode in ("_proxy", "_proxy_start") and (supports_server or supports_shadow):
+        elif mode in ("_proxy", "_proxy_start", "_shadow_start") and (supports_server or supports_shadow):
             nox()
-            return run_proxy(parser, options, script_file, args, mode=="_proxy_start")
+            return run_proxy(parser, options, script_file, args, mode)
         else:
             parser.error("invalid mode '%s'" % mode)
             return 1
@@ -780,8 +789,7 @@ def run_client(parser, opts, extra_args, mode):
         app = make_client(parser.error, opts)
         if opts.encoding:
             #fix old encoding names if needed:
-            from xpra.codecs.loader import ALL_OLD_ENCODING_NAMES_TO_NEW, encodings_help
-            opts.encoding = ALL_OLD_ENCODING_NAMES_TO_NEW.get(opts.encoding, opts.encoding)
+            from xpra.codecs.loader import encodings_help
             err = opts.encoding not in app.get_encodings()
             if err and opts.encoding!="help":
                 print("invalid encoding: %s" % opts.encoding)
@@ -867,11 +875,13 @@ def do_run_client(app):
     finally:
         app.cleanup()
 
-def run_remote_server(parser, opts, args):
+def run_remote_server(parser, opts, args, mode):
     """ Uses the regular XpraClient with patched proxy arguments to tell run_proxy to start the server """
     params = parse_display_name(parser.error, opts, args[0])
     #add special flags to "display_as_args"
-    proxy_args = [params["display"]]
+    proxy_args = []
+    if params["display"] is not None:
+        proxy_args.append(params["display"])
     if opts.start_child:
         for c in opts.start_child:
             proxy_args.append("--start-child=%s" % c)
@@ -879,21 +889,64 @@ def run_remote_server(parser, opts, args):
         proxy_args.append("--exit-with-children")
     params["display_as_args"] = proxy_args
     #and use _proxy_start subcommand:
-    params["proxy_command"] = ["_proxy_start"]
+    if mode=="shadow":
+        params["proxy_command"] = ["_shadow_start"]
+    else:
+        assert mode=="start"
+        params["proxy_command"] = ["_proxy_start"]
     conn = connect_or_fail(params)
     app = make_client(parser.error, opts)
     app.setup_connection(conn)
     app.init(opts)
     do_run_client(app)
 
-def run_proxy(parser, opts, script_file, args, start_server=False):
+def find_X11_displays(max_display_no=10):
+    displays = []
+    X11_SOCKET_DIR = "/tmp/.X11-unix/"
+    if os.path.exists(X11_SOCKET_DIR) and os.path.isdir(X11_SOCKET_DIR):
+        for x in os.listdir(X11_SOCKET_DIR):
+            if not x.startswith("X"):
+                continue
+            try:
+                v = int(x[1:])
+                #arbitrary: only shadow automatically displays below 10..
+                if v<max_display_no:
+                    displays.append(v)
+                #check that this is a socket
+                socket_path = os.path.join(X11_SOCKET_DIR, x)
+                mode = os.stat(socket_path).st_mode
+                is_socket = stat.S_ISSOCK(mode)
+                if not is_socket:
+                    continue
+            except:
+                pass
+    return displays
+
+def guess_X11_display():
+    displays = find_X11_displays()
+    assert len(displays)!=0, "could not detect any live X11 displays"
+    assert len(displays)==1, "too many live X11 displays to choose from"
+    return ":%s" % displays[0]
+
+def run_proxy(parser, opts, script_file, args, mode):
     from xpra.server.proxy import XpraProxy
     assert "gtk" not in sys.modules
-    if start_server:
-        assert len(args)==1, "proxy-start: expected 1 argument but got %s" % len(args)
-        display_name = args[0]
+    if mode in ("_proxy_start", "_shadow_start"):
         #we must use a subprocess to avoid messing things up - yuk
-        cmd = [script_file, "start"]+args
+        cmd = [script_file]
+        if mode=="_proxy_start":
+            cmd.append("start")
+            assert len(args)==1, "proxy/shadow-start: expected 1 argument but got %s" % len(args)
+            display_name = args[0]
+        else:
+            assert mode=="_shadow_start"
+            cmd.append("shadow")
+            if len(args)==1:
+                #display_name was provided:
+                display_name = args[0]
+            else:
+                display_name = guess_X11_display()
+        cmd += args
         if opts.start_child and len(opts.start_child)>0:
             for x in opts.start_child:
                 cmd.append("--start-child=%s" % x)

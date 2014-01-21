@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 """
+The original version of python-webm can be found here:
+https://code.google.com/p/python-webm/
+This modified version adds support for lossless compression.
+
 Copyright (c) 2011, Daniele Esposti <expo@expobrain.net>
-Copyright (c) 2012, 2013 Antoine Martin <antoine@devloop.org.uk>
+Copyright (c) 2012-2014 Antoine Martin <antoine@devloop.org.uk>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -45,7 +49,7 @@ elif sys.platform == "darwin":
     _LIBRARY_NAMES = ["libwebp.dylib"]
 
 elif os.name == "posix":
-    _LIBRARY_NAMES = ["libwebp.so.4", "libwebp.so.2"]
+    _LIBRARY_NAMES = ["libwebp.so.5", "libwebp.so.4", "libwebp.so.2"]
 
 else:
     raise ImportError(
