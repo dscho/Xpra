@@ -1,0 +1,809 @@
+<!--css_fils = [u"/home/antoine/Documents/sofastats/css/default.css"]-->
+
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'
+'http://www.w3.org/TR/html4/loose.dtd'>
+<html>
+<head>
+<meta http-equiv="P3P" content='CP="IDC DSP COR CURa ADMa OUR IND PHY ONL COM 
+STA"'>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<title>Source Code Statistics</title>
+
+<link rel='stylesheet' type='text/css' 
+href="sofastats_report_extras/tundra.css" />
+<script src="sofastats_report_extras/dojo.xd.js"></script>
+<script src="sofastats_report_extras/sofastatsdojo_minified.js"></script>
+<script src="sofastats_report_extras/sofastats_charts.js"></script>
+<script type="text/javascript">
+get_ie_script = function(mysrc){
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = mysrc;
+    document.getElementsByTagName('head')[0].appendChild(script); 
+}
+if(dojo.isIE){
+    get_ie_script("sofastats_report_extras/arc.xd.js");
+    get_ie_script("sofastats_report_extras/gradient.xd.js");
+    get_ie_script("sofastats_report_extras/vml.xd.js");
+}
+makeObjects = function(){
+
+    //n_charts_start
+    var n_charts = 4;
+    //n_charts_end
+    for(var i=0;i<n_charts;i++){
+        try{
+            window["makechart" + String('00'+i).slice(-2)]();
+        } catch(exceptionObject) {
+            var keepGoing = true;
+        }
+    }
+};
+dojo.addOnLoad(makeObjects);
+
+var DEFAULT_SATURATION  = 100,
+DEFAULT_LUMINOSITY1 = 75,
+DEFAULT_LUMINOSITY2 = 50,
+
+c = dojox.color,
+
+cc = function(colour){
+    return function(){ return colour; };
+},
+
+hl = function(colour){
+
+    var a = new c.Color(colour),
+        x = a.toHsl();
+    if(x.s == 0){
+        x.l = x.l < 50 ? 100 : 0;
+    }else{
+        x.s = DEFAULT_SATURATION;
+        if(x.l < DEFAULT_LUMINOSITY2){
+            x.l = DEFAULT_LUMINOSITY1;
+        }else if(x.l > DEFAULT_LUMINOSITY1){
+            x.l = DEFAULT_LUMINOSITY2;
+        }else{
+            x.l = x.l - DEFAULT_LUMINOSITY2 > DEFAULT_LUMINOSITY1 - x.l 
+                ? DEFAULT_LUMINOSITY2 : DEFAULT_LUMINOSITY1;
+        }
+    }
+    return c.fromHsl(x);
+}
+
+getfainthex = function(hexcolour){
+    var a = new c.Color(hexcolour)
+    x = a.toHsl();
+    x.s = x.s * 1.5;
+    x.l = x.l * 1.25;
+    return c.fromHsl(x);
+}
+
+makefaint = function(colour){
+    var fainthex = getfainthex(colour.toHex());
+    return new dojox.color.Color(fainthex);
+}
+
+var labelLineBreak = (dojo.isIE) ? "\n" : "<br>";
+
+</script>
+
+<style type="text/css">
+<!--
+    .dojoxLegendNode {
+        border: 1px solid #ccc; 
+        margin: 5px 10px 5px 10px; 
+        padding: 3px
+    }
+    .dojoxLegendText {
+        vertical-align: text-top; 
+        padding-right: 10px
+    }
+    @media print {
+        .screen-float-only{
+        float: none;
+        }
+    }
+    
+    @media screen {
+        .screen-float-only{
+        float: left;
+        }
+    }
+-->
+</style>
+<style type="text/css">
+<!--
+
+body {
+    background-color: #ffffff;
+}
+td, th {
+    background-color: white;
+}
+/*
+dojo_style_start
+outer_bg = u"white"
+inner_bg = u"#f2f1f0" # u"#e0d9d5"
+axis_label_font_colour = u"#423126"
+major_gridline_colour = u"#b8a49e"
+gridline_width = 1
+stroke_width = 3
+tooltip_border_colour = u"#736354"
+colour_mappings = [(u"#e95f29", u"#ef7d44"),
+    (u"#f4cb3a", u"#f7d858"),
+    (u"#4495c3", u"#62add2"),
+    (u"#44953a", u"#62ad58"),
+    (u"#f43a3a", u"#f75858"),
+    ]
+connector_style = u"defbrown"
+dojo_style_end
+*/
+    body{
+        font-size: 12px;
+        font-family: Ubuntu, Helvetica, sans-serif;
+    }
+    h1, h2{
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+    }
+    h1{
+        font-size: 18px;
+    }
+    h2{
+        font-size: 16px;
+    }
+    .gui-msg-medium, gui-msg-small{
+        color: #29221c;
+        font-family: arial;
+    }
+    .gui-msg-medium{
+        font-size: 16px;
+    }
+    *html .gui-msg-medium{
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .gui-msg-small{
+        font-size: 13px;
+        line-height: 150%;
+    }
+    .gui-note{
+        background-color: #e95829;
+        color: white;
+        font-weight: bold;
+        padding: 2px;
+    }
+    tr, td, th{
+        margin: 0;
+    }
+
+    .tbltitle0, .tblsubtitle0{
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .tbltitle0{ /*spans*/
+        padding: 0;
+        font-size: 18px;
+    }
+    .tblsubtitle0{
+        padding: 12px 0px 0px 0px;
+        font-size: 14px;
+    }
+    .tblcelltitle0{ /*th*/
+        text-align: left;
+        border: none;
+        padding: 0px 0px 12px 0px;
+        margin: 0;
+    }
+
+    th, .rowvar0, .rowval0, .datacell0, .firstdatacell0 {
+        border: solid 1px #A1A1A1;
+    }
+    th{
+        margin: 0;
+        padding: 0px 6px;
+    }
+    td{
+        padding: 2px 6px;
+        border: solid 1px #c0c0c0;
+        font-size: 13px;
+    }
+    .rowval0{
+        margin: 0;
+    }
+    .datacell0, .firstdatacell0{
+        text-align: right;
+        margin: 0;
+    }
+    .firstcolvar0, .firstrowvar0, .spaceholder0 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        color: white;
+    }
+    .firstcolvar0, .firstrowvar0{
+        background-color: #333435;
+    }
+    .firstrowvar0{
+        border-left: solid 1px #333435;
+        border-bottom:  solid 1px #333435;
+    }
+    .topline0{
+        border-top: 2px solid #c0c0c0;
+    }
+    .spaceholder0 {
+        background-color: #CCD9D7;
+    }
+    .firstcolvar0{
+        padding: 9px 6px;
+        vertical-align: top;
+    }
+    .rowvar0, .colvar0{
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        color: #333435;
+        background-color: white;
+    }
+    .colvar0{
+        padding: 6px 0px;            
+    } 
+    .colval0, .measure0{
+        font-size: 12px;
+        vertical-align: top;
+    }
+    table {
+        border-collapse: collapse;
+    }
+    tr.total-row0 td{
+        font-weight: bold;
+        border-top: solid 2px black;
+        border-bottom: double 3px black;
+    }
+    .page-break-before0{
+        page-break-before: always;
+        border-bottom: none; /*3px dotted #AFAFAF;*/
+        width: auto;
+        height: 18px;
+    }
+    td.lbl0{
+        text-align: left;
+        background-color: #F5F5F5;
+    }
+    td.right0{
+        text-align: right;
+    }
+    .ftnote-line{
+        /* for hr http://www.w3schools.com/TAGS/att_hr_align.asp*/
+        width: 300px;
+        text-align: left; /* IE and Opera*/
+        margin-left: 0; /* Firefox, Chrome, Safari */
+    }
+    .tbl-header-ftnote0{
+        color: white;
+    }
+    .ftnote{
+        color: black;
+    }
+    /* Tool tip connector arrows */
+    .dijitTooltipBelow-defbrown {
+	
+	    padding-top: 13px;
+    }
+    .dijitTooltipAbove-defbrown {
+	
+	    padding-bottom: 13px;
+    }
+    .tundra .dijitTooltipBelow-defbrown .dijitTooltipConnector {
+	
+	    top: 0px;
+	    left: 3px;
+	    background: url("sofastats_report_extras/tooltipConnectorUp-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipBelow-defbrown .dijitTooltipConnector {
+	
+	    background-image: url("sofastats_report_extras/tooltipConnectorUp-defbrown.gif") !important;
+    }
+    .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	
+	    bottom: 0px;
+	    left: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorDown-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorDown-defbrown.gif") !important;
+    }
+    .dj_ie6 .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	    bottom: -3px;
+    }
+    .tundra .dijitTooltipLeft-defbrown {
+	    padding-right: 14px;
+    }
+    .dj_ie6 .tundra .dijitTooltipLeft-defbrown {
+	    padding-left: 15px;
+    }
+    .tundra .dijitTooltipLeft-defbrown .dijitTooltipConnector {
+	
+	    right: 0px;
+	    bottom: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorRight-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipLeft-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorRight-defbrown.gif") !important;
+    }
+    .tundra .dijitTooltipRight-defbrown {
+	    padding-left: 14px;
+    }
+    .tundra .dijitTooltipRight-defbrown .dijitTooltipConnector {
+	
+	    left: 0px;
+	    bottom: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorLeft-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipRight-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorLeft-defbrown.gif") !important;
+    }
+
+-->
+</style>
+</head>
+<body class="tundra">
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both; ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Number of Source Files
+</span>
+<span class='tblsubtitle0'>
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl00 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart00 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "C";
+    series0["yVals"] = [0.0, 0.0, 3.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 4.0, 4.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['0.0, C<br>0.0', '1.0, C<br>0.0', '2.0, C<br>3.0', '3.0, C<br>2.0', '4.0, C<br>2.0', '5.0, C<br>2.0', '6.0, C<br>2.0', '7.0, C<br>2.0', '8.0, C<br>2.0', '9.0, C<br>2.0', '10.0, C<br>4.0', '11.0, C<br>4.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "Cython";
+    series1["yVals"] = [2.0, 2.0, 2.0, 2.0, 2.0, 6.0, 6.0, 6.0, 8.0, 8.0, 22.0, 25.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['0.0, Cython<br>2.0', '1.0, Cython<br>2.0', '2.0, Cython<br>2.0', '3.0, Cython<br>2.0', '4.0, Cython<br>2.0', '5.0, Cython<br>6.0', '6.0, Cython<br>6.0', '7.0, Cython<br>6.0', '8.0, Cython<br>8.0', '9.0, Cython<br>8.0', '10.0, Cython<br>22.0', '11.0, Cython<br>25.0']};
+    
+    var series2 = new Array();
+    series2["seriesLabel"] = "Python";
+    series2["yVals"] = [63.0, 68.0, 73.0, 74.0, 58.0, 64.0, 66.0, 72.0, 96.0, 109.0, 202.0, 231.0];
+    series2["options"] = {stroke: {color: "white", width: "0px"}, fill: "#4495c3", yLbls: ['0.0, Python<br>63.0', '1.0, Python<br>68.0', '2.0, Python<br>73.0', '3.0, Python<br>74.0', '4.0, Python<br>58.0', '5.0, Python<br>64.0', '6.0, Python<br>66.0', '7.0, Python<br>72.0', '8.0, Python<br>96.0', '9.0, Python<br>109.0', '10.0, Python<br>202.0', '11.0, Python<br>231.0']};
+    
+    var series = new Array(series0, series1, series2);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "0.0.7.x"},
+            {value: 2, text: "0.1.x"},
+            {value: 3, text: "0.2.x"},
+            {value: 4, text: "0.3.x"},
+            {value: 5, text: "0.4.x"},
+            {value: 6, text: "0.5.x"},
+            {value: 7, text: "0.6.x"},
+            {value: 8, text: "0.7.x"},
+            {value: 9, text: "0.8.x"},
+            {value: 10, text: "0.9.x"},
+            {value: 11, text: "0.10.x"},
+            {value: 12, text: "0.11.x"}];
+    chartconf["xgap"] = 5;
+    chartconf["xfontsize"] = 8;
+    chartconf["sofaHl"] = sofaHl00;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = true;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Version";
+    chartconf["axisLabelDrop"] = 15;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 57.5;
+    chartconf["marginOffsetL"] = 42.5;
+    chartconf["yTitle"] = "Number of Files";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 254.1;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart00", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+
+<div id="mychart00" 
+    style="width: 1542.5px; height: 325px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Language:
+        </p>
+        <div id="legendMychart00">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Number of Source Files--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Lines of code
+</span>
+<span class='tblsubtitle0'>
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl01 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart01 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "C";
+    series0["yVals"] = [0.0, 0.0, 472.0, 483.0, 506.0, 711.0, 742.0, 752.0, 925.0, 915.0, 676.0, 97.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['0.0, C<br>0.0', '1.0, C<br>0.0', '2.0, C<br>472.0', '3.0, C<br>483.0', '4.0, C<br>506.0', '5.0, C<br>711.0', '6.0, C<br>742.0', '7.0, C<br>752.0', '8.0, C<br>925.0', '9.0, C<br>915.0', '10.0, C<br>676.0', '11.0, C<br>97.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "Cython";
+    series1["yVals"] = [2147.0, 2134.0, 2386.0, 2387.0, 2513.0, 3111.0, 3086.0, 3239.0, 3740.0, 3704.0, 6551.0, 9919.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['0.0, Cython<br>2147.0', '1.0, Cython<br>2134.0', '2.0, Cython<br>2386.0', '3.0, Cython<br>2387.0', '4.0, Cython<br>2513.0', '5.0, Cython<br>3111.0', '6.0, Cython<br>3086.0', '7.0, Cython<br>3239.0', '8.0, Cython<br>3740.0', '9.0, Cython<br>3704.0', '10.0, Cython<br>6551.0', '11.0, Cython<br>9919.0']};
+    
+    var series2 = new Array();
+    series2["seriesLabel"] = "Python";
+    series2["yVals"] = [13536.0, 13640.0, 14602.0, 15987.0, 15052.0, 15811.0, 16279.0, 18687.0, 23168.0, 26309.0, 32640.0, 40125.0];
+    series2["options"] = {stroke: {color: "white", width: "0px"}, fill: "#4495c3", yLbls: ['0.0, Python<br>13536.0', '1.0, Python<br>13640.0', '2.0, Python<br>14602.0', '3.0, Python<br>15987.0', '4.0, Python<br>15052.0', '5.0, Python<br>15811.0', '6.0, Python<br>16279.0', '7.0, Python<br>18687.0', '8.0, Python<br>23168.0', '9.0, Python<br>26309.0', '10.0, Python<br>32640.0', '11.0, Python<br>40125.0']};
+    
+    var series = new Array(series0, series1, series2);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "0.0"},
+            {value: 2, text: "1.0"},
+            {value: 3, text: "2.0"},
+            {value: 4, text: "3.0"},
+            {value: 5, text: "4.0"},
+            {value: 6, text: "5.0"},
+            {value: 7, text: "6.0"},
+            {value: 8, text: "7.0"},
+            {value: 9, text: "8.0"},
+            {value: 10, text: "9.0"},
+            {value: 11, text: "10.0"},
+            {value: 12, text: "11.0"}];
+    chartconf["xgap"] = 5;
+    chartconf["xfontsize"] = 8;
+    chartconf["sofaHl"] = sofaHl01;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = true;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Version";
+    chartconf["axisLabelDrop"] = 15;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 70.5;
+    chartconf["marginOffsetL"] = 55.5;
+    chartconf["yTitle"] = "Number of Lines";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 44137.5;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart01", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+
+<div id="mychart01" 
+    style="width: 1555.5px; height: 325px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Language:
+        </p>
+        <div id="legendMychart01">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Lines of code--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Unique lines of code
+</span>
+<span class='tblsubtitle0'>
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl02 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart02 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "C";
+    series0["yVals"] = [0.0, 0.0, 281.0, 288.0, 286.0, 427.0, 427.0, 431.0, 555.0, 566.0, 412.0, 55.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['0.0, C<br>0.0', '1.0, C<br>0.0', '2.0, C<br>281.0', '3.0, C<br>288.0', '4.0, C<br>286.0', '5.0, C<br>427.0', '6.0, C<br>427.0', '7.0, C<br>431.0', '8.0, C<br>555.0', '9.0, C<br>566.0', '10.0, C<br>412.0', '11.0, C<br>55.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "Cython";
+    series1["yVals"] = [1679.0, 1670.0, 1770.0, 1771.0, 1831.0, 2203.0, 2193.0, 2342.0, 2701.0, 2707.0, 4015.0, 6350.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['0.0, Cython<br>1679.0', '1.0, Cython<br>1670.0', '2.0, Cython<br>1770.0', '3.0, Cython<br>1771.0', '4.0, Cython<br>1831.0', '5.0, Cython<br>2203.0', '6.0, Cython<br>2193.0', '7.0, Cython<br>2342.0', '8.0, Cython<br>2701.0', '9.0, Cython<br>2707.0', '10.0, Cython<br>4015.0', '11.0, Cython<br>6350.0']};
+    
+    var series2 = new Array();
+    series2["seriesLabel"] = "Python";
+    series2["yVals"] = [9990.0, 9974.0, 10581.0, 11684.0, 11028.0, 11642.0, 11943.0, 13577.0, 16713.0, 18773.0, 22428.0, 27247.0];
+    series2["options"] = {stroke: {color: "white", width: "0px"}, fill: "#4495c3", yLbls: ['0.0, Python<br>9990.0', '1.0, Python<br>9974.0', '2.0, Python<br>10581.0', '3.0, Python<br>11684.0', '4.0, Python<br>11028.0', '5.0, Python<br>11642.0', '6.0, Python<br>11943.0', '7.0, Python<br>13577.0', '8.0, Python<br>16713.0', '9.0, Python<br>18773.0', '10.0, Python<br>22428.0', '11.0, Python<br>27247.0']};
+    
+    var series = new Array(series0, series1, series2);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "0.0.7.x"},
+            {value: 2, text: "0.1.x"},
+            {value: 3, text: "0.2.x"},
+            {value: 4, text: "0.3.x"},
+            {value: 5, text: "0.4.x"},
+            {value: 6, text: "0.5.x"},
+            {value: 7, text: "0.6.x"},
+            {value: 8, text: "0.7.x"},
+            {value: 9, text: "0.8.x"},
+            {value: 10, text: "0.9.x"},
+            {value: 11, text: "0.10.x"},
+            {value: 12, text: "0.11.x"}];
+    chartconf["xgap"] = 5;
+    chartconf["xfontsize"] = 8;
+    chartconf["sofaHl"] = sofaHl02;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = true;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Version";
+    chartconf["axisLabelDrop"] = 15;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 70.5;
+    chartconf["marginOffsetL"] = 55.5;
+    chartconf["yTitle"] = "Number of Unique lines of code";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 29971.7;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart02", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+
+<div id="mychart02" 
+    style="width: 1555.5px; height: 325px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Language:
+        </p>
+        <div id="legendMychart02">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Unique lines of code--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Unique lines of code per file
+</span>
+<span class='tblsubtitle0'>
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl03 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart03 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "C";
+    series0["yVals"] = [0.0, 0.0, 94.0, 144.0, 143.0, 214.0, 214.0, 216.0, 278.0, 283.0, 103.0, 14.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['0.0, C<br>0.0', '1.0, C<br>0.0', '2.0, C<br>94.0', '3.0, C<br>144.0', '4.0, C<br>143.0', '5.0, C<br>214.0', '6.0, C<br>214.0', '7.0, C<br>216.0', '8.0, C<br>278.0', '9.0, C<br>283.0', '10.0, C<br>103.0', '11.0, C<br>14.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "Cython";
+    series1["yVals"] = [840.0, 835.0, 885.0, 886.0, 916.0, 367.0, 366.0, 390.0, 338.0, 338.0, 183.0, 254.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['0.0, Cython<br>840.0', '1.0, Cython<br>835.0', '2.0, Cython<br>885.0', '3.0, Cython<br>886.0', '4.0, Cython<br>916.0', '5.0, Cython<br>367.0', '6.0, Cython<br>366.0', '7.0, Cython<br>390.0', '8.0, Cython<br>338.0', '9.0, Cython<br>338.0', '10.0, Cython<br>183.0', '11.0, Cython<br>254.0']};
+    
+    var series2 = new Array();
+    series2["seriesLabel"] = "Python";
+    series2["yVals"] = [159.0, 147.0, 145.0, 158.0, 190.0, 182.0, 181.0, 189.0, 174.0, 172.0, 111.0, 118.0];
+    series2["options"] = {stroke: {color: "white", width: "0px"}, fill: "#4495c3", yLbls: ['0.0, Python<br>159.0', '1.0, Python<br>147.0', '2.0, Python<br>145.0', '3.0, Python<br>158.0', '4.0, Python<br>190.0', '5.0, Python<br>182.0', '6.0, Python<br>181.0', '7.0, Python<br>189.0', '8.0, Python<br>174.0', '9.0, Python<br>172.0', '10.0, Python<br>111.0', '11.0, Python<br>118.0']};
+    
+    var series = new Array(series0, series1, series2);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "0.0.7.x"},
+            {value: 2, text: "0.1.x"},
+            {value: 3, text: "0.2.x"},
+            {value: 4, text: "0.3.x"},
+            {value: 5, text: "0.4.x"},
+            {value: 6, text: "0.5.x"},
+            {value: 7, text: "0.6.x"},
+            {value: 8, text: "0.7.x"},
+            {value: 9, text: "0.8.x"},
+            {value: 10, text: "0.9.x"},
+            {value: 11, text: "0.10.x"},
+            {value: 12, text: "0.11.x"}];
+    chartconf["xgap"] = 5;
+    chartconf["xfontsize"] = 8;
+    chartconf["sofaHl"] = sofaHl03;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = true;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Version";
+    chartconf["axisLabelDrop"] = 15;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 57.5;
+    chartconf["marginOffsetL"] = 42.5;
+    chartconf["yTitle"] = "Unique lines of code per file";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 1007.6;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart03", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+
+<div id="mychart03" 
+    style="width: 1542.5px; height: 325px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Language:
+        </p>
+        <div id="legendMychart03">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Unique lines of code per file--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+</body></html>
