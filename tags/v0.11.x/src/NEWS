@@ -1,3 +1,8 @@
+v0.11.1 (2014-01-22)
+======================
+	-- fix compatibility with old/unsupported servers
+
+
 v0.11.0 (2014-01-20)
 ======================
 	-- NVENC hardware h264 encoding acceleration
