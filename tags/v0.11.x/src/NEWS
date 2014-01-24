@@ -1,6 +1,9 @@
-v0.11.1 (2014-01-22)
+v0.11.1 (2014-01-24)
 ======================
 	-- fix compatibility with old/unsupported servers
+	-- fix shadow mode
+	-- fix paint issue with transparent tooltips on OSX and MS Windows
+	-- fix pixel format typo in OpenGL logging
 
 
 v0.11.0 (2014-01-20)
