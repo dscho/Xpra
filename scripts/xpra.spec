@@ -196,8 +196,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Jan 22 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.1-1
+* Fri Jan 24 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.1-1
 - fix compatibility with old/unsupported servers
+- fix shadow mode
+- fix paint issue with transparent tooltips on OSX and MS Windows
+- fix pixel format typo in OpenGL logging
 
 * Mon Jan 20 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.0-1
 - NVENC hardware h264 encoding acceleration
