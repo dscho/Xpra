@@ -1,0 +1,1027 @@
+<!--css_fils = [u"/home/antoine/Documents/sofastats/css/default.css"]-->
+
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'
+'http://www.w3.org/TR/html4/loose.dtd'>
+<html>
+<head>
+<meta http-equiv="P3P" content='CP="IDC DSP COR CURa ADMa OUR IND PHY ONL COM 
+STA"'>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<title>RGB Compression Statistics - Network Code Changes</title>
+
+<link rel='stylesheet' type='text/css' 
+href="sofastats_report_extras/tundra.css" />
+<script src="sofastats_report_extras/dojo.xd.js"></script>
+<script src="sofastats_report_extras/sofastatsdojo_minified.js"></script>
+<script src="sofastats_report_extras/sofastats_charts.js"></script>
+<script type="text/javascript">
+get_ie_script = function(mysrc){
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = mysrc;
+    document.getElementsByTagName('head')[0].appendChild(script); 
+}
+if(dojo.isIE){
+    get_ie_script("sofastats_report_extras/arc.xd.js");
+    get_ie_script("sofastats_report_extras/gradient.xd.js");
+    get_ie_script("sofastats_report_extras/vml.xd.js");
+}
+makeObjects = function(){
+
+    //n_charts_start
+    var n_charts = 6;
+    //n_charts_end
+    for(var i=0;i<n_charts;i++){
+        try{
+            window["makechart" + String('00'+i).slice(-2)]();
+        } catch(exceptionObject) {
+            var keepGoing = true;
+        }
+    }
+};
+dojo.addOnLoad(makeObjects);
+
+var DEFAULT_SATURATION  = 100,
+DEFAULT_LUMINOSITY1 = 75,
+DEFAULT_LUMINOSITY2 = 50,
+
+c = dojox.color,
+
+cc = function(colour){
+    return function(){ return colour; };
+},
+
+hl = function(colour){
+
+    var a = new c.Color(colour),
+        x = a.toHsl();
+    if(x.s == 0){
+        x.l = x.l < 50 ? 100 : 0;
+    }else{
+        x.s = DEFAULT_SATURATION;
+        if(x.l < DEFAULT_LUMINOSITY2){
+            x.l = DEFAULT_LUMINOSITY1;
+        }else if(x.l > DEFAULT_LUMINOSITY1){
+            x.l = DEFAULT_LUMINOSITY2;
+        }else{
+            x.l = x.l - DEFAULT_LUMINOSITY2 > DEFAULT_LUMINOSITY1 - x.l 
+                ? DEFAULT_LUMINOSITY2 : DEFAULT_LUMINOSITY1;
+        }
+    }
+    return c.fromHsl(x);
+}
+
+getfainthex = function(hexcolour){
+    var a = new c.Color(hexcolour)
+    x = a.toHsl();
+    x.s = x.s * 1.5;
+    x.l = x.l * 1.25;
+    return c.fromHsl(x);
+}
+
+makefaint = function(colour){
+    var fainthex = getfainthex(colour.toHex());
+    return new dojox.color.Color(fainthex);
+}
+
+var labelLineBreak = (dojo.isIE) ? "\n" : "<br>";
+
+</script>
+
+<style type="text/css">
+<!--
+    .dojoxLegendNode {
+        border: 1px solid #ccc; 
+        margin: 5px 10px 5px 10px; 
+        padding: 3px
+    }
+    .dojoxLegendText {
+        vertical-align: text-top; 
+        padding-right: 10px
+    }
+    @media print {
+        .screen-float-only{
+        float: none;
+        }
+    }
+    
+    @media screen {
+        .screen-float-only{
+        float: left;
+        }
+    }
+-->
+</style>
+<style type="text/css">
+<!--
+
+body {
+    background-color: #ffffff;
+}
+td, th {
+    background-color: white;
+}
+/*
+dojo_style_start
+outer_bg = u"white"
+inner_bg = u"#f2f1f0" # u"#e0d9d5"
+axis_label_font_colour = u"#423126"
+major_gridline_colour = u"#b8a49e"
+gridline_width = 1
+stroke_width = 3
+tooltip_border_colour = u"#736354"
+colour_mappings = [(u"#e95f29", u"#ef7d44"),
+    (u"#f4cb3a", u"#f7d858"),
+    (u"#4495c3", u"#62add2"),
+    (u"#44953a", u"#62ad58"),
+    (u"#f43a3a", u"#f75858"),
+    ]
+connector_style = u"defbrown"
+dojo_style_end
+*/
+    body{
+        font-size: 12px;
+        font-family: Ubuntu, Helvetica, sans-serif;
+    }
+    h1, h2{
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+    }
+    h1{
+        font-size: 18px;
+    }
+    h2{
+        font-size: 16px;
+    }
+    .gui-msg-medium, gui-msg-small{
+        color: #29221c;
+        font-family: arial;
+    }
+    .gui-msg-medium{
+        font-size: 16px;
+    }
+    *html .gui-msg-medium{
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .gui-msg-small{
+        font-size: 13px;
+        line-height: 150%;
+    }
+    .gui-note{
+        background-color: #e95829;
+        color: white;
+        font-weight: bold;
+        padding: 2px;
+    }
+    tr, td, th{
+        margin: 0;
+    }
+
+    .tbltitle0, .tblsubtitle0{
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .tbltitle0{ /*spans*/
+        padding: 0;
+        font-size: 18px;
+    }
+    .tblsubtitle0{
+        padding: 12px 0px 0px 0px;
+        font-size: 14px;
+    }
+    .tblcelltitle0{ /*th*/
+        text-align: left;
+        border: none;
+        padding: 0px 0px 12px 0px;
+        margin: 0;
+    }
+
+    th, .rowvar0, .rowval0, .datacell0, .firstdatacell0 {
+        border: solid 1px #A1A1A1;
+    }
+    th{
+        margin: 0;
+        padding: 0px 6px;
+    }
+    td{
+        padding: 2px 6px;
+        border: solid 1px #c0c0c0;
+        font-size: 13px;
+    }
+    .rowval0{
+        margin: 0;
+    }
+    .datacell0, .firstdatacell0{
+        text-align: right;
+        margin: 0;
+    }
+    .firstcolvar0, .firstrowvar0, .spaceholder0 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        color: white;
+    }
+    .firstcolvar0, .firstrowvar0{
+        background-color: #333435;
+    }
+    .firstrowvar0{
+        border-left: solid 1px #333435;
+        border-bottom:  solid 1px #333435;
+    }
+    .topline0{
+        border-top: 2px solid #c0c0c0;
+    }
+    .spaceholder0 {
+        background-color: #CCD9D7;
+    }
+    .firstcolvar0{
+        padding: 9px 6px;
+        vertical-align: top;
+    }
+    .rowvar0, .colvar0{
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        color: #333435;
+        background-color: white;
+    }
+    .colvar0{
+        padding: 6px 0px;            
+    } 
+    .colval0, .measure0{
+        font-size: 12px;
+        vertical-align: top;
+    }
+    table {
+        border-collapse: collapse;
+    }
+    tr.total-row0 td{
+        font-weight: bold;
+        border-top: solid 2px black;
+        border-bottom: double 3px black;
+    }
+    .page-break-before0{
+        page-break-before: always;
+        border-bottom: none; /*3px dotted #AFAFAF;*/
+        width: auto;
+        height: 18px;
+    }
+    td.lbl0{
+        text-align: left;
+        background-color: #F5F5F5;
+    }
+    td.right0{
+        text-align: right;
+    }
+    .ftnote-line{
+        /* for hr http://www.w3schools.com/TAGS/att_hr_align.asp*/
+        width: 300px;
+        text-align: left; /* IE and Opera*/
+        margin-left: 0; /* Firefox, Chrome, Safari */
+    }
+    .tbl-header-ftnote0{
+        color: white;
+    }
+    .ftnote{
+        color: black;
+    }
+    /* Tool tip connector arrows */
+    .dijitTooltipBelow-defbrown {
+	
+	    padding-top: 13px;
+    }
+    .dijitTooltipAbove-defbrown {
+	
+	    padding-bottom: 13px;
+    }
+    .tundra .dijitTooltipBelow-defbrown .dijitTooltipConnector {
+	
+	    top: 0px;
+	    left: 3px;
+	    background: url("sofastats_report_extras/tooltipConnectorUp-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipBelow-defbrown .dijitTooltipConnector {
+	
+	    background-image: url("sofastats_report_extras/tooltipConnectorUp-defbrown.gif") !important;
+    }
+    .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	
+	    bottom: 0px;
+	    left: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorDown-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorDown-defbrown.gif") !important;
+    }
+    .dj_ie6 .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	    bottom: -3px;
+    }
+    .tundra .dijitTooltipLeft-defbrown {
+	    padding-right: 14px;
+    }
+    .dj_ie6 .tundra .dijitTooltipLeft-defbrown {
+	    padding-left: 15px;
+    }
+    .tundra .dijitTooltipLeft-defbrown .dijitTooltipConnector {
+	
+	    right: 0px;
+	    bottom: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorRight-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipLeft-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorRight-defbrown.gif") !important;
+    }
+    .tundra .dijitTooltipRight-defbrown {
+	    padding-left: 14px;
+    }
+    .tundra .dijitTooltipRight-defbrown .dijitTooltipConnector {
+	
+	    left: 0px;
+	    bottom: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorLeft-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipRight-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorLeft-defbrown.gif") !important;
+    }
+
+-->
+</style>
+</head>
+<body class="tundra">
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both; ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Pixel lz4 compression: auto vs none - FPS
+</span>
+<br />
+<span class='tblsubtitle0'>
+Sending raw RGB pixels does allow us to push a lot more frames
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl00 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart00 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "16k";
+    series0["yVals"] = [18.5, 29.0, 5.0, 8.5, 1.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['glxgears, 16k<br>18.5', 'moebiusgears, 16k<br>29.0', 'x11perf, 16k<br>5.0', 'xonotic-linux64-glx, 16k<br>8.5', 'xterm, 16k<br>1.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "64k";
+    series1["yVals"] = [19.0, 27.0, 5.0, 17.5, 2.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['glxgears, 64k<br>19.0', 'moebiusgears, 64k<br>27.0', 'x11perf, 64k<br>5.0', 'xonotic-linux64-glx, 64k<br>17.5', 'xterm, 64k<br>2.0']};
+    
+    var series2 = new Array();
+    series2["seriesLabel"] = "64k2";
+    series2["yVals"] = [19.0, 27.0, 5.0, 17.0, 1.5];
+    series2["options"] = {stroke: {color: "white", width: "0px"}, fill: "#4495c3", yLbls: ['glxgears, 64k2<br>19.0', 'moebiusgears, 64k2<br>27.0', 'x11perf, 64k2<br>5.0', 'xonotic-linux64-glx, 64k2<br>17.0', 'xterm, 64k2<br>1.5']};
+    
+    var series3 = new Array();
+    series3["seriesLabel"] = "new";
+    series3["yVals"] = [18.5, 29.0, 5.0, 8.5, 1.0];
+    series3["options"] = {stroke: {color: "white", width: "0px"}, fill: "#44953a", yLbls: ['glxgears, new<br>18.5', 'moebiusgears, new<br>29.0', 'x11perf, new<br>5.0', 'xonotic-linux64-glx, new<br>8.5', 'xterm, new<br>1.0']};
+    
+    var series4 = new Array();
+    series4["seriesLabel"] = "old";
+    series4["yVals"] = [19.0, 28.5, 5.0, 9.0, 2.0];
+    series4["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f43a3a", yLbls: ['glxgears, old<br>19.0', 'moebiusgears, old<br>28.5', 'x11perf, old<br>5.0', 'xonotic-linux64-glx, old<br>9.0', 'xterm, old<br>2.0']};
+    
+    var series5 = new Array();
+    series5["seriesLabel"] = "old64k";
+    series5["yVals"] = [18.5, 26.0, 5.0, 17.0, 1.5];
+    series5["options"] = {stroke: {color: "white", width: "0px"}, fill: "indigo", yLbls: ['glxgears, old64k<br>18.5', 'moebiusgears, old64k<br>26.0', 'x11perf, old64k<br>5.0', 'xonotic-linux64-glx, old64k<br>17.0', 'xterm, old64k<br>1.5']};
+    
+    var series = new Array(series0, series1, series2, series3, series4, series5);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "glxgears"},
+            {value: 2, text: "moebiusgears"},
+            {value: 3, text: "x11perf"},
+            {value: 4, text: "                 " + labelLineBreak + "xonotic-linux64-glx"},
+            {value: 5, text: "xterm"}];
+    chartconf["xgap"] = 8.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl00;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Test_Command";
+    chartconf["axisLabelDrop"] = 22;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 51.0;
+    chartconf["marginOffsetL"] = 39.0;
+    chartconf["yTitle"] = "Regions/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 47.3;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart00", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Speed: auto</b></p>
+<div id="mychart00" 
+    style="width: 899.0px; height: 332px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Network Receive Buffer:
+        </p>
+        <div id="legendMychart00">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Pixel lz4 compression: auto vs none - F_Speed: -1.0--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl01 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart01 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "16k";
+    series0["yVals"] = [29.0, 29.0, 5.0, 36.5, 1.5];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['glxgears, 16k<br>29.0', 'moebiusgears, 16k<br>29.0', 'x11perf, 16k<br>5.0', 'xonotic-linux64-glx, 16k<br>36.5', 'xterm, 16k<br>1.5']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "64k";
+    series1["yVals"] = [31.0, 27.0, 5.0, 43.0, 1.5];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['glxgears, 64k<br>31.0', 'moebiusgears, 64k<br>27.0', 'x11perf, 64k<br>5.0', 'xonotic-linux64-glx, 64k<br>43.0', 'xterm, 64k<br>1.5']};
+    
+    var series2 = new Array();
+    series2["seriesLabel"] = "64k2";
+    series2["yVals"] = [30.0, 27.0, 5.0, 41.0, 1.5];
+    series2["options"] = {stroke: {color: "white", width: "0px"}, fill: "#4495c3", yLbls: ['glxgears, 64k2<br>30.0', 'moebiusgears, 64k2<br>27.0', 'x11perf, 64k2<br>5.0', 'xonotic-linux64-glx, 64k2<br>41.0', 'xterm, 64k2<br>1.5']};
+    
+    var series3 = new Array();
+    series3["seriesLabel"] = "new";
+    series3["yVals"] = [26.5, 29.0, 5.0, 26.5, 1.0];
+    series3["options"] = {stroke: {color: "white", width: "0px"}, fill: "#44953a", yLbls: ['glxgears, new<br>26.5', 'moebiusgears, new<br>29.0', 'x11perf, new<br>5.0', 'xonotic-linux64-glx, new<br>26.5', 'xterm, new<br>1.0']};
+    
+    var series4 = new Array();
+    series4["seriesLabel"] = "old";
+    series4["yVals"] = [27.0, 29.0, 5.0, 21.0, 1.0];
+    series4["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f43a3a", yLbls: ['glxgears, old<br>27.0', 'moebiusgears, old<br>29.0', 'x11perf, old<br>5.0', 'xonotic-linux64-glx, old<br>21.0', 'xterm, old<br>1.0']};
+    
+    var series5 = new Array();
+    series5["seriesLabel"] = "old64k";
+    series5["yVals"] = [33.0, 26.5, 5.0, 41.5, 2.0];
+    series5["options"] = {stroke: {color: "white", width: "0px"}, fill: "indigo", yLbls: ['glxgears, old64k<br>33.0', 'moebiusgears, old64k<br>26.5', 'x11perf, old64k<br>5.0', 'xonotic-linux64-glx, old64k<br>41.5', 'xterm, old64k<br>2.0']};
+    
+    var series = new Array(series0, series1, series2, series3, series4, series5);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "glxgears"},
+            {value: 2, text: "moebiusgears"},
+            {value: 3, text: "x11perf"},
+            {value: 4, text: "                 " + labelLineBreak + "xonotic-linux64-glx"},
+            {value: 5, text: "xterm"}];
+    chartconf["xgap"] = 8.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl01;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Test_Command";
+    chartconf["axisLabelDrop"] = 22;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 51.0;
+    chartconf["marginOffsetL"] = 39.0;
+    chartconf["yTitle"] = "Regions/S";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 47.3;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart01", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Speed: 100.0</b></p>
+<div id="mychart01" 
+    style="width: 899.0px; height: 332px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Network Receive Buffer:
+        </p>
+        <div id="legendMychart01">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Pixel lz4 compression: auto vs none - _Speed: 100.0--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Pixel lz4 compression: auto vs none - PPS
+</span>
+<br />
+<span class='tblsubtitle0'>
+Sending raw RGB pixels does allow us to push a lot more pixels
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl02 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart02 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "16k";
+    series0["yVals"] = [21329575.0, 8436131.0, 1344027.0, 7023441.0, 1477248.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['glxgears, 16k<br>21329575.0', 'moebiusgears, 16k<br>8436131.0', 'x11perf, 16k<br>1344027.0', 'xonotic-linux64-glx, 16k<br>7023441.0', 'xterm, 16k<br>1477248.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "64k";
+    series1["yVals"] = [21388858.5, 7933797.5, 1371353.0, 13892079.0, 1890442.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['glxgears, 64k<br>21388858.5', 'moebiusgears, 64k<br>7933797.5', 'x11perf, 64k<br>1371353.0', 'xonotic-linux64-glx, 64k<br>13892079.0', 'xterm, 64k<br>1890442.0']};
+    
+    var series2 = new Array();
+    series2["seriesLabel"] = "64k2";
+    series2["yVals"] = [21414082.5, 7831600.0, 1378164.5, 13850509.0, 1609768.0];
+    series2["options"] = {stroke: {color: "white", width: "0px"}, fill: "#4495c3", yLbls: ['glxgears, 64k2<br>21414082.5', 'moebiusgears, 64k2<br>7831600.0', 'x11perf, 64k2<br>1378164.5', 'xonotic-linux64-glx, 64k2<br>13850509.0', 'xterm, 64k2<br>1609768.0']};
+    
+    var series3 = new Array();
+    series3["seriesLabel"] = "new";
+    series3["yVals"] = [21532804.0, 8376038.5, 1355834.0, 7192049.0, 1123531.5];
+    series3["options"] = {stroke: {color: "white", width: "0px"}, fill: "#44953a", yLbls: ['glxgears, new<br>21532804.0', 'moebiusgears, new<br>8376038.5', 'x11perf, new<br>1355834.0', 'xonotic-linux64-glx, new<br>7192049.0', 'xterm, new<br>1123531.5']};
+    
+    var series4 = new Array();
+    series4["seriesLabel"] = "old";
+    series4["yVals"] = [21882184.0, 8346545.0, 1366273.5, 7503826.0, 2057578.5];
+    series4["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f43a3a", yLbls: ['glxgears, old<br>21882184.0', 'moebiusgears, old<br>8346545.0', 'x11perf, old<br>1366273.5', 'xonotic-linux64-glx, old<br>7503826.0', 'xterm, old<br>2057578.5']};
+    
+    var series5 = new Array();
+    series5["seriesLabel"] = "old64k";
+    series5["yVals"] = [21267761.0, 7639908.0, 1339504.5, 13905513.5, 1709666.0];
+    series5["options"] = {stroke: {color: "white", width: "0px"}, fill: "indigo", yLbls: ['glxgears, old64k<br>21267761.0', 'moebiusgears, old64k<br>7639908.0', 'x11perf, old64k<br>1339504.5', 'xonotic-linux64-glx, old64k<br>13905513.5', 'xterm, old64k<br>1709666.0']};
+    
+    var series = new Array(series0, series1, series2, series3, series4, series5);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "glxgears"},
+            {value: 2, text: "moebiusgears"},
+            {value: 3, text: "x11perf"},
+            {value: 4, text: "                 " + labelLineBreak + "xonotic-linux64-glx"},
+            {value: 5, text: "xterm"}];
+    chartconf["xgap"] = 8.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl02;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Test_Command";
+    chartconf["axisLabelDrop"] = 22;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 90.0;
+    chartconf["marginOffsetL"] = 78.0;
+    chartconf["yTitle"] = "Pixels/s Sent";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 40913324.65;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart02", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Speed: auto</b></p>
+<div id="mychart02" 
+    style="width: 938.0px; height: 332px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Network Receive Buffer:
+        </p>
+        <div id="legendMychart02">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Pixel lz4 compression: auto vs none - P_Speed: -1.0--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl03 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart03 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "16k";
+    series0["yVals"] = [32526947.5, 8458057.0, 1346807.5, 29379132.5, 1664498.5];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['glxgears, 16k<br>32526947.5', 'moebiusgears, 16k<br>8458057.0', 'x11perf, 16k<br>1346807.5', 'xonotic-linux64-glx, 16k<br>29379132.5', 'xterm, 16k<br>1664498.5']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "64k";
+    series1["yVals"] = [35181373.5, 7924250.0, 1359642.0, 33942267.0, 1607834.5];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['glxgears, 64k<br>35181373.5', 'moebiusgears, 64k<br>7924250.0', 'x11perf, 64k<br>1359642.0', 'xonotic-linux64-glx, 64k<br>33942267.0', 'xterm, 64k<br>1607834.5']};
+    
+    var series2 = new Array();
+    series2["seriesLabel"] = "64k2";
+    series2["yVals"] = [33725633.0, 7865039.5, 1336222.0, 32612535.0, 1688477.5];
+    series2["options"] = {stroke: {color: "white", width: "0px"}, fill: "#4495c3", yLbls: ['glxgears, 64k2<br>33725633.0', 'moebiusgears, 64k2<br>7865039.5', 'x11perf, 64k2<br>1336222.0', 'xonotic-linux64-glx, 64k2<br>32612535.0', 'xterm, 64k2<br>1688477.5']};
+    
+    var series3 = new Array();
+    series3["seriesLabel"] = "new";
+    series3["yVals"] = [30069045.5, 8507088.0, 1355391.0, 21369223.5, 927348.5];
+    series3["options"] = {stroke: {color: "white", width: "0px"}, fill: "#44953a", yLbls: ['glxgears, new<br>30069045.5', 'moebiusgears, new<br>8507088.0', 'x11perf, new<br>1355391.0', 'xonotic-linux64-glx, new<br>21369223.5', 'xterm, new<br>927348.5']};
+    
+    var series4 = new Array();
+    series4["seriesLabel"] = "old";
+    series4["yVals"] = [30875782.5, 8478876.0, 1377320.5, 17086958.5, 1446028.0];
+    series4["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f43a3a", yLbls: ['glxgears, old<br>30875782.5', 'moebiusgears, old<br>8478876.0', 'x11perf, old<br>1377320.5', 'xonotic-linux64-glx, old<br>17086958.5', 'xterm, old<br>1446028.0']};
+    
+    var series5 = new Array();
+    series5["seriesLabel"] = "old64k";
+    series5["yVals"] = [37193931.5, 7764089.5, 1366897.5, 32982507.5, 1806755.0];
+    series5["options"] = {stroke: {color: "white", width: "0px"}, fill: "indigo", yLbls: ['glxgears, old64k<br>37193931.5', 'moebiusgears, old64k<br>7764089.5', 'x11perf, old64k<br>1366897.5', 'xonotic-linux64-glx, old64k<br>32982507.5', 'xterm, old64k<br>1806755.0']};
+    
+    var series = new Array(series0, series1, series2, series3, series4, series5);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "glxgears"},
+            {value: 2, text: "moebiusgears"},
+            {value: 3, text: "x11perf"},
+            {value: 4, text: "                 " + labelLineBreak + "xonotic-linux64-glx"},
+            {value: 5, text: "xterm"}];
+    chartconf["xgap"] = 8.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl03;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Test_Command";
+    chartconf["axisLabelDrop"] = 22;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 90.0;
+    chartconf["marginOffsetL"] = 78.0;
+    chartconf["yTitle"] = "Pixels/s Sent";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 40913324.65;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart03", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Speed: 100.0</b></p>
+<div id="mychart03" 
+    style="width: 938.0px; height: 332px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Network Receive Buffer:
+        </p>
+        <div id="legendMychart03">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Pixel lz4 compression: auto vs none - _Speed: 100.0--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Pixel lz4 compression: auto vs none - bandwidth
+</span>
+<br />
+<span class='tblsubtitle0'>
+The obvious downside is that the bandwidth consumption can go up 100 fold!
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl04 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart04 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "16k";
+    series0["yVals"] = [835047.5, 1598856.5, 1705692.0, 28476534.5, 204194.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['glxgears, 16k<br>835047.5', 'moebiusgears, 16k<br>1598856.5', 'x11perf, 16k<br>1705692.0', 'xonotic-linux64-glx, 16k<br>28476534.5', 'xterm, 16k<br>204194.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "64k";
+    series1["yVals"] = [830223.0, 1427951.5, 1636414.0, 33195068.5, 316837.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['glxgears, 64k<br>830223.0', 'moebiusgears, 64k<br>1427951.5', 'x11perf, 64k<br>1636414.0', 'xonotic-linux64-glx, 64k<br>33195068.5', 'xterm, 64k<br>316837.0']};
+    
+    var series2 = new Array();
+    series2["seriesLabel"] = "64k2";
+    series2["yVals"] = [813261.0, 1510758.5, 1575528.0, 33539336.5, 263055.0];
+    series2["options"] = {stroke: {color: "white", width: "0px"}, fill: "#4495c3", yLbls: ['glxgears, 64k2<br>813261.0', 'moebiusgears, 64k2<br>1510758.5', 'x11perf, 64k2<br>1575528.0', 'xonotic-linux64-glx, 64k2<br>33539336.5', 'xterm, 64k2<br>263055.0']};
+    
+    var series3 = new Array();
+    series3["seriesLabel"] = "new";
+    series3["yVals"] = [861413.5, 1457637.0, 1760321.5, 29901596.5, 352249.5];
+    series3["options"] = {stroke: {color: "white", width: "0px"}, fill: "#44953a", yLbls: ['glxgears, new<br>861413.5', 'moebiusgears, new<br>1457637.0', 'x11perf, new<br>1760321.5', 'xonotic-linux64-glx, new<br>29901596.5', 'xterm, new<br>352249.5']};
+    
+    var series4 = new Array();
+    series4["seriesLabel"] = "old";
+    series4["yVals"] = [7288302.0, 1638486.0, 1654027.0, 29269641.5, 232465.5];
+    series4["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f43a3a", yLbls: ['glxgears, old<br>7288302.0', 'moebiusgears, old<br>1638486.0', 'x11perf, old<br>1654027.0', 'xonotic-linux64-glx, old<br>29269641.5', 'xterm, old<br>232465.5']};
+    
+    var series5 = new Array();
+    series5["seriesLabel"] = "old64k";
+    series5["yVals"] = [800276.0, 1515710.5, 1490891.0, 32849550.5, 281309.0];
+    series5["options"] = {stroke: {color: "white", width: "0px"}, fill: "indigo", yLbls: ['glxgears, old64k<br>800276.0', 'moebiusgears, old64k<br>1515710.5', 'x11perf, old64k<br>1490891.0', 'xonotic-linux64-glx, old64k<br>32849550.5', 'xterm, old64k<br>281309.0']};
+    
+    var series = new Array(series0, series1, series2, series3, series4, series5);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "glxgears"},
+            {value: 2, text: "moebiusgears"},
+            {value: 3, text: "x11perf"},
+            {value: 4, text: "                 " + labelLineBreak + "xonotic-linux64-glx"},
+            {value: 5, text: "xterm"}];
+    chartconf["xgap"] = 8.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl04;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Test_Command";
+    chartconf["axisLabelDrop"] = 22;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 96.5;
+    chartconf["marginOffsetL"] = 84.5;
+    chartconf["yTitle"] = "Application Bytes Out/s";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 122710598.45;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart04", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Speed: -1.0</b></p>
+<div id="mychart04" 
+    style="width: 944.5px; height: 332px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Network Receive Buffer:
+        </p>
+        <div id="legendMychart04">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Pixel lz4 compression: auto vs none - b_Speed: -1.0--><!--SOFASTATS_ITEM_DIVIDER-->
+<script type="text/javascript">
+
+var sofaHl05 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart05 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "16k";
+    series0["yVals"] = [98495927.5, 25678107.5, 1759554.5, 102879288.0, 5218886.0];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['glxgears, 16k<br>98495927.5', 'moebiusgears, 16k<br>25678107.5', 'x11perf, 16k<br>1759554.5', 'xonotic-linux64-glx, 16k<br>102879288.0', 'xterm, 16k<br>5218886.0']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "64k";
+    series1["yVals"] = [106462789.5, 24068983.5, 1690815.5, 104215845.0, 4911705.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['glxgears, 64k<br>106462789.5', 'moebiusgears, 64k<br>24068983.5', 'x11perf, 64k<br>1690815.5', 'xonotic-linux64-glx, 64k<br>104215845.0', 'xterm, 64k<br>4911705.0']};
+    
+    var series2 = new Array();
+    series2["seriesLabel"] = "64k2";
+    series2["yVals"] = [102652748.5, 23802716.0, 1686806.0, 98495727.0, 4498584.5];
+    series2["options"] = {stroke: {color: "white", width: "0px"}, fill: "#4495c3", yLbls: ['glxgears, 64k2<br>102652748.5', 'moebiusgears, 64k2<br>23802716.0', 'x11perf, 64k2<br>1686806.0', 'xonotic-linux64-glx, 64k2<br>98495727.0', 'xterm, 64k2<br>4498584.5']};
+    
+    var series3 = new Array();
+    series3["seriesLabel"] = "new";
+    series3["yVals"] = [91841899.0, 25854309.5, 1831417.0, 85441384.5, 2964035.0];
+    series3["options"] = {stroke: {color: "white", width: "0px"}, fill: "#44953a", yLbls: ['glxgears, new<br>91841899.0', 'moebiusgears, new<br>25854309.5', 'x11perf, new<br>1831417.0', 'xonotic-linux64-glx, new<br>85441384.5', 'xterm, new<br>2964035.0']};
+    
+    var series4 = new Array();
+    series4["seriesLabel"] = "old";
+    series4["yVals"] = [93223204.5, 25814737.0, 1734159.5, 71874947.0, 5189304.5];
+    series4["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f43a3a", yLbls: ['glxgears, old<br>93223204.5', 'moebiusgears, old<br>25814737.0', 'x11perf, old<br>1734159.5', 'xonotic-linux64-glx, old<br>71874947.0', 'xterm, old<br>5189304.5']};
+    
+    var series5 = new Array();
+    series5["seriesLabel"] = "old64k";
+    series5["yVals"] = [111555089.5, 23399760.0, 1768428.5, 97896140.5, 5448593.5];
+    series5["options"] = {stroke: {color: "white", width: "0px"}, fill: "indigo", yLbls: ['glxgears, old64k<br>111555089.5', 'moebiusgears, old64k<br>23399760.0', 'x11perf, old64k<br>1768428.5', 'xonotic-linux64-glx, old64k<br>97896140.5', 'xterm, old64k<br>5448593.5']};
+    
+    var series = new Array(series0, series1, series2, series3, series4, series5);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "glxgears"},
+            {value: 2, text: "moebiusgears"},
+            {value: 3, text: "x11perf"},
+            {value: 4, text: "                 " + labelLineBreak + "xonotic-linux64-glx"},
+            {value: 5, text: "xterm"}];
+    chartconf["xgap"] = 8.0;
+    chartconf["xfontsize"] = 8.0;
+    chartconf["sofaHl"] = sofaHl05;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Test_Command";
+    chartconf["axisLabelDrop"] = 22;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 96.5;
+    chartconf["marginOffsetL"] = 84.5;
+    chartconf["yTitle"] = "Application Bytes Out/s";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 122710598.45;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart05", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+<p><b>Speed: 100.0</b></p>
+<div id="mychart05" 
+    style="width: 944.5px; height: 332px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Network Receive Buffer:
+        </p>
+        <div id="legendMychart05">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Pixel lz4 compression: auto vs none - _Speed: 100.0--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+</body></html>
