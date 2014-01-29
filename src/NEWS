@@ -1,3 +1,11 @@
+v0.11.2 (2014-01-29)
+======================
+	-- fix Cython 0.10 compatibility
+	-- fix OpenGL pixel upload alignment code
+	-- fix xpra command line help page tokens
+	-- fix compatibility with old versions of the python glib library
+
+
 v0.11.1 (2014-01-24)
 ======================
 	-- fix compatibility with old/unsupported servers
