@@ -1,3 +1,11 @@
+xpra (0.11.2-1) UNRELEASED; urgency=low
+  * fix Cython 0.10 compatibility
+  * fix OpenGL pixel upload alignment code
+  * fix xpra command line help page tokens
+  * fix compatibility with old versions of the python glib library
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 29 Jan 2014 12:13:35 +0700
+
 xpra (0.11.1-1) UNRELEASED; urgency=low
   * fix compatibility with old/unsupported servers
   * fix shadow mode
