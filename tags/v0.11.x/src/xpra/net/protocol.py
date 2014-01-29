@@ -741,7 +741,7 @@ class Protocol(object):
                     bl = len(read_buffer)-8
                     if protocol_flags & Protocol.FLAGS_CIPHER:
                         if self.cipher_in_block_size==0 or not self.cipher_in_name:
-                            log.warn("received cipher block but we don't have a cipher do decrypt it with, not an xpra client?")
+                            log.warn("received cipher block but we don't have a cipher to decrypt it with, not an xpra client?")
                             self._invalid_header(read_buffer)
                             return
                         padding = (self.cipher_in_block_size - data_size % self.cipher_in_block_size) * " "
