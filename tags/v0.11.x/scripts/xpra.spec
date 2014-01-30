@@ -197,7 +197,7 @@ So basically it's screen for remote X apps.
 
 %changelog
 * Wed Jan 29 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.2-1
-- fix Cython 0.10 compatibility
+- fix Cython 0.20 compatibility
 - fix OpenGL pixel upload alignment code
 - fix xpra command line help page tokens
 - fix compatibility with old versions of the python glib library

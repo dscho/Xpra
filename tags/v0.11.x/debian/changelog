@@ -1,5 +1,5 @@
 xpra (0.11.2-1) UNRELEASED; urgency=low
-  * fix Cython 0.10 compatibility
+  * fix Cython 0.20 compatibility
   * fix OpenGL pixel upload alignment code
   * fix xpra command line help page tokens
   * fix compatibility with old versions of the python glib library
