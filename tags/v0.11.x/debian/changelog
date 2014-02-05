@@ -1,3 +1,10 @@
+xpra (0.11.3-1) UNRELEASED; urgency=low
+  * fix compatibility with ancient versions of GTK
+  * blacklist VMware OpenGL driver which causes client crashes
+  * ensure all "control" subcommands run in UI thread
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 05 Feb 2014 14:55:10 +0700
+
 xpra (0.11.2-1) UNRELEASED; urgency=low
   * fix Cython 0.20 compatibility
   * fix OpenGL pixel upload alignment code
