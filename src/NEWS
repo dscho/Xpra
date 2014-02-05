@@ -1,3 +1,10 @@
+v0.11.3 (2014-02-05)
+======================
+	-- fix compatibility with ancient versions of GTK
+	-- blacklist VMware OpenGL driver which causes client crashes
+	-- ensure all "control" subcommands run in UI thread
+
+
 v0.11.2 (2014-01-29)
 ======================
 	-- fix Cython 0.20 compatibility

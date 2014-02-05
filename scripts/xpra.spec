@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.11.2
+%define version 0.11.3
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -196,6 +196,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Wed Feb 05 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.3-1
+- fix compatibility with ancient versions of GTK
+- blacklist VMware OpenGL driver which causes client crashes
+- ensure all "control" subcommands run in UI thread
+
 * Wed Jan 29 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.2-1
 - fix Cython 0.20 compatibility
 - fix OpenGL pixel upload alignment code
@@ -241,7 +246,7 @@ So basically it's screen for remote X apps.
 - big warnings about webp leaking memory
 - generated debuginfo RPMs
 
-* Tue Jan 07 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.11.2
+* Tue Jan 07 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.11.3
 - fix popup windows focus issue
 - fix "xpra upgrade" subcommand
 - fix server backtrace in error handler
