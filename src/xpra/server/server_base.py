@@ -441,7 +441,7 @@ class ServerBase(ServerCore):
             return
         command_req = c.strlistget("command_request")
         if len(command_req)>0:
-            self.handle_command_request(proto, command_req)
+            self.idle_add(self.handle_command_request, proto, command_req)
             return
 
         #"normal" connection, so log welcome message:
