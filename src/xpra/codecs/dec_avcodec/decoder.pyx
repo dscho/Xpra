@@ -130,15 +130,15 @@ def init_colorspaces():
     #populate mappings:
     COLORSPACES = []
     for pix_fmt, av_enum_str in {
-            "YUV420P"   : "AV_PIX_FMT_YUV420P",
-            "YUV422P"   : "AV_PIX_FMT_YUV422P",
-            "YUV444P"   : "AV_PIX_FMT_YUV444P",
-            "RGB"       : "AV_PIX_FMT_RGB24",
-            "XRGB"      : "AV_PIX_FMT_0RGB",
-            "BGRX"      : "AV_PIX_FMT_BGR0",
-            "ARGB"      : "AV_PIX_FMT_ARGB",
-            "BGRA"      : "AV_PIX_FMT_BGRA",
-            "GBRP"      : "AV_PIX_FMT_GBRP",
+            "YUV420P"   : "PIX_FMT_YUV420P",
+            "YUV422P"   : "PIX_FMT_YUV422P",
+            "YUV444P"   : "PIX_FMT_YUV444P",
+            "RGB"       : "PIX_FMT_RGB24",
+            "XRGB"      : "PIX_FMT_0RGB",
+            "BGRX"      : "PIX_FMT_BGR0",
+            "ARGB"      : "PIX_FMT_ARGB",
+            "BGRA"      : "PIX_FMT_BGRA",
+            "GBRP"      : "PIX_FMT_GBRP",
          }.items():
         av_enum = constants.get(av_enum_str)
         if av_enum is None:

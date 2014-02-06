@@ -79,16 +79,16 @@ cdef class CSCPixelFormat:
 COLORSPACES = []
 #keeping this array in scope ensures the strings don't go away!
 FORMAT_OPTIONS = [
-    ("AV_PIX_FMT_RGB24",    (3, 0, 0, 0),       (1, 0, 0, 0),       "RGB"  ),
-    ("AV_PIX_FMT_BGR24",    (3, 0, 0, 0),       (1, 0, 0, 0),       "BGR"  ),
-    ("AV_PIX_FMT_0RGB",     (4, 0, 0, 0),       (1, 0, 0, 0),       "XRGB"  ),
-    ("AV_PIX_FMT_BGR0",     (4, 0, 0, 0),       (1, 0, 0, 0),       "BGRX"  ),
-    ("AV_PIX_FMT_ARGB",     (4, 0, 0, 0),       (1, 0, 0, 0),       "XRGB"  ),
-    ("AV_PIX_FMT_BGRA",     (4, 0, 0, 0),       (1, 0, 0, 0),       "BGRX"  ),
-    ("AV_PIX_FMT_YUV420P",  (1, 0.5, 0.5, 0),   (1, 0.5, 0.5, 0),   "YUV420P"),
-    ("AV_PIX_FMT_YUV422P",  (1, 0.5, 0.5, 0),   (1, 1, 1, 0),       "YUV422P"),
-    ("AV_PIX_FMT_YUV444P",  (1, 1, 1, 0),       (1, 1, 1, 0),       "YUV444P"),
-    ("AV_PIX_FMT_GBRP",     (1, 1, 1, 0),       (1, 1, 1, 0),       "GBRP"   )
+    ("PIX_FMT_RGB24",    (3, 0, 0, 0),       (1, 0, 0, 0),       "RGB"  ),
+    ("PIX_FMT_BGR24",    (3, 0, 0, 0),       (1, 0, 0, 0),       "BGR"  ),
+    ("PIX_FMT_0RGB",     (4, 0, 0, 0),       (1, 0, 0, 0),       "XRGB"  ),
+    ("PIX_FMT_BGR0",     (4, 0, 0, 0),       (1, 0, 0, 0),       "BGRX"  ),
+    ("PIX_FMT_ARGB",     (4, 0, 0, 0),       (1, 0, 0, 0),       "XRGB"  ),
+    ("PIX_FMT_BGRA",     (4, 0, 0, 0),       (1, 0, 0, 0),       "BGRX"  ),
+    ("PIX_FMT_YUV420P",  (1, 0.5, 0.5, 0),   (1, 0.5, 0.5, 0),   "YUV420P"),
+    ("PIX_FMT_YUV422P",  (1, 0.5, 0.5, 0),   (1, 1, 1, 0),       "YUV422P"),
+    ("PIX_FMT_YUV444P",  (1, 1, 1, 0),       (1, 1, 1, 0),       "YUV444P"),
+    ("PIX_FMT_GBRP",     (1, 1, 1, 0),       (1, 1, 1, 0),       "GBRP"   )
      ]
 FORMATS = {}
 for av_enum_name, width_mult, height_mult, pix_fmt in FORMAT_OPTIONS:
