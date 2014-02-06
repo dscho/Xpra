@@ -98,7 +98,7 @@ cdef extern from "libavcodec/avcodec.h":
     AVCodecContext *avcodec_alloc_context3(const AVCodec *codec)
     int avcodec_open2(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options)
     AVFrame *avcodec_alloc_frame()
-    void avcodec_free_frame(AVFrame **frame)
+    #void avcodec_free_frame(AVFrame **frame)
     int avcodec_close(AVCodecContext *avctx)
 
     #actual decoding:
@@ -453,8 +453,8 @@ cdef class Decoder:
 
         debug("clean_decoder() freeing AVFrame: %s", hex(<unsigned long> self.frame))
         if self.frame!=NULL:
-            avcodec_free_frame(&self.frame)
-            #redundant: self.frame = NULL
+            av_free(self.frame) #freeing here causes a double free on Ubuntu, avcodec_close probably does it too
+            self.frame = NULL
 
         cdef unsigned long ctx_key          #@DuplicatedSignature
         debug("clean_decoder() freeing AVCodecContext: %s", hex(<unsigned long> self.codec_ctx))
