@@ -9,5 +9,5 @@ Index: xpra/client/gl/gl_check.py
 -SILENCE_FORMAT_HANDLER_LOGGER = sys.platform.startswith("win") or sys.platform.startswith("darwin")
 +SILENCE_FORMAT_HANDLER_LOGGER = True
  
- BLACKLIST = {"vendor" : ["nouveau", "Humper"]}
+ BLACKLIST = {"vendor" : ["nouveau", "Humper", "VMware, Inc."]}
  
