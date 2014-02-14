@@ -134,7 +134,7 @@ def parse_cmdline(cmdline):
                       + " the value of '$DISPLAY' will be substituted with the actual display used"
                       )
         group.add_option("--no-mdns", action="store_false",
-                          dest="mdns", default=True,
+                          dest="mdns", default=defaults.mdns,
                           help="Don't publish session information via mDNS")
     else:
         hidden_options["daemon"] = False
