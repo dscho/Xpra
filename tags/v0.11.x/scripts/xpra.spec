@@ -196,8 +196,11 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Feb 05 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.3-1
+* Fri Feb 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.3-1
 - fix compatibility with ancient versions of GTK
+- fix crashes with malformed socket names
+- fix server builds without client modules
+- honour mdns flag set in config file
 - blacklist VMware OpenGL driver which causes client crashes
 - ensure all "control" subcommands run in UI thread
 

@@ -1,6 +1,9 @@
-v0.11.3 (2014-02-05)
+v0.11.3 (2014-02-14)
 ======================
 	-- fix compatibility with ancient versions of GTK
+	-- fix crashes with malformed socket names
+	-- fix server builds without client modules
+	-- honour mdns flag set in config file
 	-- blacklist VMware OpenGL driver which causes client crashes
 	-- ensure all "control" subcommands run in UI thread
 
