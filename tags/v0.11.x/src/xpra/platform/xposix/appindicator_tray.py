@@ -9,10 +9,7 @@
 import os
 from xpra.client.tray_base import TrayBase, debug
 from xpra.platform.paths import get_icon_dir
-
-
-def is_unity():
-    return os.environ.get("XDG_CURRENT_DESKTOP", "").lower() == "unity"
+from xpra.util import is_unity
 
 
 _appindicator = False
