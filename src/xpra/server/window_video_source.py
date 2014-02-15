@@ -12,7 +12,6 @@ from xpra.net.protocol import Compressed
 from xpra.codecs.codec_constants import get_avutil_enum_from_colorspace, get_subsampling_divs, TransientCodecException
 from xpra.codecs.video_helper import getVideoHelper
 from xpra.server.window_source import WindowSource, log
-from xpra.server.background_worker import add_work_item
 from xpra.log import debug_if_env
 
 debug = debug_if_env(log, "XPRA_VIDEO_DEBUG")
@@ -146,14 +145,14 @@ class WindowVideoSource(WindowSource):
         #MUST be called with video lock held!
         if self._csc_encoder is None:
             return
-        add_work_item(self._csc_encoder.clean)
+        self._csc_encoder.clean()
         self._csc_encoder = None
 
     def do_video_encoder_cleanup(self):
         #MUST be called with video lock held!
         if self._video_encoder is None:
             return
-        add_work_item(self._video_encoder.clean)
+        self._video_encoder.clean()
         self._video_encoder = None
 
     def set_new_encoding(self, encoding):
