@@ -61,7 +61,7 @@ class WindowVideoSource(WindowSource):
         self.video_reinit = self.encoding_options.get("video_reinit", False)
         if not self.encoding_client_options:
             #old clients can only use 420P:
-            def_csc_modes = ("YUV420P")
+            def_csc_modes = ("YUV420P", )
         else:
             #default for newer clients that don't specify "csc_modes":
             def_csc_modes = ("YUV420P", "YUV422P", "YUV444P")
