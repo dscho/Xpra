@@ -1,3 +1,9 @@
+xpra (0.11.4-1) UNRELEASED; urgency=low
+  * fix NVENC GPU memory leak
+  * fix video compatibility with ancient clients
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 26 Feb 2014 15:59:07 +0700
+
 xpra (0.11.3-1) UNRELEASED; urgency=low
   * fix compatibility with ancient versions of GTK
   * fix crashes with malformed socket names

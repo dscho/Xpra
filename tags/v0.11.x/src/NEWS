@@ -1,3 +1,9 @@
+v0.11.4 (2014-02-26)
+======================
+	-- fix NVENC GPU memory leak
+	-- fix video compatibility with ancient clients
+
+
 v0.11.3 (2014-02-14)
 ======================
 	-- fix compatibility with ancient versions of GTK
