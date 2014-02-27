@@ -1,8 +1,9 @@
 xpra (0.11.4-1) UNRELEASED; urgency=low
   * fix NVENC GPU memory leak
   * fix video compatibility with ancient clients
+  * fix vpx decoding in ffmpeg decoders
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 26 Feb 2014 15:59:07 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 27 Feb 2014 12:52:03 +0700
 
 xpra (0.11.3-1) UNRELEASED; urgency=low
   * fix compatibility with ancient versions of GTK
