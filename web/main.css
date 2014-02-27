@@ -146,6 +146,13 @@ form#search input.submit {
 	vertical-align: middle;
 }
 
+#main {
+	background-color: #f0f0f0;
+}
+#main .box,#main .codebox {
+	background-color: #fefefe;
+}
+
 /* main body */
 #content,#fullcontent,#subcontent{
 	display: table-cell;
@@ -188,7 +195,7 @@ h4 {
 #footer{
 	clear:both;
 	color:#102030;
-	background:#d0ffd4;
+	background:#e4f6e6;
 	text-align:center;
 	vertical-align:top;
 	border-top:2px solid #80C080;
@@ -224,7 +231,7 @@ div#validators {
 	padding-left: 8px;
 }
 
-div#footer a, div#footer a:visited{
+div#footer a, div#footer a:visited, div#footer :link {
 	color:#4040e0; background-color:inherit; font-weight:normal;
 }
 div#footer a:hover{
@@ -236,14 +243,14 @@ div#footer a:hover{
 	margin: 0 0 10px 0;
 	padding: 2px 10px 2px 10px;
 	border: 1px solid #c0d0c0;
-	background-color:#eafcef;
+	background-color:#f8fcf8;
 	color:#505050;
 	line-height:1.3em;
 	border-radius: 4px;
 }
 .codebox{
 	border:1px dashed #a0a0a0;
-	background-color:#f6fefb;
+	background-color:#fefefe;
 	line-height:1.2em;
 }
 .codebox code{
