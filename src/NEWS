@@ -1,8 +1,9 @@
-v0.11.4 (2014-02-27)
+v0.11.4 (2014-02-28)
 ======================
 	-- fix NVENC GPU memory leak
 	-- fix video compatibility with ancient clients
 	-- fix vpx decoding in ffmpeg decoders
+	-- fix transparent system tray image with RGB encoding
 
 
 v0.11.3 (2014-02-14)
