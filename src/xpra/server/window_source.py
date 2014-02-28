@@ -886,7 +886,7 @@ class WindowSource(object):
         #by default, don't set rowstride (the container format will take care of providing it):
         encoder = self._encoders.get(coding)
         assert encoder is not None, "encoder not found for %s" % coding
-        encoder_type, data, client_options, outw, outh, outstride, bpp = encoder(coding, image, options)
+        coding, data, client_options, outw, outh, outstride, bpp = encoder(coding, image, options)
         #check cancellation list again since the code above may take some time:
         #but always send mmap data so we can reclaim the space!
         if coding!="mmap" and (self.is_cancelled(sequence)  or self.suspended):
@@ -913,7 +913,7 @@ class WindowSource(object):
         self.global_statistics.packet_count += 1
         self.statistics.packet_count += 1
         self._damage_packet_sequence += 1
-        self.statistics.encoding_stats.append((encoder_type, w*h, bpp, len(data), end-start))
+        self.statistics.encoding_stats.append((coding, w*h, bpp, len(data), end-start))
         #record number of frames and pixels:
         totals = self.statistics.encoding_totals.setdefault(coding, [0, 0])
         totals[0] = totals[0] + 1
@@ -981,6 +981,11 @@ class WindowSource(object):
                 raise Exception("cannot find compatible rgb format to use for %s! (supported: %s)" % (pixel_format, self.rgb_formats))
             #get the new format:
             pixel_format = image.get_pixel_format()
+            #switch encoding if necessary:
+            if len(pixel_format)==4 and coding=="rgb24": 
+                coding = "rgb32" 
+            elif len(pixel_format)==3 and coding=="rgb32": 
+                coding = "rgb24" 
         #always tell client which pixel format we are sending:
         options = {"rgb_format" : pixel_format}
         #compress here and return a wrapper so network code knows it is already zlib compressed:
