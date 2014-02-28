@@ -4,6 +4,7 @@ v0.11.4 (2014-02-28)
 	-- fix video compatibility with ancient clients
 	-- fix vpx decoding in ffmpeg decoders
 	-- fix transparent system tray image with RGB encoding
+	-- fix client crashes with system tray forwarding
 
 
 v0.11.3 (2014-02-14)
