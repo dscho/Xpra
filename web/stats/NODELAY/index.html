@@ -1,0 +1,663 @@
+<!--css_fils = [u"/home/antoine/Documents/sofastats/css/default.css"]-->
+
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'
+'http://www.w3.org/TR/html4/loose.dtd'>
+<html>
+<head>
+<meta http-equiv="P3P" content='CP="IDC DSP COR CURa ADMa OUR IND PHY ONL COM 
+STA"'>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<title>SOFA Statistics Report 2014-02-28_07:40:31</title>
+
+<link rel='stylesheet' type='text/css' 
+href="sofastats_report_extras/tundra.css" />
+<script src="sofastats_report_extras/dojo.xd.js"></script>
+<script src="sofastats_report_extras/sofastatsdojo_minified.js"></script>
+<script src="sofastats_report_extras/sofastats_charts.js"></script>
+<script type="text/javascript">
+get_ie_script = function(mysrc){
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = mysrc;
+    document.getElementsByTagName('head')[0].appendChild(script); 
+}
+if(dojo.isIE){
+    get_ie_script("sofastats_report_extras/arc.xd.js");
+    get_ie_script("sofastats_report_extras/gradient.xd.js");
+    get_ie_script("sofastats_report_extras/vml.xd.js");
+}
+makeObjects = function(){
+
+    //n_charts_start
+    var n_charts = 21;
+    //n_charts_end
+    for(var i=0;i<n_charts;i++){
+        try{
+            window["makechart" + String('00'+i).slice(-2)]();
+        } catch(exceptionObject) {
+            var keepGoing = true;
+        }
+    }
+};
+dojo.addOnLoad(makeObjects);
+
+var DEFAULT_SATURATION  = 100,
+DEFAULT_LUMINOSITY1 = 75,
+DEFAULT_LUMINOSITY2 = 50,
+
+c = dojox.color,
+
+cc = function(colour){
+    return function(){ return colour; };
+},
+
+hl = function(colour){
+
+    var a = new c.Color(colour),
+        x = a.toHsl();
+    if(x.s == 0){
+        x.l = x.l < 50 ? 100 : 0;
+    }else{
+        x.s = DEFAULT_SATURATION;
+        if(x.l < DEFAULT_LUMINOSITY2){
+            x.l = DEFAULT_LUMINOSITY1;
+        }else if(x.l > DEFAULT_LUMINOSITY1){
+            x.l = DEFAULT_LUMINOSITY2;
+        }else{
+            x.l = x.l - DEFAULT_LUMINOSITY2 > DEFAULT_LUMINOSITY1 - x.l 
+                ? DEFAULT_LUMINOSITY2 : DEFAULT_LUMINOSITY1;
+        }
+    }
+    return c.fromHsl(x);
+}
+
+getfainthex = function(hexcolour){
+    var a = new c.Color(hexcolour)
+    x = a.toHsl();
+    x.s = x.s * 1.5;
+    x.l = x.l * 1.25;
+    return c.fromHsl(x);
+}
+
+makefaint = function(colour){
+    var fainthex = getfainthex(colour.toHex());
+    return new dojox.color.Color(fainthex);
+}
+
+var labelLineBreak = (dojo.isIE) ? "\n" : "<br>";
+
+</script>
+
+<style type="text/css">
+<!--
+    .dojoxLegendNode {
+        border: 1px solid #ccc; 
+        margin: 5px 10px 5px 10px; 
+        padding: 3px
+    }
+    .dojoxLegendText {
+        vertical-align: text-top; 
+        padding-right: 10px
+    }
+    @media print {
+        .screen-float-only{
+        float: none;
+        }
+    }
+    
+    @media screen {
+        .screen-float-only{
+        float: left;
+        }
+    }
+-->
+</style>
+<style type="text/css">
+<!--
+
+body {
+    background-color: #ffffff;
+}
+td, th {
+    background-color: white;
+}
+/*
+dojo_style_start
+outer_bg = u"white"
+inner_bg = u"#f2f1f0" # u"#e0d9d5"
+axis_label_font_colour = u"#423126"
+major_gridline_colour = u"#b8a49e"
+gridline_width = 1
+stroke_width = 3
+tooltip_border_colour = u"#736354"
+colour_mappings = [(u"#e95f29", u"#ef7d44"),
+    (u"#f4cb3a", u"#f7d858"),
+    (u"#4495c3", u"#62add2"),
+    (u"#44953a", u"#62ad58"),
+    (u"#f43a3a", u"#f75858"),
+    ]
+connector_style = u"defbrown"
+dojo_style_end
+*/
+    body{
+        font-size: 12px;
+        font-family: Ubuntu, Helvetica, sans-serif;
+    }
+    h1, h2{
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+    }
+    h1{
+        font-size: 18px;
+    }
+    h2{
+        font-size: 16px;
+    }
+    .gui-msg-medium, gui-msg-small{
+        color: #29221c;
+        font-family: arial;
+    }
+    .gui-msg-medium{
+        font-size: 16px;
+    }
+    *html .gui-msg-medium{
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .gui-msg-small{
+        font-size: 13px;
+        line-height: 150%;
+    }
+    .gui-note{
+        background-color: #e95829;
+        color: white;
+        font-weight: bold;
+        padding: 2px;
+    }
+    tr, td, th{
+        margin: 0;
+    }
+
+    .tbltitle0, .tblsubtitle0{
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .tbltitle0{ /*spans*/
+        padding: 0;
+        font-size: 18px;
+    }
+    .tblsubtitle0{
+        padding: 12px 0px 0px 0px;
+        font-size: 14px;
+    }
+    .tblcelltitle0{ /*th*/
+        text-align: left;
+        border: none;
+        padding: 0px 0px 12px 0px;
+        margin: 0;
+    }
+
+    th, .rowvar0, .rowval0, .datacell0, .firstdatacell0 {
+        border: solid 1px #A1A1A1;
+    }
+    th{
+        margin: 0;
+        padding: 0px 6px;
+    }
+    td{
+        padding: 2px 6px;
+        border: solid 1px #c0c0c0;
+        font-size: 13px;
+    }
+    .rowval0{
+        margin: 0;
+    }
+    .datacell0, .firstdatacell0{
+        text-align: right;
+        margin: 0;
+    }
+    .firstcolvar0, .firstrowvar0, .spaceholder0 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        color: white;
+    }
+    .firstcolvar0, .firstrowvar0{
+        background-color: #333435;
+    }
+    .firstrowvar0{
+        border-left: solid 1px #333435;
+        border-bottom:  solid 1px #333435;
+    }
+    .topline0{
+        border-top: 2px solid #c0c0c0;
+    }
+    .spaceholder0 {
+        background-color: #CCD9D7;
+    }
+    .firstcolvar0{
+        padding: 9px 6px;
+        vertical-align: top;
+    }
+    .rowvar0, .colvar0{
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        color: #333435;
+        background-color: white;
+    }
+    .colvar0{
+        padding: 6px 0px;            
+    } 
+    .colval0, .measure0{
+        font-size: 12px;
+        vertical-align: top;
+    }
+    table {
+        border-collapse: collapse;
+    }
+    tr.total-row0 td{
+        font-weight: bold;
+        border-top: solid 2px black;
+        border-bottom: double 3px black;
+    }
+    .page-break-before0{
+        page-break-before: always;
+        border-bottom: none; /*3px dotted #AFAFAF;*/
+        width: auto;
+        height: 18px;
+    }
+    td.lbl0{
+        text-align: left;
+        background-color: #F5F5F5;
+    }
+    td.right0{
+        text-align: right;
+    }
+    .ftnote-line{
+        /* for hr http://www.w3schools.com/TAGS/att_hr_align.asp*/
+        width: 300px;
+        text-align: left; /* IE and Opera*/
+        margin-left: 0; /* Firefox, Chrome, Safari */
+    }
+    .tbl-header-ftnote0{
+        color: white;
+    }
+    .ftnote{
+        color: black;
+    }
+    /* Tool tip connector arrows */
+    .dijitTooltipBelow-defbrown {
+	
+	    padding-top: 13px;
+    }
+    .dijitTooltipAbove-defbrown {
+	
+	    padding-bottom: 13px;
+    }
+    .tundra .dijitTooltipBelow-defbrown .dijitTooltipConnector {
+	
+	    top: 0px;
+	    left: 3px;
+	    background: url("sofastats_report_extras/tooltipConnectorUp-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipBelow-defbrown .dijitTooltipConnector {
+	
+	    background-image: url("sofastats_report_extras/tooltipConnectorUp-defbrown.gif") !important;
+    }
+    .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	
+	    bottom: 0px;
+	    left: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorDown-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorDown-defbrown.gif") !important;
+    }
+    .dj_ie6 .tundra .dijitTooltipAbove-defbrown .dijitTooltipConnector {
+	    bottom: -3px;
+    }
+    .tundra .dijitTooltipLeft-defbrown {
+	    padding-right: 14px;
+    }
+    .dj_ie6 .tundra .dijitTooltipLeft-defbrown {
+	    padding-left: 15px;
+    }
+    .tundra .dijitTooltipLeft-defbrown .dijitTooltipConnector {
+	
+	    right: 0px;
+	    bottom: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorRight-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipLeft-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorRight-defbrown.gif") !important;
+    }
+    .tundra .dijitTooltipRight-defbrown {
+	    padding-left: 14px;
+    }
+    .tundra .dijitTooltipRight-defbrown .dijitTooltipConnector {
+	
+	    left: 0px;
+	    bottom: 3px;
+	    background:url("sofastats_report_extras/tooltipConnectorLeft-defbrown.png") no-repeat top left !important;
+	    width:16px;
+	    height:14px;
+    }
+    .dj_ie .tundra .dijitTooltipRight-defbrown .dijitTooltipConnector {
+	    background-image: url("sofastats_report_extras/tooltipConnectorLeft-defbrown.gif") !important;
+    }
+
+-->
+</style>
+</head>
+<body class="tundra">
+
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Throughput
+</span>
+<span class='tblsubtitle0'>
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl18 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart18 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "DELAY";
+    series0["yVals"] = [19250360.88, 23272687.38, 28712004.25, 8434247.5, 10305802.13];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['deluxe, DELAY<br>19250360.88', 'eruption, DELAY<br>23272687.38', 'glxgears, DELAY<br>28712004.25', 'moebiusgears, DELAY<br>8434247.5', 'polytopes, DELAY<br>10305802.13']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NODELAY";
+    series1["yVals"] = [19559522.38, 23063121.25, 29119673.38, 8459992.25, 10306851.38];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['deluxe, NODELAY<br>19559522.38', 'eruption, NODELAY<br>23063121.25', 'glxgears, NODELAY<br>29119673.38', 'moebiusgears, NODELAY<br>8459992.25', 'polytopes, NODELAY<br>10306851.38']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "deluxe"},
+            {value: 2, text: "eruption"},
+            {value: 3, text: "glxgears"},
+            {value: 4, text: "moebiusgears"},
+            {value: 5, text: "polytopes"}];
+    chartconf["xgap"] = 10;
+    chartconf["xfontsize"] = 10;
+    chartconf["sofaHl"] = sofaHl18;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Test_Command";
+    chartconf["axisLabelDrop"] = 15;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 96.5;
+    chartconf["marginOffsetL"] = 69.5;
+    chartconf["yTitle"] = "Mean Pixels/S_Sent";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 32031640.718;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart18", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+
+<div id="mychart18" 
+    style="width: 634.5px; height: 325px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart18">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Throughput--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Client Latency
+</span>
+<span class='tblsubtitle0'>
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl19 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart19 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "DELAY";
+    series0["yVals"] = [16.5, 14.0, 27.63, 13.88, 14.25];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['deluxe, DELAY<br>16.5', 'eruption, DELAY<br>14.0', 'glxgears, DELAY<br>27.63', 'moebiusgears, DELAY<br>13.88', 'polytopes, DELAY<br>14.25']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NODELAY";
+    series1["yVals"] = [2.63, 2.63, 15.0, 2.0, 2.0];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['deluxe, NODELAY<br>2.63', 'eruption, NODELAY<br>2.63', 'glxgears, NODELAY<br>15.0', 'moebiusgears, NODELAY<br>2.0', 'polytopes, NODELAY<br>2.0']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "deluxe"},
+            {value: 2, text: "eruption"},
+            {value: 3, text: "glxgears"},
+            {value: 4, text: "moebiusgears"},
+            {value: 5, text: "polytopes"}];
+    chartconf["xgap"] = 10;
+    chartconf["xfontsize"] = 10;
+    chartconf["sofaHl"] = sofaHl19;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Test_Command";
+    chartconf["axisLabelDrop"] = 15;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 57.5;
+    chartconf["marginOffsetL"] = 30.5;
+    chartconf["yTitle"] = "Mean Avg_Client_Latency_(Ms)";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 30.393;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart19", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+
+<div id="mychart19" 
+    style="width: 595.5px; height: 325px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart19">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Client Latency--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+
+
+
+
+
+<br><br>
+<hr style="clear: both;  page-break-before: always ">
+
+<!--VISUAL_DIVIDER_BEFORE_THIS-->
+<table cellspacing='0'><thead><tr><th class='tblcelltitle0'>
+<span class='tbltitle0'>
+Server Latency
+</span>
+<span class='tblsubtitle0'>
+</span>
+</th></tr></thead></table>
+<script type="text/javascript">
+
+var sofaHl20 = function(colour){
+    var hlColour;
+    switch (colour.toHex()){
+        case "#e95f29":
+                    hlColour = "#ef7d44";
+                    break;
+                case "#f4cb3a":
+                    hlColour = "#f7d858";
+                    break;
+                case "#4495c3":
+                    hlColour = "#62add2";
+                    break;
+                case "#44953a":
+                    hlColour = "#62ad58";
+                    break;
+                case "#f43a3a":
+                    hlColour = "#f75858";
+                    break;
+        default:
+            hlColour = hl(colour.toHex());
+            break;
+    }
+    return new dojox.color.Color(hlColour);
+}
+
+makechart20 = function(){
+    var series0 = new Array();
+    series0["seriesLabel"] = "DELAY";
+    series0["yVals"] = [10.38, 8.63, 23.88, 16.25, 14.88];
+    series0["options"] = {stroke: {color: "white", width: "0px"}, fill: "#e95f29", yLbls: ['deluxe, DELAY<br>10.38', 'eruption, DELAY<br>8.63', 'glxgears, DELAY<br>23.88', 'moebiusgears, DELAY<br>16.25', 'polytopes, DELAY<br>14.88']};
+    
+    var series1 = new Array();
+    series1["seriesLabel"] = "NODELAY";
+    series1["yVals"] = [3.13, 2.75, 13.88, 2.13, 2.75];
+    series1["options"] = {stroke: {color: "white", width: "0px"}, fill: "#f4cb3a", yLbls: ['deluxe, NODELAY<br>3.13', 'eruption, NODELAY<br>2.75', 'glxgears, NODELAY<br>13.88', 'moebiusgears, NODELAY<br>2.13', 'polytopes, NODELAY<br>2.75']};
+    
+    var series = new Array(series0, series1);
+    var chartconf = new Array();
+    chartconf["xaxisLabels"] = [{value: 1, text: "deluxe"},
+            {value: 2, text: "eruption"},
+            {value: 3, text: "glxgears"},
+            {value: 4, text: "moebiusgears"},
+            {value: 5, text: "polytopes"}];
+    chartconf["xgap"] = 10;
+    chartconf["xfontsize"] = 10;
+    chartconf["sofaHl"] = sofaHl20;
+    chartconf["gridlineWidth"] = 1;
+    chartconf["gridBg"] = "#f2f1f0";
+    chartconf["minorTicks"] = false;
+    chartconf["axisLabelFontColour"] = "#423126";
+    chartconf["majorGridlineColour"] = "#b8a49e";
+    chartconf["xTitle"] = "Test_Command";
+    chartconf["axisLabelDrop"] = 15;
+    chartconf["axisLabelRotate"] = 0;
+    chartconf["yTitleOffset"] = 57.5;
+    chartconf["marginOffsetL"] = 30.5;
+    chartconf["yTitle"] = "Mean Avg_Server_Ping_Latency_(Ms)";
+    chartconf["tooltipBorderColour"] = "#736354";
+    chartconf["connectorStyle"] = "defbrown";
+    chartconf["ymax"] = 26.268;
+    chartconf["outerBg"] = "white";
+    makeBarChart("mychart20", series, chartconf);
+}
+</script>
+
+<div class="screen-float-only" style="margin-right: 10px; ">
+
+<div id="mychart20" 
+    style="width: 595.5px; height: 325px;">
+    </div>
+
+        <p style="float: left; font-weight: bold; margin-right: 12px; 
+                margin-top: 9px;">
+            Custom_Params:
+        </p>
+        <div id="legendMychart20">
+            </div>
+</div><!--ITEM_TITLE_START--><!--Clust Bar_Server Latency--><!--SOFASTATS_ITEM_DIVIDER--><div style="clear: both;">&nbsp;&nbsp;</div>
+
+
+
+</body></html>
