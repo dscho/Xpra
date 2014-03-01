@@ -4,8 +4,9 @@ xpra (0.11.4-1) UNRELEASED; urgency=low
   * fix vpx decoding in ffmpeg decoders
   * fix transparent system tray image with RGB encoding
   * fix client crashes with system tray forwarding
+  * fix webp codec loader error handler
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 28 Feb 2014 20:45:29 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 01 Mar 2014 08:06:48 +0700
 
 xpra (0.11.3-1) UNRELEASED; urgency=low
   * fix compatibility with ancient versions of GTK
