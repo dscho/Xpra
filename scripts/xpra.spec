@@ -196,12 +196,13 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Fri Feb 28 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.4-1
+* Sat Mar 01 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.4-1
 - fix NVENC GPU memory leak
 - fix video compatibility with ancient clients
 - fix vpx decoding in ffmpeg decoders
 - fix transparent system tray image with RGB encoding
 - fix client crashes with system tray forwarding
+- fix webp codec loader error handler
 
 * Fri Feb 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.3-1
 - fix compatibility with ancient versions of GTK
