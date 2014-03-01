@@ -117,7 +117,7 @@ def load_codecs():
             if not webp_handlers:
                 nowebp()
         except Exception, e:
-            warn("cannot load webp: " % e)
+            log.warn("cannot load webp: %s", e)
             nowebp()
     debug("done loading codecs")
     debug("found:")
