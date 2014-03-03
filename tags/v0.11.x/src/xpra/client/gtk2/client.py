@@ -311,7 +311,7 @@ class XpraClient(GTKXpraClient):
                     log("setting new cursor by name: %s=%s", cursor_name, gdk_cursor)
                     return gdk.Cursor(gdk_cursor)
                 else:
-                    log.warn("cursor name '%s' not found", cursor_name)
+                    log("cursor name '%s' not found", cursor_name)
         #create cursor from the pixel data:
         w, h, xhot, yhot, serial, pixels = cursor_data[2:8]
         if len(pixels)<w*h*4:
