@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.11.4
+%define version 0.11.5
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -196,6 +196,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Mon Mar 03 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.5-1
+- remove spurious cursor warnings
+
 * Sat Mar 01 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.4-1
 - fix NVENC GPU memory leak
 - fix video compatibility with ancient clients
@@ -257,7 +260,7 @@ So basically it's screen for remote X apps.
 - big warnings about webp leaking memory
 - generated debuginfo RPMs
 
-* Tue Jan 07 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.11.4
+* Tue Jan 07 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.11.5
 - fix popup windows focus issue
 - fix "xpra upgrade" subcommand
 - fix server backtrace in error handler
