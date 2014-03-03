@@ -463,10 +463,10 @@ class UIXpraClient(XpraClientBase):
         t = []
         if self.session_name:
             t.append(self.session_name)
-        if self._protocol._conn:
+        if self._protocol and self._protocol._conn:
             t.append(self._protocol._conn.target)
         if len(t)==0:
-            t.index(0, "Xpra")
+            t.insert(0, "Xpra")
         return "\n".join(t)
 
     def setup_system_tray(self, client, wid, w, h, title):
