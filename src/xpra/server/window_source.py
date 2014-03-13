@@ -325,6 +325,7 @@ class WindowSource(object):
         else:
             info = {}
             speed = min(100, speed)
+        speed = int(speed)
         elog("update_speed() info=%s, speed=%s", info, speed)
         self._encoding_speed.append((time.time(), info, speed))
 
@@ -355,6 +356,7 @@ class WindowSource(object):
         else:
             info = {}
             quality = min(100, quality)
+        quality = int(quality)
         elog("update_quality() info=%s, quality=%s", info, quality)
         self._encoding_quality.append((time.time(), info, quality))
 
