@@ -197,6 +197,8 @@ So basically it's screen for remote X apps.
 
 %changelog
 * Mon Mar 03 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.5-1
+- fix "xpra info" with bencoder
+- fix compilation warning
 - remove spurious cursor warnings
 
 * Sat Mar 01 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.4-1
