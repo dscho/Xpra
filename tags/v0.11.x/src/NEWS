@@ -1,5 +1,7 @@
-v0.11.5 (2014-03-03)
+v0.11.5 (2014-03-13)
 ======================
+	-- fix "xpra info" with bencoder
+	-- fix compilation warning
 	-- remove spurious cursor warnings
 
 
