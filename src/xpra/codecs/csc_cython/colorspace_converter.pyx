@@ -213,7 +213,9 @@ cdef class ColorspaceConverter:
         cdef unsigned short Rsum
         cdef unsigned short Gsum
         cdef unsigned short Bsum
-        cdef unsigned char *Y, *U, *V
+        cdef unsigned char *Y
+        cdef unsigned char *U
+        cdef unsigned char *V
 
         start = time.time()
         iplanes = image.get_planes()
