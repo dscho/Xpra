@@ -38,7 +38,6 @@ class GTKStatusIconTray(TrayBase):
             self.set_icon_from_file(filename)
 
     def may_guess(self):
-        log("may_guess() GUESS_GEOMETRY=%s, current guess=%s", GUESS_GEOMETRY, self.geometry_guess)
         if GUESS_GEOMETRY:
             x, y = gdk.get_default_root_window().get_pointer()[:2]
             w, h = self.get_size()
