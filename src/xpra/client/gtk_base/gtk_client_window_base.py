@@ -26,6 +26,7 @@ if os.name=="posix":
         from xpra.x11.gtk_x11.gdk_bindings import get_xwindow
         from xpra.x11.bindings.window_bindings import constants, X11WindowBindings  #@UnresolvedImport
         from xpra.x11.gtk_x11.error import trap
+        X11Window = X11WindowBindings()
         HAS_X11_BINDINGS = True
         try:
             #TODO: in theory this is not a proper check, meh - that will do
@@ -51,8 +52,8 @@ class GTKClientWindowBase(ClientWindowBase, gtk.Window):
 
     def init_window(self, metadata):
         self._fullscreen = None
-        self._can_set_workspace = HAS_X11_BINDINGS and CAN_SET_WORKSPACE
         ClientWindowBase.init_window(self, metadata)
+        self._can_set_workspace = HAS_X11_BINDINGS and CAN_SET_WORKSPACE
 
     def setup_window(self):
         ClientWindowBase.setup_window(self)
@@ -149,7 +150,7 @@ class GTKClientWindowBase(ClientWindowBase, gtk.Window):
         def send():
             root_window = get_xwindow(root)
             window = get_xwindow(self.gdk_window())
-            X11WindowBindings.sendClientMessage(root_window, window, False, event_mask, "_NET_WM_DESKTOP",
+            X11Window.sendClientMessage(root_window, window, False, event_mask, "_NET_WM_DESKTOP",
                   workspace, constants["CurrentTime"],
                   0, 0, 0)
         trap.call_synced(send)
