@@ -196,8 +196,13 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Mon Mar 03 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.5-1
+* Tue Mar 18 2014 Antoine Martin <antoine@devloop.org.uk> 0.11.5-1
 - fix "xpra info" with bencoder
+- ensure we re-sanitize window size hints when they change
+- workaround applications with nonsensical size hints (ie: handbrake)
+- fix 32-bit painting with GTK pixbuf loader (when PIL is not installed or disabled)
+- fix system tray forwarding geometry issues
+- fix workspace restore
 - fix compilation warning
 - remove spurious cursor warnings
 
