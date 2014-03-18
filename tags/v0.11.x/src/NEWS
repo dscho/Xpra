@@ -1,3 +1,8 @@
+v0.11.6 (2014-03-18)
+======================
+	-- correct fix for system tray forwarding
+
+
 v0.11.5 (2014-03-18)
 ======================
 	-- fix "xpra info" with bencoder
