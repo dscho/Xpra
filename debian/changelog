@@ -1,3 +1,8 @@
+xpra (0.11.6-1) UNRELEASED; urgency=low
+  * correct fix for system tray forwarding
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 18 Mar 2014 16:54:38 +0700
+
 xpra (0.11.5-1) UNRELEASED; urgency=low
   * fix "xpra info" with bencoder
   * ensure we re-sanitize window size hints when they change
