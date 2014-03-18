@@ -238,7 +238,6 @@ class GTKClientWindowBase(ClientWindowBase, gtk.Window):
     def do_map_event(self, event):
         self.debug("Got map event: %s - OR=%s", event, self._override_redirect)
         gtk.Window.do_map_event(self, event)
-        self._been_mapped = True
         xid = self._metadata.get("xid")
         if xid:
             self.set_xid(xid)
@@ -259,6 +258,7 @@ class GTKClientWindowBase(ClientWindowBase, gtk.Window):
             self._pos = (x, y)
             self._size = (w, h)
             self.idle_add(self._focus_change, "initial")
+        self._been_mapped = True
 
     def do_configure_event(self, event):
         self.debug("Got configure event: %s", event)
