@@ -1,6 +1,7 @@
 v0.12.2 (2014-03-28)
 ======================
 	-- fix switching to RGB encoding via client tray
+	-- fix remote server start via SSH
 
 
 v0.12.1 (2014-03-27)

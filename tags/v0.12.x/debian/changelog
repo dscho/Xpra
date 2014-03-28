@@ -1,7 +1,8 @@
 xpra (0.12.2-1) UNRELEASED; urgency=low
   * fix switching to RGB encoding via client tray
+  * fix remote server start via SSH
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 28 Mar 2014 10:52:36 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 28 Mar 2014 14:39:44 +0700
 
 xpra (0.12.1-1) UNRELEASED; urgency=low
   * fix 32-bit server timestamps
