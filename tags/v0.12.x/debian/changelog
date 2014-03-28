@@ -1,3 +1,8 @@
+xpra (0.12.2-1) UNRELEASED; urgency=low
+  * fix switching to RGB encoding via client tray
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 28 Mar 2014 10:52:36 +0700
+
 xpra (0.12.1-1) UNRELEASED; urgency=low
   * fix 32-bit server timestamps
   * fix client PNG handling on installations without PIL / Pillow

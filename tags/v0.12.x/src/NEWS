@@ -1,3 +1,8 @@
+v0.12.2 (2014-03-28)
+======================
+	-- fix switching to RGB encoding via client tray
+
+
 v0.12.1 (2014-03-27)
 ======================
 	-- fix 32-bit server timestamps
