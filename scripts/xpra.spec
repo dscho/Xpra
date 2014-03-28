@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.12.1
+%define version 0.12.2
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -193,6 +193,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Fri Mar 28 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.2-1
+- fix switching to RGB encoding via client tray
+
 * Thu Mar 27 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.1-1
 - fix 32-bit server timestamps
 - fix client PNG handling on installations without PIL / Pillow
@@ -290,7 +293,7 @@ So basically it's screen for remote X apps.
 - experimental HTML5 client
 - drop non xpra clients with a more friendly response
 
-* Tue Jan 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.12-1
+* Tue Jan 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.12.2
 - fix missing auto-refresh with lossy colourspace conversion
 - fix spurious warning from Nvidia OpenGL driver
 - fix OpenGL client crash with some drivers (ie: VirtualBox)
