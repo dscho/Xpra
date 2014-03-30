@@ -193,9 +193,10 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Fri Mar 28 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.2-1
+* Sun Mar 30 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.2-1
 - fix switching to RGB encoding via client tray
 - fix remote server start via SSH
+- fix workspace change detection causing slow screen updates
 
 * Thu Mar 27 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.1-1
 - fix 32-bit server timestamps
