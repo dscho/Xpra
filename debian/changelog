@@ -1,3 +1,15 @@
+xpra (0.12.3-1) UNRELEASED; urgency=low
+  * fix rare invalid memory read with XShm
+  * fix webp decoder leak
+  * fix memory leak on client disconnection
+  * fix focus errors if windows disappear
+  * fix mmap errors on window close
+  * fix incorrect x264 encoder speed reported via "xpra info"
+  * fix potential use of mmap as an invalid fallback for video encoding
+  * fix logging errors in debug mode
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 05 Apr 2014 10:29:15 +0700
+
 xpra (0.12.2-1) UNRELEASED; urgency=low
   * fix switching to RGB encoding via client tray
   * fix remote server start via SSH

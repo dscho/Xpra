@@ -1,3 +1,15 @@
+v0.12.3 (2014-04-05)
+======================
+	-- fix rare invalid memory read with XShm
+	-- fix webp decoder leak
+	-- fix memory leak on client disconnection
+	-- fix focus errors if windows disappear
+	-- fix mmap errors on window close
+	-- fix incorrect x264 encoder speed reported via "xpra info"
+	-- fix potential use of mmap as an invalid fallback for video encoding
+	-- fix logging errors in debug mode
+
+
 v0.12.2 (2014-03-30)
 ======================
 	-- fix switching to RGB encoding via client tray
