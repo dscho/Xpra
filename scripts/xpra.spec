@@ -193,7 +193,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Sat Apr 05 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.3-1
+* Tue Apr 08 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.3-1
+- fix mispostioned windows
+- fix quickly disappearing windows (often menus)
 - fix rare invalid memory read with XShm
 - fix webp decoder leak
 - fix memory leak on client disconnection
