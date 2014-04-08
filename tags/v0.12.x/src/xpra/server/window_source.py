@@ -218,8 +218,8 @@ class WindowSource(object):
         self.max_bytes_percent = 0
         self.small_packet_cost = 0
         #
-        self._encoding_quality = None
-        self._encoding_speed = None
+        self._encoding_quality = []
+        self._encoding_speed = []
         #
         self._fixed_quality = -1
         self._fixed_min_quality = -1
@@ -390,16 +390,16 @@ class WindowSource(object):
                 _, descr, _ = l[-1]
                 for k,v in descr.items():
                     info[prefix+"."+k] = v
-        quality_list = [x for _, _, x in list(self._encoding_quality)]
-        if len(quality_list)>0:
+        quality_list = self._encoding_quality
+        if quality_list:
             qp = prefix+"encoding.quality"+suffix
-            add_list_stats(info, qp, quality_list)
-            add_last_rec_info(qp, self._encoding_quality)
-        speed_list = [x for _, _, x in list(self._encoding_speed)]
-        if len(speed_list)>0:
+            add_list_stats(info, qp, [x for _, _, x in list(quality_list)])
+            add_last_rec_info(qp, quality_list)
+        speed_list = self._encoding_speed
+        if speed_list:
             sp = prefix+"encoding.speed"+suffix
-            add_list_stats(info, sp, speed_list)
-            add_last_rec_info(sp, self._encoding_speed)
+            add_list_stats(info, sp, [x for _, _, x in list(speed_list)])
+            add_last_rec_info(sp, speed_list)
         self.batch_config.add_stats(info, prefix, suffix)
 
     def calculate_batch_delay(self, has_focus, other_is_fullscreen, other_is_maximized):
@@ -445,9 +445,10 @@ class WindowSource(object):
         s = min(100, self._fixed_speed)
         if s>=0:
             return max(ms, s)
-        if len(self._encoding_speed)==0:
+        es = self._encoding_speed
+        if not es:
             return max(ms, 80)
-        return max(ms, self._encoding_speed[-1][-1])
+        return max(ms, es[-1][-1])
 
     def update_quality(self):
         if self.suspended or self._mmap:
@@ -455,10 +456,10 @@ class WindowSource(object):
         quality = self._fixed_quality
         if quality<0:
             min_quality = self.get_min_quality()
-            info, target_quality = get_target_quality(self.wid, self.window_dimensions, self.batch_config, self.global_statistics, self.statistics, min_quality)
+            info, quality = get_target_quality(self.wid, self.window_dimensions, self.batch_config, self.global_statistics, self.statistics, min_quality)
             #make a copy to work on (and discard "info")
             ves_copy = [(event_time, speed) for event_time, _, speed in list(self._encoding_quality)]
-            ves_copy.append((time.time(), target_quality))
+            ves_copy.append((time.time(), quality))
             quality = max(min_quality, time_weighted_average(ves_copy, min_offset=0.1, rpow=1.2))
             quality = min(99, quality)
         else:
@@ -482,9 +483,10 @@ class WindowSource(object):
         q = min(100, self._fixed_quality)
         if q>=0:
             return max(mq, q)
-        if len(self._encoding_quality)==0:
+        eq = self._encoding_quality
+        if not eq:
             return max(mq, 90)
-        return max(mq, self._encoding_quality[-1][-1])
+        return max(mq, eq[-1][-1])
 
     def reconfigure(self, force_reload=False):
         self.update_quality()
@@ -950,6 +952,9 @@ class WindowSource(object):
         if self._damage_delayed:
             #new incoming damage
             return
+        if not self.auto_refresh_encodings or self.is_cancelled():
+            #can happen during cleanup
+            return
         #ok, so we will schedule a new refresh - cancel any pending one:
         self.cancel_refresh_timer()
         delay = int(max(50, self.auto_refresh_delay, self.batch_config.delay*4))
@@ -964,10 +969,13 @@ class WindowSource(object):
     def full_quality_refresh(self, window, damage_options):
         if self._damage_delayed:
             #there is already a new damage region pending
-            return  False
+            return
         if not window.is_managed():
             #this window is no longer managed
-            return  False
+            return
+        if not self.auto_refresh_encodings or self.is_cancelled():
+            #can happen during cleanup
+            return
         w, h = window.get_dimensions()
         log("full_quality_refresh() for %sx%s window", w, h)
         new_options = damage_options.copy()
