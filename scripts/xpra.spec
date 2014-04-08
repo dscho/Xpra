@@ -196,6 +196,7 @@ So basically it's screen for remote X apps.
 * Tue Apr 08 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.3-1
 - fix mispostioned windows
 - fix quickly disappearing windows (often menus)
+- fix server errors when closing windows
 - fix rare invalid memory read with XShm
 - fix webp decoder leak
 - fix memory leak on client disconnection
