@@ -11,8 +11,9 @@ xpra (0.12.3-1) UNRELEASED; urgency=low
   * fix incorrect x264 encoder speed reported via "xpra info"
   * fix potential use of mmap as an invalid fallback for video encoding
   * fix logging errors in debug mode
+  * fix timer expired warning
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 08 Apr 2014 22:58:05 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 09 Apr 2014 12:39:07 +0700
 
 xpra (0.12.2-1) UNRELEASED; urgency=low
   * fix switching to RGB encoding via client tray

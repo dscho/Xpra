@@ -193,7 +193,7 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Tue Apr 08 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.3-1
+* Wed Apr 09 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.3-1
 - fix mispostioned windows
 - fix quickly disappearing windows (often menus)
 - fix server errors when closing windows
@@ -206,6 +206,7 @@ So basically it's screen for remote X apps.
 - fix incorrect x264 encoder speed reported via "xpra info"
 - fix potential use of mmap as an invalid fallback for video encoding
 - fix logging errors in debug mode
+- fix timer expired warning
 
 * Sun Mar 30 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.2-1
 - fix switching to RGB encoding via client tray

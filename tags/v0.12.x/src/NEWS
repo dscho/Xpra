@@ -1,4 +1,4 @@
-v0.12.3 (2014-04-08)
+v0.12.3 (2014-04-09)
 ======================
 	-- fix mispostioned windows
 	-- fix quickly disappearing windows (often menus)
@@ -12,6 +12,7 @@ v0.12.3 (2014-04-08)
 	-- fix incorrect x264 encoder speed reported via "xpra info"
 	-- fix potential use of mmap as an invalid fallback for video encoding
 	-- fix logging errors in debug mode
+	-- fix timer expired warning
 
 
 v0.12.2 (2014-03-30)
