@@ -197,6 +197,7 @@ So basically it's screen for remote X apps.
 - fix mispostioned windows
 - fix quickly disappearing windows (often menus)
 - fix server errors when closing windows
+- fix NVENC server initialization crash with driver version mismatch
 - fix rare invalid memory read with XShm
 - fix webp decoder leak
 - fix memory leak on client disconnection
