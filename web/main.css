@@ -416,6 +416,11 @@ form.trac-comment-editor, div.ticketdraft  {
         text-shadow: 0px 0 #eee;
 }
 
+tt {
+	color: #5E2612;
+	border: 1px solid #953;
+}
+
 /* override trac's red colour */
 :link, :visited, dt em, .report div.reports h3 em, .milestone .info h2 em {
         color: #0040A5;
