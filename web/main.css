@@ -391,6 +391,9 @@ div#ticket {
 div#ticketchange {
 	clear: both;
 }
+#changelog h3, #ticketchange h3 {
+	color: #679;
+}
 div.box h1, div.box h2, div.box h3 {
 	margin-left: 5px;
 }
