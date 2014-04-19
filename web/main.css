@@ -113,7 +113,6 @@ span.lighter {
 	padding:0px;
 	margin:0px;
 	list-style-type:none;
-	border-right:1px solid #ffffff;
 	white-space:nowrap;
 	list-style: none;
 }
@@ -137,9 +136,9 @@ form#search {
 	margin: 0px;
 }
 form#search input[type='text'] {
-	font-size: 0.95em;
-	line-height: 0.95em;
-	height: 0.95em;
+	font-size: 0.85em;
+	line-height: 0.85em;
+	height: 0.85em;
 }
 form#search input.submit {
 	margin: auto;
