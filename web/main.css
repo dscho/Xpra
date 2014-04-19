@@ -298,12 +298,14 @@ select#docnav, select#docnav option {
 #docnav a.index:after {
 	content: url(/icons/arrow-up-circle-small.png)
 }
+form, fieldset {
+        float: left;
+}
 form, fieldset, select {
-	float: left;
-	display: inline;
-	border: none;
-	padding: 0px;
-	margin: 0px;
+        display: inline;
+        border: none;
+        padding: 0px;
+        margin: 0px;
 }
 
 ul.faq {
@@ -363,6 +365,9 @@ li.a {
 	list-style-image: url(/icons/arrow.png);
 }
 
+
+/* TRAC OVERRIDES */
+
 #content.ticket {
 	width: auto;
 	min-width: 58em;
@@ -383,13 +388,19 @@ div.trac-content {
 div.trac-ticket-buttons {
 	height: 1.5em;
 }
-div.trac-ticket-buttons form {
-}
 div#ticket {
-	border-radius: 10px;
+        border-radius: 10px;
+        background: #f0f8f0;
+        border: 1.5px solid #ded;
 }
 div#ticketchange {
-	clear: both;
+        clear: both;
+}
+#ticket .description h3 {
+        border-bottom: 2px solid #ded;
+}
+#ticket table.properties {
+        border-top: 2px solid #ded;
 }
 #changelog h3, #ticketchange h3 {
 	color: #679;
@@ -400,4 +411,9 @@ div.box h1, div.box h2, div.box h3 {
 
 form.trac-comment-editor, div.ticketdraft  {
 	clear: both;
+}
+
+/* override trac's red colour */
+:link, :visited, dt em, .report div.reports h3 em, .milestone .info h2 em {
+        color: #0040A5;
 }
