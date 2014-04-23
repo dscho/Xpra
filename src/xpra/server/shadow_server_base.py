@@ -146,7 +146,8 @@ class ShadowServerBase(object):
         return self.root_window_model.get_dimensions()
 
     def set_keymap(self, server_source, force=False):
-        log.info("shadow server: not setting keymap")
+        log.info("shadow server: setting default keymap translation")
+        self.keyboard_config = server_source.set_default_keymap()
 
     def load_existing_windows(self, system_tray):
         log("loading existing windows")

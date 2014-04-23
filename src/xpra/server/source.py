@@ -890,6 +890,13 @@ class ServerSource(object):
         if self.keyboard_config and self.keyboard_config.enabled:
             self.keyboard_config.make_keymask_match(modifier_list, ignored_modifier_keycode, ignored_modifier_keynames)
 
+    def set_default_keymap(self):
+        keylog("set_default_keymap() keyboard_config=%s", self.keyboard_config)
+        if self.keyboard_config:
+            self.keyboard_config.set_default_keymap()
+        return self.keyboard_config
+
+
     def set_keymap(self, current_keyboard_config, keys_pressed, force):
         keylog("set_keymap%s", (current_keyboard_config, keys_pressed, force))
         if self.keyboard_config and self.keyboard_config.enabled:

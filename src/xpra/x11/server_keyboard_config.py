@@ -12,6 +12,7 @@ from xpra.log import Logger
 log = Logger("keyboard")
 
 
+from xpra.gtk_common.keymap import get_gtk_keymap
 from xpra.x11.gtk_x11.keys import grok_modifier_map
 from xpra.keyboard.mask import DEFAULT_MODIFIER_NUISANCE, mask_to_names
 from xpra.x11.xkbhelper import do_set_keymap, set_all_keycodes, \
@@ -67,19 +68,19 @@ class KeyboardConfig(object):
                 }
         #keycodes:
         if self.keycode_translation:
-            for ks, keycode in self.keycode_translation.items():
-                if type(ks)==tuple:
-                    client_keycode, keysym = ks
-                    info["keysym." + str(keysym)+"."+str(client_keycode)] = keycode
-                else:
-                    info["keysym." + str(ks)] = keycode
-        if self.xkbmap_keycodes:
-            for kc, spec in self.keycode_translation.items():
+            for kc, keycode in self.keycode_translation.items():
                 if type(kc)==tuple:
                     client_keycode, keysym = kc
-                    info["keycode." + str(client_keycode)+"."+keysym] = spec
+                    info["keysym." + str(keysym)+"."+str(client_keycode)] = keycode
+                    info["keycode." + str(client_keycode)+"."+keysym] = keycode
                 else:
-                    info["keycode." + str(kc)] = spec
+                    info["keysym." + str(kc)] = keycode
+                    info["keycode." + str(kc)] = keycode
+        if self.xkbmap_keycodes:
+            i = 0
+            for keyval, name, keycode, group, level in self.xkbmap_keycodes:
+                info["keymap.%s" % i] = (keyval, name, keycode, group, level)
+                i += 1
         #modifiers:
         if self.modifier_client_keycodes:
             for mod, keys in self.modifier_client_keycodes.items():
@@ -213,6 +214,42 @@ class KeyboardConfig(object):
             log("keyname_for_mod=%s", self.keynames_for_mod)
         except:
             log.error("error setting xmodmap", exc_info=True)
+
+    def set_default_keymap(self):
+        """ assign a default keymap based on the current X11 server keymap
+            sets up the translation tables so we can lookup keys without
+            setting a client keymap.
+        """
+        if not self.enabled:
+            return
+        self.is_native_keymap = False
+        clean_keyboard_state()
+        #keycodes:
+        keycode_to_keynames = X11Keyboard.get_keycode_mappings()
+        self.keycode_translation = {}
+        for keycode, keynames in keycode_to_keynames.items():
+            for keyname in keynames:
+                self.keycode_translation[keyname] = keycode
+        #add the ones we find via gtk, since we may rely on finding those keynames from the client:
+        for _, keyname, keycode, _, _ in get_gtk_keymap():
+            if keyname not in self.keycode_translation:
+                self.keycode_translation[keyname] = keycode
+        log("set_default_keymap: keycode_translation=%s", self.keycode_translation)
+        #modifiers:
+        self.keynames_for_mod = {}
+        #ie: {'control': [(37, 'Control_L'), (105, 'Control_R')], ...}
+        mod_mappings = X11Keyboard.get_modifier_mappings()
+        log("set_default_keymap: using modifier mappings=%s", mod_mappings)
+        for modifier, mappings in mod_mappings.items():
+            keynames = []
+            for m in mappings:      #ie: (37, 'Control_L'), (105, 'Control_R')
+                if len(m)==2: 
+                    keynames.append(m[1])   #ie: 'Control_L'
+            self.keynames_for_mod[modifier] = set(keynames)
+        self.compute_modifier_keynames()
+        log("set_default_keymap: keynames_for_mod=%s", self.keynames_for_mod)
+        log("set_default_keymap: keycodes_for_modifier_keynames=%s", self.keycodes_for_modifier_keynames)
+        log("set_default_keymap: modifier_map=%s", self.modifier_map)
 
     def make_keymask_match(self, modifier_list, ignored_modifier_keycode=None, ignored_modifier_keynames=None):
         """
