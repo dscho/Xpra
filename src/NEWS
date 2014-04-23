@@ -1,3 +1,10 @@
+v0.12.4 (2014-04-23)
+======================
+	-- fix xpra shadow subcommand
+	-- fix xpra shadow keyboard mapping support for non-posix clients
+	-- avoid Xorg dummy warning in log
+
+
 v0.12.3 (2014-04-09)
 ======================
 	-- fix mispostioned windows
