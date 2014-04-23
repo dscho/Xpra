@@ -1,3 +1,10 @@
+xpra (0.12.4-1) UNRELEASED; urgency=low
+  * fix xpra shadow subcommand
+  * fix xpra shadow keyboard mapping support for non-posix clients
+  * avoid Xorg dummy warning in log
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 23 Apr 2014 13:59:22 +0700
+
 xpra (0.12.3-1) UNRELEASED; urgency=low
   * fix mispostioned windows
   * fix quickly disappearing windows (often menus)
