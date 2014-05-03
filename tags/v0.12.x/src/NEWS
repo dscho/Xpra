@@ -1,3 +1,14 @@
+v0.12.5 (2014-05-03)
+======================
+	-- fix error when clients supply invalid screen dimensions
+	-- fix MS Windows build without ffmpeg
+	-- fix cairo backing alternative
+	-- fix keyboard and sound test tools initialization and cleanup
+	-- fix gcc version test used for enabling sanitizer build options
+	-- fix exception handling in client when called from the launcher
+	-- fix libav dependencies for Debian and Ubuntu builds 
+
+
 v0.12.4 (2014-04-23)
 ======================
 	-- fix xpra shadow subcommand

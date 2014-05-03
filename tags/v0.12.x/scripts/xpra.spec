@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.12.4
+%define version 0.12.5
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -193,6 +193,15 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Sat May 03 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.5-1
+- fix error when clients supply invalid screen dimensions
+- fix MS Windows build without ffmpeg
+- fix cairo backing alternative
+- fix keyboard and sound test tools initialization and cleanup
+- fix gcc version test used for enabling sanitizer build options
+- fix exception handling in client when called from the launcher
+- fix libav dependencies for Debian and Ubuntu builds 
+
 * Wed Apr 23 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.4-1
 - fix xpra shadow subcommand
 - fix xpra shadow keyboard mapping support for non-posix clients
@@ -315,7 +324,7 @@ So basically it's screen for remote X apps.
 - experimental HTML5 client
 - drop non xpra clients with a more friendly response
 
-* Tue Jan 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.12.4
+* Tue Jan 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.12.5
 - fix missing auto-refresh with lossy colourspace conversion
 - fix spurious warning from Nvidia OpenGL driver
 - fix OpenGL client crash with some drivers (ie: VirtualBox)
