@@ -71,7 +71,9 @@ class ApplicationWindow:
         self.config_keys = set(["username", "password", "host", "port", "mode", "ssh_port",
                                 "encoding", "quality", "min-quality", "speed", "min-speed"])
         self.config.client_toolkit = "gtk2"
-        self.client = make_client(Exception, self.config)
+        def raise_exception(*args):
+            raise Exception(*args)
+        self.client = make_client(raise_exception, self.config)
         self.client.init(self.config)
         self.exit_code = None
 
