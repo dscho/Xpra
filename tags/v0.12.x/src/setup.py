@@ -699,7 +699,7 @@ if WIN32:
     cuda_bin_dir       = os.path.join(cuda_path, "bin")
 
     #ffmpeg is needed for both swscale and x264:
-    libffmpeg_path = None
+    libffmpeg_path = ""
     if dec_avcodec_ENABLED:
         assert not dec_avcodec2_ENABLED, "cannot enable both dec_avcodec and dec_avcodec2"
         libffmpeg_path = "C:\\ffmpeg-win32-bin"
