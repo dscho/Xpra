@@ -196,6 +196,7 @@ So basically it's screen for remote X apps.
 * Fri May 09 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.6-1
 - fix sound sink with older versions of GStreamer plugins
 - fix error in cairo backing cleanup
+- fix OpenGL error with some odd driver configurations
 
 * Sat May 03 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.5-1
 - fix error when clients supply invalid screen dimensions
