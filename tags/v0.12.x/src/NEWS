@@ -1,3 +1,9 @@
+v0.12.6 (2014-05-09)
+======================
+	-- fix sound sink with older versions of GStreamer plugins
+	-- fix error in cairo backing cleanup
+
+
 v0.12.5 (2014-05-03)
 ======================
 	-- fix error when clients supply invalid screen dimensions

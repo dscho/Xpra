@@ -1,3 +1,9 @@
+xpra (0.12.6-1) UNRELEASED; urgency=low
+  * fix sound sink with older versions of GStreamer plugins
+  * fix error in cairo backing cleanup
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 09 May 2014 12:24:57 +0700
+
 xpra (0.12.5-1) UNRELEASED; urgency=low
   * fix error when clients supply invalid screen dimensions
   * fix MS Windows build without ffmpeg

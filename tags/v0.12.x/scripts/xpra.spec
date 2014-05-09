@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.12.5
+%define version 0.12.6
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -193,6 +193,10 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Fri May 09 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.6-1
+- fix sound sink with older versions of GStreamer plugins
+- fix error in cairo backing cleanup
+
 * Sat May 03 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.5-1
 - fix error when clients supply invalid screen dimensions
 - fix MS Windows build without ffmpeg
@@ -324,7 +328,7 @@ So basically it's screen for remote X apps.
 - experimental HTML5 client
 - drop non xpra clients with a more friendly response
 
-* Tue Jan 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.12.5
+* Tue Jan 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.10.12.6
 - fix missing auto-refresh with lossy colourspace conversion
 - fix spurious warning from Nvidia OpenGL driver
 - fix OpenGL client crash with some drivers (ie: VirtualBox)
