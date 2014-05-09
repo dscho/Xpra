@@ -4,11 +4,13 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
+import os
 import time
 
 from xpra.log import Logger
 log = Logger("csc", "swscale")
 
+from xpra.os_util import is_Ubuntu 
 from xpra.codecs.codec_constants import codec_spec
 from xpra.codecs.image_wrapper import ImageWrapper
 
@@ -232,6 +234,18 @@ cdef class CSCImage:
             free(self.buf[0])
             for i in xrange(4):
                 self.buf[i] = NULL
+
+
+MIN_SWSCALE_VERSION = (2, 1, 1)
+if (LIBSWSCALE_VERSION_MAJOR, LIBSWSCALE_VERSION_MINOR, LIBSWSCALE_VERSION_MICRO)<MIN_SWSCALE_VERSION and is_Ubuntu():
+    log.warn("buggy Ubuntu swscale version detected: %s", get_version())
+    if os.environ.get("XPRA_FORCE_SWSCALE", "0")=="1":
+        log.warn("XPRA_FORCE_SWSCALE enabled at your own risk!")
+    else:
+        log.warn("cowardly refusing to use it to avoid problems, set the environment variable:")
+        log.warn("XPRA_FORCE_SWSCALE=1")
+        log.warn("to use it anyway, at your own risk")
+        raise ImportError("unsupported Ubuntu swscale version: %s" % str(get_version()))
 
 
 class CSCImageWrapper(ImageWrapper):
