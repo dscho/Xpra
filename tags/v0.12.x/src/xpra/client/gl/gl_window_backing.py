@@ -18,7 +18,7 @@ OPENGL_DEBUG = os.environ.get("XPRA_OPENGL_DEBUG", "0")=="1"
 
 
 from xpra.codecs.codec_constants import get_subsampling_divs
-from xpra.client.gl.gl_check import get_DISPLAY_MODE
+from xpra.client.gl.gl_check import get_DISPLAY_MODE, HAS_ALPHA
 from xpra.client.gl.gl_colorspace_conversions import YUV2RGB_shader, RGBP2RGB_shader
 from xpra.client.gtk2.window_backing import GTK2WindowBacking, fire_paint_callbacks
 from OpenGL.GL import GL_PROJECTION, GL_MODELVIEW, \
@@ -134,7 +134,7 @@ class GLPixmapBacking(GTK2WindowBacking):
         except gtk.gdkgl.NoMatches:
             display_mode &= ~gtk.gdkgl.MODE_DOUBLE
             self.glconfig = gtk.gdkgl.Config(mode=display_mode)
-        if not self.glconfig.has_alpha():
+        if not HAS_ALPHA or not self.glconfig.has_alpha():
             has_alpha = False
         GTK2WindowBacking.__init__(self, wid, w, h, has_alpha)
         self._backing = gtk.gtkgl.DrawingArea(self.glconfig)
