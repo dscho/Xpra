@@ -3,6 +3,7 @@ v0.12.6 (2014-05-09)
 	-- fix sound sink with older versions of GStreamer plugins
 	-- fix error in cairo backing cleanup
 	-- fix OpenGL error with some odd driver configurations
+	-- fix global menu entry text on OSX
 	-- avoid buggy swscale 2.1.0 on Ubuntu
 
 
