@@ -373,7 +373,7 @@ class GLPixmapBacking(GTK2WindowBacking):
         w, h = self.size
 
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, self.textures[TEX_FBO])
-        if self._has_alpha:
+        if self._has_alpha and bool(glEnablei):
             # support alpha channel if present:
             glEnablei(GL_BLEND, self.textures[TEX_FBO])
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
