@@ -193,10 +193,12 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Fri May 09 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.6-1
+* Wed May 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.6-1
 - fix sound sink with older versions of GStreamer plugins
+- fix Qt applications crashes caused by a newline in xsettings..
+- fix error with graphics drivers only supporting OpenGL 2.x
 - fix error in cairo backing cleanup
-- fix OpenGL error with some odd driver configurations
+- avoid buggy swscale 2.1.0 on Ubuntu
 
 * Sat May 03 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.5-1
 - fix error when clients supply invalid screen dimensions
