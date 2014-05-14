@@ -1,9 +1,11 @@
 v0.12.6 (2014-05-09)
 ======================
 	-- fix sound sink with older versions of GStreamer plugins
-	-- fix error in cairo backing cleanup
-	-- fix OpenGL error with some odd driver configurations
+	-- fix Qt applications crashes caused by a newline in xsettings..
+	-- fix error with graphics drivers only supporting OpenGL 2.x
+	-- fix OpenGL crash on OSX with the Intel driver (now blacklisted)
 	-- fix global menu entry text on OSX
+	-- fix error in cairo backing cleanup
 	-- avoid buggy swscale 2.1.0 on Ubuntu
 
 

@@ -1,10 +1,11 @@
 xpra (0.12.6-1) UNRELEASED; urgency=low
   * fix sound sink with older versions of GStreamer plugins
+  * fix Qt applications crashes caused by a newline in xsettings..
+  * fix error with graphics drivers only supporting OpenGL 2.x
   * fix error in cairo backing cleanup
-  * fix OpenGL error with some odd driver configurations
   * avoid buggy swscale 2.1.0 on Ubuntu
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 09 May 2014 12:24:57 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 14 May 2014 17:12:07 +0700
 
 xpra (0.12.5-1) UNRELEASED; urgency=low
   * fix error when clients supply invalid screen dimensions
