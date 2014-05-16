@@ -913,11 +913,11 @@ class WindowSource(object):
             if not window.is_managed():
                 #no: window is gone
                 return
-            client_options = packet[10]     #info about this packet from the encoder
-            if client_options.get("auto_refresh", False):
+            if options.get("auto_refresh", False):
                 #no: this is from an auto-refresh already!
                 return
             #check quality:
+            client_options = packet[10]     #info about this packet from the encoder
             actual_quality = client_options.get("quality", 0)
             lossy_csc = client_options.get("csc") in LOSSY_PIXEL_FORMATS
             scaled = client_options.get("scaled_size") is not None
@@ -1148,17 +1148,20 @@ class WindowSource(object):
 
 
     def webp_encode(self, coding, image, options):
-        return webp_encode(coding, image, self.get_current_quality())
+        q = options.get("quality") or self.get_current_quality()
+        return webp_encode(coding, image, q)
 
     def rgb_encode(self, coding, image, options):
-        return rgb_encode(coding, image, self.rgb_formats, self.supports_transparency, self.get_current_speed(),
+        s = options.get("speed") or self.get_current_speed()
+        return rgb_encode(coding, image, self.rgb_formats, self.supports_transparency, s,
                           self.rgb_zlib, self.rgb_lz4, self.encoding_client_options, self.supports_rgb24zlib)
 
     def PIL_encode(self, coding, image, options):
         #for more information on pixel formats supported by PIL / Pillow, see:
         #https://github.com/python-imaging/Pillow/blob/master/libImaging/Unpack.c
         assert coding in self.server_core_encodings
-        return PIL_encode(coding, image, self.get_current_quality(), self.supports_transparency)
+        q = options.get("quality") or self.get_current_quality()
+        return PIL_encode(coding, image, q, self.supports_transparency)
 
     def mmap_encode(self, coding, image, options):
         return mmap_encode(coding, image, options)
