@@ -193,11 +193,16 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed May 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.6-1
+* Fri May 16 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.6-1
+- fix invalid pixel buffer size causing encoding failures
+- fix auto-refresh infinite loop, and honour refresh quality
 - fix sound sink with older versions of GStreamer plugins
 - fix Qt applications crashes caused by a newline in xsettings..
-- fix error with graphics drivers only supporting OpenGL 2.x
+- fix error with graphics drivers only supporting OpenGL 2.x only
+- fix OpenGL crash on OSX with the Intel driver (now blacklisted)
+- fix global menu entry text on OSX
 - fix error in cairo backing cleanup
+- fix RGB pixel data buffer size (re-stride as needed)
 - avoid buggy swscale 2.1.0 on Ubuntu
 
 * Sat May 03 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.5-1
