@@ -116,19 +116,20 @@
 	<a id="get_started"></a>
 	<div class="box">
 	  <h2><img src="/icons/forward.png" alt="forward" /> Get started with Xpra</h2>
-		On the machine which will export the application (xterm in this example):
+		To start an application (a simple <code>xterm</code> in this example) on a remote system
+		and display it your local machine, simply run:
 	    <div class="codebox">
-		<pre><code>xpra start :100 --start-child=xterm
+		<pre><code>xpra start ssh:SERVERHOSTNAME:100 --start-child=xterm
 </code></pre></div>
+		This is similar to <code>ssh -X</code>, except it is faster and you can disconnect and re-connect to the session as many times as you like. (obviously xpra must be installed on your server host)
 
-		We can then attach to this session from the same machine, with:
-		<div class="codebox">
-		<pre><code>xpra attach :100
-</code></pre></div>
-		If connecting from a remote machine, you would use something like (or you can also use the GUI):
+		<br />
+
+		To re-connect or to connect to this session from another machine, use the <code>attach</code> command (you can also use the <code>xpra_launcher</code> GUI):
 		<div class="codebox">
 		<pre><code>xpra attach ssh:serverhostname:100
 </code></pre></div>
+		You can find many more usage examples <a href="/trac/wiki/Usage">here</a>.
 	</div>
 
 	<a id="help"></a>
