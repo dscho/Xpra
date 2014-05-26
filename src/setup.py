@@ -134,7 +134,7 @@ dec_avcodec2_ENABLED    = pkg_config_ok("--atleast-version=55", "libavcodec", fa
 # some version strings I found:
 # Fedora 19: 54.92.100
 # Fedora 20: 55.39.101
-# Debian sid and jessie: 54.35.0
+# Debian sid and jessie: 55.34.1
 # Debian wheezy: 53.35
 avcodec_static_ENABLED  = False
 avcodec2_static_ENABLED = False
