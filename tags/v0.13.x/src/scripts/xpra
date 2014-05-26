@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+
+from xpra.platform import init
+init("Xpra")
+
+import sys
+from xpra.scripts.main import main
+sys.exit(main(sys.argv[0], sys.argv))
