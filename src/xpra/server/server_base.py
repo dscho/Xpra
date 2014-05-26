@@ -19,7 +19,6 @@ from xpra.keyboard.mask import DEFAULT_MODIFIER_MEANINGS
 from xpra.server.server_core import ServerCore
 from xpra.util import log_screen_sizes
 from xpra.os_util import thread, get_hex_uuid
-from xpra.version_util import get_version_info
 from xpra.util import typedict
 from xpra.codecs.loader import PREFERED_ENCODING_ORDER, codec_versions, has_codec, get_codec
 from xpra.codecs.codec_constants import get_PIL_encodings
@@ -629,7 +628,6 @@ class ServerBase(ServerCore):
              "sound.server_driven"          : True,
              "server_type"                  : "base",
              })
-        capabilities.update(get_version_info("build."))
         for k,v in codec_versions.items():
             capabilities["encoding.%s.version" % k] = v
         return capabilities
@@ -912,6 +910,8 @@ class ServerBase(ServerCore):
             (ie: things that query the display)
         """
         info = {"server.max_desktop_size" : self.get_max_screen_size()}
+        if self.keyboard_config:
+            info["state.modifiers"] = self.keyboard_config.get_current_mask()
         #window info:
         self.add_windows_info(info, wids)
         return info
@@ -1361,7 +1361,12 @@ class ServerBase(ServerCore):
         return ss.get_keycode(client_keycode, keyname, modifiers)
 
     def is_modifier(self, keyname, keycode):
-        return keyname in DEFAULT_MODIFIER_MEANINGS.keys()
+        if keyname in DEFAULT_MODIFIER_MEANINGS.keys():
+            return True
+        #keyboard config should always exist if we are here?
+        if self.keyboard_config:
+            return self.keyboard_config.is_modifier(keycode)
+        return False
 
     def fake_key(self, keycode, press):
         pass
@@ -1389,10 +1394,11 @@ class ServerBase(ServerCore):
             if keycode in self.keys_pressed:
                 del self.keys_pressed[keycode]
             self.fake_key(keycode, False)
+        is_mod = self.is_modifier(name, keycode)
         if pressed:
             if keycode not in self.keys_pressed:
                 press()
-                if not self.keyboard_sync and not self.keyboard_config.is_modifier(keycode):
+                if not self.keyboard_sync and not is_mod:
                     #keyboard is not synced: client manages repeat so unpress
                     #it immediately unless this is a modifier key
                     #(as modifiers are synced via many packets: key, focus and mouse events)
@@ -1404,7 +1410,6 @@ class ServerBase(ServerCore):
                 unpress()
             else:
                 keylog("handle keycode %s: key %s was already unpressed, ignoring", keycode, name)
-        is_mod = self.is_modifier(name, keycode)
         if not is_mod and self.keyboard_sync and self.key_repeat_delay>0 and self.key_repeat_interval>0:
             self._key_repeat(wid, pressed, name, keyval, keycode, modifiers, self.key_repeat_delay)
 

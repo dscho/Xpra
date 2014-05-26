@@ -14,7 +14,7 @@ from xpra.util import AtomicInteger
 from xpra.net.protocol import Compressed
 from xpra.codecs.codec_constants import get_avutil_enum_from_colorspace, get_subsampling_divs, get_default_csc_modes, \
                                         TransientCodecException, RGB_FORMATS, PIXEL_SUBSAMPLING, LOSSY_PIXEL_FORMATS
-from xpra.server.window_source import WindowSource, MAX_PIXELS_PREFER_RGB
+from xpra.server.window_source import WindowSource, MAX_PIXELS_PREFER_RGB, STRICT_MODE
 from xpra.gtk_common.region import rectangle, merge_all
 from xpra.codecs.loader import PREFERED_ENCODING_ORDER
 from xpra.log import Logger
@@ -252,7 +252,7 @@ class WindowVideoSource(WindowSource):
             sublog("identify video: not using a video mode! (%s)", self.encoding)
             self.video_subregion = None
             return
-        if self.full_frames_only:
+        if self.full_frames_only or STRICT_MODE:
             sublog("identify video: full frames only!")
             self.video_subregion = None
             return
@@ -556,6 +556,10 @@ class WindowVideoSource(WindowSource):
         if time.time()-self.statistics.last_resized<0.150:
             #window has just been resized, may still resize
             return nonvideo(q=quality-30)
+
+        if self.get_current_quality()!=quality or self.get_current_speed()!=speed:
+            #quality or speed override, best not to force video encoder re-init
+            return nonvideo()
 
         def lossless(reason):
             log("get_encoding_options(..) temporarily switching to lossless mode for %8i pixels: %s", pixel_count, reason)
@@ -887,19 +891,26 @@ class WindowVideoSource(WindowSource):
         elif SCALING_HARDCODED:
             actual_scaling = tuple(SCALING_HARDCODED)
             log("using hardcoded scaling: %s", actual_scaling)
-        elif actual_scaling is None:
+        elif actual_scaling is None and self.statistics.damage_events_count>50 and self.statistics.last_resized>0.5:
             #no scaling window attribute defined, so use heuristics to enable:
             q = self.get_current_quality()
             s = self.get_current_speed()
-            qs = s>q and q<80
-            #full frames per second:
+            #full frames per second (measured in pixels vs window size):
             ffps = 0
-            lde = list(self.statistics.last_damage_events)
+            stime = time.time()-5           #only look at the last 5 seconds max
+            lde = [x for x in list(self.statistics.last_damage_events) if x[0]>stime]
             if len(lde)>10:
                 #the first event's first element is the oldest event time:
                 otime = lde[0][0]
                 pixels = sum(w*h for _,_,_,w,h in lde)
                 ffps = int(pixels/(width*height)/(time.time() - otime))
+
+            #edge resistance:
+            er = 0
+            if self.actual_scaling!=(1, 1):
+                #if we are currently downscaling, stick with it a bit longer:
+                er = 1
+            qs = s>(q-er*10) and q<(70+er*15)
 
             if width>max_w or height>max_h:
                 #most encoders can't deal with that!
@@ -907,13 +918,13 @@ class WindowVideoSource(WindowSource):
                 while width/d>max_w or height/d>max_h:
                     d += 1
                 actual_scaling = 1,d
-            elif self.fullscreen and (qs or ffps>=10):
+            elif self.fullscreen and (qs or ffps>=(10-er*3)):
                 actual_scaling = 1,3
-            elif self.maximized and (qs or ffps>=10):
+            elif self.maximized and (qs or ffps>=(10-er*3)):
                 actual_scaling = 1,2
-            elif width*height>=2048*1200 and (q<80 or ffps>=25):
+            elif width*height>=(2048-er*768)*1200 and (qs or ffps>=(25-er*5)):
                 actual_scaling = 1,3
-            elif width*height>=1024*1024 and (q<80 or ffps>=30):
+            elif width*height>=(1024-er*384)*1024 and (qs or ffps>=(30-er*10)):
                 actual_scaling = 2,3
         if actual_scaling is None:
             actual_scaling = 1, 1

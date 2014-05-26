@@ -442,7 +442,7 @@ class UIXpraClient(XpraClientBase):
         core_encodings = ["rgb24"]
         #PIL:
         core_encodings += get_PIL_decodings(get_codec("PIL"))
-        if has_codec("dec_webm") and "webp" not in core_encodings:
+        if (has_codec("dec_webm") or has_codec("dec_webp")) and "webp" not in core_encodings:
             core_encodings.append("webp")
         #we enable all the video decoders we know about,
         #what will actually get used by the server will still depend on the csc modes supported
@@ -1213,6 +1213,7 @@ class UIXpraClient(XpraClientBase):
             proxy_platform = c.strget("proxy.platform")
             proxy_release = c.strget("proxy.platform.release")
             proxy_version = c.strget("proxy.version")
+            proxy_version = c.strget("proxy.build.version", proxy_version)
             msg = "via: %s proxy version %s" % (platform_name(proxy_platform, proxy_release), std(proxy_version))
             if proxy_hostname:
                 msg += " on '%s'" % std(proxy_hostname)

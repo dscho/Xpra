@@ -93,7 +93,7 @@ cdef extern from "webp/encode.h":
                                         #if filter_strength > 0 or autofilter > 0)
         int autofilter                  #Auto adjust filter's strength [0 = off, 1 = on]
         int alpha_compression           #Algorithm for encoding the alpha plane (0 = none,
-                                        #compressed with WebP lossless). Default is 1.
+                                        #1 compressed with WebP lossless). Default is 1.
         int alpha_filtering             #Predictive filtering method for alpha plane.
                                         #0: none, 1: fast, 2: best. Default if 1.
         int alpha_quality               #Between 0 (smallest size) and 100 (lossless).
@@ -134,7 +134,7 @@ cdef extern from "webp/encode.h":
         # compression, and YUV input (*y, *u, *v, etc.) for lossy compression
         # since these are the respective native colorspace for these formats.
         int use_argb
-      
+
         # YUV input (mostly used for input to lossy compression)
         WebPEncCSP colorspace           #colorspace: should be YUV420 for now (=Y'CbCr).
         int width, height               #dimensions (less or equal to WEBP_MAX_DIMENSION)
@@ -145,17 +145,17 @@ cdef extern from "webp/encode.h":
         uint8_t* a                      #pointer to the alpha plane
         int a_stride                    #stride of the alpha plane
         uint32_t pad1[2]                #padding for later use
-      
+
         # ARGB input (mostly used for input to lossless compression)
         uint32_t* argb                  #Pointer to argb (32 bit) plane.
         int argb_stride                 #This is stride in pixels units, not bytes.
         uint32_t pad2[3]                #padding for later use
-      
+
         #   OUTPUT
         # Byte-emission hook, to store compressed bytes as they are ready.
         WebPWriterFunction writer       #can be NULL
         void* custom_ptr                #can be used by the writer.
-      
+
         # map for extra information (only for lossy compression mode)
         int extra_info_type             #1: intra type, 2: segment, 3: quant
                                         #4: intra-16 prediction mode,
@@ -165,22 +165,22 @@ cdef extern from "webp/encode.h":
                                         # ((width + 15) / 16) * ((height + 15) / 16) that
                                         #will be filled with a macroblock map, depending
                                         #on extra_info_type.
-      
+
         #   STATS AND REPORTS
         # Pointer to side statistics (updated only if not NULL)
         WebPAuxStats* stats
-      
+
         # Error code for the latest error encountered during encoding
         WebPEncodingError error_code
-      
+
         #If not NULL, report progress during encoding.
         WebPProgressHook progress_hook
-      
+
         void* user_data                 #this field is free to be set to any value and
                                         #used during callbacks (like progress-report e.g.).
-      
+
         uint32_t pad3[3]                #padding for later use
-      
+
         # Unused for now: original samples (for non-YUV420 modes)
         uint8_t *u0
         uint8_t *v0
@@ -200,6 +200,7 @@ cdef extern from "webp/encode.h":
     int WebPConfigPreset(WebPConfig* config, WebPPreset preset, float quality)
     int WebPValidateConfig(const WebPConfig* config)
     int WebPPictureInit(WebPPicture* picture)
+    void WebPPictureFree(WebPPicture* picture)
 
     # Colorspace conversion function to import RGB samples.
     # Previous buffer will be free'd, if any.
@@ -292,6 +293,7 @@ def compress(pixels, width, height, stride=0, quality=50, speed=50, has_alpha=Fa
     cdef Py_ssize_t pic_buf_len = 0
     cdef WebPConfig config
     cdef int ret
+    cdef int i, c
     #presets: DEFAULT, PICTURE, PHOTO, DRAWING, ICON, TEXT
     cdef WebPPreset preset = WEBP_PRESET_TEXT
     if width*height<8192:
@@ -299,6 +301,15 @@ def compress(pixels, width, height, stride=0, quality=50, speed=50, has_alpha=Fa
 
     assert object_as_buffer(pixels, <const void**> &pic_buf, &pic_buf_len)==0
     log("webp.compress(%s bytes, %s, %s, %s, %s, %s, %s) buf=%#x", len(pixels), width, height, stride, quality, speed, has_alpha, <unsigned long> pic_buf)
+
+    if not has_alpha:
+        #ensure webp will not decide to encode the alpha channel
+        #(this is stupid: we should be able to pass a flag instead)
+        i = 3
+        c = (stride or width) * height * 4
+        while i<c:
+            pic_buf[i] = 0xff
+            i += 4
 
     ret = WebPConfigPreset(&config, preset, fclamp(quality))
     if not ret:
@@ -311,7 +322,7 @@ def compress(pixels, width, height, stride=0, quality=50, speed=50, has_alpha=Fa
     else:
         config.quality = fclamp(quality)
     config.method = max(0, min(6, 6-speed/16))
-    config.alpha_compression = int(has_alpha)
+    config.alpha_compression = int(quality>=90)
     config.alpha_filtering = max(0, min(2, speed/50)) * int(has_alpha)
     config.alpha_quality = quality * int(has_alpha)
     #hints: DEFAULT, PICTURE, PHOTO, GRAPH
@@ -340,11 +351,12 @@ def compress(pixels, width, height, stride=0, quality=50, speed=50, has_alpha=Fa
     pic.argb = <uint32_t*> pic_buf
     pic.argb_stride = stride or width
     pic.writer = <WebPWriterFunction> WebPMemoryWrite
-    pic.custom_ptr = <void*> &memory_writer  
+    pic.custom_ptr = <void*> &memory_writer
     ret = WebPEncode(&config, &pic)
     if not ret:
         raise Exception("WebPEncode failed: %s" % ERROR_TO_NAME.get(pic.error_code, pic.error_code))
 
     cdata = memory_writer.mem[:memory_writer.size]
     free(memory_writer.mem)
+    WebPPictureFree(&pic)
     return cdata

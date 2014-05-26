@@ -185,17 +185,34 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Sat May 03 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.0-1
+* Thu May 22 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.0-1
 - Python3 / GTK3 client support
 - NVENC module included in binary builds
 - support for enhanced dummy driver with DPI option
 - better build system with features auto-detection
 - removed unsupported CUDA csc module
 - improved buffer support
+- faster webp encoder
 - improved automatic encoding selection
 - support running MS Windows installer under wine
 - support for window opacity forwarding
-- support for webp encoding via native codec, python-webm or Pillow
+- fix password mode in launcher
+- edge resistance for automatic image downscaling
+- increased default memory allocation of the dummy driver
+- more detailed version information and tools
+- stricter handling of server supplied values
+
+* Fri May 16 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.6-1
+- fix invalid pixel buffer size causing encoding failures
+- fix auto-refresh infinite loop, and honour refresh quality
+- fix sound sink with older versions of GStreamer plugins
+- fix Qt applications crashes caused by a newline in xsettings..
+- fix error with graphics drivers only supporting OpenGL 2.x only
+- fix OpenGL crash on OSX with the Intel driver (now blacklisted)
+- fix global menu entry text on OSX
+- fix error in cairo backing cleanup
+- fix RGB pixel data buffer size (re-stride as needed)
+- avoid buggy swscale 2.1.0 on Ubuntu
 
 * Sat May 03 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.5-1
 - fix error when clients supply invalid screen dimensions
@@ -204,7 +221,7 @@ So basically it's screen for remote X apps.
 - fix keyboard and sound test tools initialization and cleanup
 - fix gcc version test used for enabling sanitizer build options
 - fix exception handling in client when called from the launcher
-- fix libav dependencies for Debian and Ubuntu builds 
+- fix libav dependencies for Debian and Ubuntu builds
 
 * Wed Apr 23 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.4-1
 - fix xpra shadow subcommand
@@ -1089,12 +1106,17 @@ rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/x11/bindings/*.so
 rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/net/rencode/_rencode.so
 rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/*/*.so
 rm -f ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/server/stats/cymaths.so
+rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/argb
+rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/buffers
+rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/csc_cython
 rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/csc_swscale
-rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/enc_x264
+rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/cuda_common
 rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/dec_avcodec*
+rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/enc_x264
+rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/enc_x265
+rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/nvenc
 rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/vpx
-rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/webm
-
+rm -fr ${RPM_BUILD_ROOT}/usr/lib/python2.*/site-packages/xpra/codecs/webp
 %else
 #not a generic RPM
 %ifarch x86_64

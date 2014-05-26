@@ -103,7 +103,6 @@ class KeyboardConfig(KeyboardConfigBase):
             v = getattr(self, "xkbmap_mod_"+x)
             if v:
                 info["modifiers."+x] = v
-        info["state.modifiers"] = self.get_current_mask()
         log("keyboard info: %s", "\n".join(["%s=%s" % (k,v) for k,v in info.items()]))
         return info
 
@@ -113,19 +112,23 @@ class KeyboardConfig(KeyboardConfigBase):
             to set the keyboard attributes """
         KeyboardConfigBase.parse_options(self, props)
         modded = []
-        for x in ["xkbmap_print", "xkbmap_query", "xkbmap_mod_meanings",
-                  "xkbmap_mod_managed", "xkbmap_mod_pointermissing",
-                  "xkbmap_keycodes", "xkbmap_x11_keycodes"]:
-            cv = getattr(self, x)
-            nv = props.get(x)
+        for x in ("print", "query", "mod_meanings",
+                  "mod_managed", "mod_pointermissing",
+                  "keycodes", "x11_keycodes"):
+            prop = "xkbmap_%s" % x
+            cv = getattr(self, prop)
+            nv = props.get(prop)
             if cv!=nv:
-                setattr(self, x, nv)
-                modded.append(x)
+                setattr(self, prop, nv)
+                modded.append(prop)
         log("assign_keymap_options(..) modified %s", modded)
         return len(modded)>0
 
 
     def get_hash(self):
+        """
+            This hash will be different whenever the keyboard configuration changes.
+        """
         try:
             import hashlib
             m = hashlib.sha1()
@@ -180,6 +183,15 @@ class KeyboardConfig(KeyboardConfigBase):
     def compute_modifier_map(self):
         self.modifier_map = grok_modifier_map(gtk.gdk.display_get_default(), self.xkbmap_mod_meanings)
         log("modifier_map(%s)=%s", self.xkbmap_mod_meanings, self.modifier_map)
+
+
+    def is_modifier(self, keycode):
+        for mod, keys in self.keycodes_for_modifier_keynames.items():
+            if keycode in keys:
+                log("is_modifier(%s) found modifier: %s", keycode, mod)
+                return True
+        log("is_modifier(%s) not found", keycode)
+        return False
 
 
     def set_keymap(self):
@@ -266,7 +278,7 @@ class KeyboardConfig(KeyboardConfigBase):
         for modifier, mappings in mod_mappings.items():
             keynames = []
             for m in mappings:      #ie: (37, 'Control_L'), (105, 'Control_R')
-                if len(m)==2: 
+                if len(m)==2:
                     keynames.append(m[1])   #ie: 'Control_L'
             self.keynames_for_mod[modifier] = set(keynames)
         self.compute_modifier_keynames()
@@ -309,9 +321,10 @@ class KeyboardConfig(KeyboardConfigBase):
                 ie: "num" on win32, which is toggled by the "Num_Lock" key presses.
             * when called from '_handle_key', we ignore the modifier key which may be pressed
                 or released as it should be set by that key press event.
-            * when called from mouse position/click events we ignore 'xkbmap_mod_pointermissing'
+            * when called from mouse position/click/focus events we ignore 'xkbmap_mod_pointermissing'
                 which is set by the client to indicate modifiers which are missing from mouse events.
                 ie: on win32, "lock" is missing.
+                (we know this is not a keyboard event because ignored_modifier_keynames is None..)
             * if the modifier is a "nuisance" one ("lock", "num", "scroll") then we must
                 simulate a full keypress (down then up).
             * some modifiers can be set by multiple keys ("shift" by both "Shift_L" and "Shift_R" for example)
@@ -322,16 +335,18 @@ class KeyboardConfig(KeyboardConfigBase):
             log("make_keymask_match: ignored as keynames_for_mod not assigned yet")
             return
         if ignored_modifier_keynames is None:
-            ignored_modifier_keynames = self.xkbmap_mod_pointermissing
-
-        def is_ignored(modifier_keynames):
-            if not ignored_modifier_keynames:
-                return False
-            for imk in ignored_modifier_keynames:
-                if imk in modifier_keynames:
-                    log("modifier ignored (ignored keyname=%s)", imk)
-                    return True
-            return False
+            #this is not a keyboard event, ignore modifiers in "mod_pointermissing"
+            def is_ignored(modifier, modifier_keynames):
+                m = modifier in self.xkbmap_mod_pointermissing
+                log("is_ignored(%s, %s)=%s", modifier, modifier_keynames, m)
+                return m
+        else:
+            #keyboard event: ignore the keynames specified
+            #(usually the modifier key being pressed/unpressed)
+            def is_ignored(modifier, modifier_keynames):
+                m = set(modifier_keynames) & set(ignored_modifier_keynames)
+                log("is_ignored(%s, %s)=%s", modifier, modifier_keynames, m)
+                return bool(m)
 
         current = set(self.get_current_mask())
         wanted = set(modifier_list)
@@ -348,7 +363,7 @@ class KeyboardConfig(KeyboardConfigBase):
                 if not keynames:
                     log.error("unknown modifier: %s", modifier)
                     continue
-                if is_ignored(keynames):
+                if is_ignored(modifier, keynames):
                     log("modifier %s ignored (in ignored keynames=%s)", modifier, keynames)
                     continue
                 #find the keycodes that match the keynames for this modifier

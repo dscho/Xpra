@@ -724,6 +724,7 @@ if 'clean' in sys.argv or 'sdist' in sys.argv:
                    "xpra/codecs/enc_x264/encoder.c",
                    "xpra/codecs/enc_x265/encoder.c",
                    "xpra/codecs/webp/encode.c",
+                   "xpra/codecs/webp/decode.c",
                    "xpra/codecs/dec_avcodec/decoder.c",
                    "xpra/codecs/dec_avcodec/constants.pxi",
                    "xpra/codecs/dec_avcodec2/decoder.c",
@@ -961,7 +962,7 @@ if WIN32:
                         print(" - lib%s*.dll" % x)
                     sys.exit(0)
                 add_data_files("", [os.path.join(include_dll_path, dll) for dll in dll_files])
-                
+
 
             #list of DLLs we want to include, without the "lib" prefix, or the version and extension
             #(ie: "libatk-1.0-0.dll" -> "atk")
@@ -1549,6 +1550,9 @@ if webp_ENABLED:
     webp_pkgconfig = pkgconfig("webp")
     cython_add(Extension("xpra.codecs.webp.encode",
                 ["xpra/codecs/webp/encode.pyx", buffers_c],
+                **webp_pkgconfig))
+    cython_add(Extension("xpra.codecs.webp.decode",
+                ["xpra/codecs/webp/decode.pyx"]+membuffers_c,
                 **webp_pkgconfig))
 
 toggle_packages(dec_avcodec_ENABLED, "xpra.codecs.dec_avcodec")

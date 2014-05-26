@@ -224,17 +224,37 @@ class WindowBackingBase(object):
         if img.mode=="RGB":
             #PIL flattens the data to a continuous straightforward RGB format:
             rowstride = width*3
-            paint_options["rgb_format"] = "RGB" 
+            paint_options["rgb_format"] = "RGB"
             img_data = self.process_delta(raw_data, width, height, rowstride, options)
             self.idle_add(self.do_paint_rgb24, img_data, x, y, width, height, rowstride, paint_options, callbacks)
         elif img.mode=="RGBA":
             rowstride = width*4
-            paint_options["rgb_format"] = "RGBA" 
+            paint_options["rgb_format"] = "RGBA"
             img_data = self.process_delta(raw_data, width, height, rowstride, options)
             self.idle_add(self.do_paint_rgb32, img_data, x, y, width, height, rowstride, paint_options, callbacks)
         return False
 
     def paint_webp(self, img_data, x, y, width, height, options, callbacks):
+        dec_webp = get_codec("dec_webp")
+        if dec_webp:
+            return self.paint_webp_using_cwebp(img_data, x, y, width, height, options, callbacks)
+        return self.paint_webp_using_webm(img_data, x, y, width, height, options, callbacks)
+
+    def paint_webp_using_cwebp(self, img_data, x, y, width, height, options, callbacks):
+        dec_webp = get_codec("dec_webp")
+        has_alpha = options.get("has_alpha", False)
+        buffer_wrapper, width, height, stride, has_alpha, rgb_format = dec_webp.decompress(img_data, has_alpha)
+        options["rgb_format"] = rgb_format
+        def free_buffer(*args):
+            buffer_wrapper.free()
+        callbacks.append(free_buffer)
+        data = buffer_wrapper.get_pixels()
+        if has_alpha:
+            return self.paint_rgb32(data, x, y, width, height, stride, options, callbacks)
+        else:
+            return self.paint_rgb24(data, x, y, width, height, stride, options, callbacks)
+
+    def paint_webp_using_webm(self, img_data, x, y, width, height, options, callbacks):
         """ can be called from any thread """
         dec_webm = get_codec("dec_webm")
         assert dec_webm is not None, "webp decoder not found"
@@ -243,12 +263,12 @@ class WindowBackingBase(object):
             decode = dec_webm.DecodeRGBA
             rowstride = width*4
             paint_rgb = self.do_paint_rgb32
-            paint_options["rgb_format"] = "RGBA" 
+            paint_options["rgb_format"] = "RGBA"
         else:
             decode = dec_webm.DecodeRGB
             rowstride = width*3
             paint_rgb = self.do_paint_rgb24
-            paint_options["rgb_format"] = "RGB" 
+            paint_options["rgb_format"] = "RGB"
         log("paint_webp(%s) using decode=%s, paint=%s, paint_options=%s",
              ("%s bytes" % len(img_data), x, y, width, height, options, callbacks), decode, paint_rgb, paint_options)
         rgb_data = decode(img_data)
@@ -452,7 +472,7 @@ class WindowBackingBase(object):
         #Note: BGR(A) is only handled by gl_window_backing
         if rgb_format in ("RGB", "BGR"):
             self.do_paint_rgb24(data, x, y, width, height, rowstride, options, callbacks)
-        elif rgb_format in ("RGBA", "BGRA", "BGRX"):
+        elif rgb_format in ("RGBA", "BGRA", "BGRX", "RGBX"):
             self.do_paint_rgb32(data, x, y, width, height, rowstride, options, callbacks)
         else:
             raise Exception("invalid rgb format: %s" % rgb_format)

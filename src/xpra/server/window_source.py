@@ -8,7 +8,6 @@
 
 import time
 import os
-from math import sqrt
 
 from xpra.log import Logger
 log = Logger("window", "encoding")
@@ -17,8 +16,8 @@ compresslog = Logger("window", "compress")
 
 
 AUTO_REFRESH_ENCODING = os.environ.get("XPRA_AUTO_REFRESH_ENCODING", "")
-AUTO_REFRESH_THRESHOLD = int(os.environ.get("XPRA_AUTO_REFRESH_THRESHOLD", 90))
-AUTO_REFRESH_QUALITY = int(os.environ.get("XPRA_AUTO_REFRESH_QUALITY", 95))
+AUTO_REFRESH_THRESHOLD = int(os.environ.get("XPRA_AUTO_REFRESH_THRESHOLD", 95))
+AUTO_REFRESH_QUALITY = int(os.environ.get("XPRA_AUTO_REFRESH_QUALITY", 99))
 AUTO_REFRESH_SPEED = int(os.environ.get("XPRA_AUTO_REFRESH_SPEED", 0))
 
 MAX_PIXELS_PREFER_RGB = 4096
@@ -27,6 +26,7 @@ DELTA = os.environ.get("XPRA_DELTA", "1")=="1"
 MAX_DELTA_SIZE = int(os.environ.get("XPRA_MAX_DELTA_SIZE", "10000"))
 HAS_ALPHA = os.environ.get("XPRA_ALPHA", "1")=="1"
 FORCE_BATCH = os.environ.get("XPRA_FORCE_BATCH", "0")=="1"
+STRICT_MODE = os.environ.get("XPRA_ENCODING_STRICT_MODE", "0")=="1"
 
 
 from xpra.deque import maxdeque
@@ -40,8 +40,7 @@ try:
 except Exception, e:
     log("cannot load xor module: %s", e)
     xor_str = None
-from xpra.server.picture_encode import webm_encode, rgb_encode, PIL_encode, mmap_encode, mmap_send
-from xpra.net.protocol import Compressed
+from xpra.server.picture_encode import webp_encode, rgb_encode, PIL_encode, mmap_encode, mmap_send
 from xpra.codecs.loader import NEW_ENCODING_NAMES_TO_OLD, PREFERED_ENCODING_ORDER, get_codec
 from xpra.codecs.codec_constants import LOSSY_PIXEL_FORMATS, get_PIL_encodings
 
@@ -721,8 +720,8 @@ class WindowSource(object):
 
     def do_send_delayed_regions(self, damage_time, window, regions, coding, options, exclude_region=None, fallback=None):
         ww,wh = window.get_dimensions()
-        speed = self.get_current_speed()
-        quality = self.get_current_quality()
+        speed = options.get("speed") or self.get_current_speed()
+        quality = options.get("quality") or self.get_current_quality()
         def get_encoding(pixel_count):
             return self.get_best_encoding(True, pixel_count, ww, wh, speed, quality, coding, fallback)
 
@@ -800,9 +799,9 @@ class WindowSource(object):
         return self.full_frames_only or self.is_tray
 
 
-    def get_best_encoding(self, batching, pixel_count, ww, wh, speed, quality, current_encoding, fallback=None):
-        #import traceback
-        #traceback.print_stack()
+    def get_best_encoding(self, batching, pixel_count, ww, wh, speed, quality, current_encoding, fallback=[]):
+        if STRICT_MODE and current_encoding:
+            return current_encoding
         if self.is_tray or (self.has_alpha and self.supports_transparency):
             #always use transparent encoding for tray or for transparent windows:
             options = self.transparent_encoding_options(current_encoding, pixel_count, speed, quality)
@@ -810,9 +809,8 @@ class WindowSource(object):
             options = self.get_encoding_options(batching, pixel_count, ww, wh, speed, quality, current_encoding)
         if current_encoding is None:
             #add all the fallbacks so something will match
-            options += [x for x in [fallback]+self.common_encodings if x is not None and x not in options]
+            options += [x for x in fallback+self.common_encodings if x is not None and x not in options]
         e = self.do_get_best_encoding(options, current_encoding, fallback)
-        #log("get_best_encoding%s=%s (from options=%s, common_encodings=%s)", (batching, pixel_count, ww, wh, speed, quality, current_encoding), e, options, self.common_encodings)
         return e
 
     def do_get_best_encoding(self, options, current_encoding, fallback):
@@ -832,7 +830,9 @@ class WindowSource(object):
         current_encoding = {"rgb" : "rgb32"}.get(current_encoding, current_encoding)
         WITH_ALPHA = ["rgb32", "png", "rgb24"]
         #webp is shockingly bad at high res and low speed:
-        if pixel_count<1920*1080 and speed>30:
+        max_webp = 1024*1024*(200-quality)/100*speed/100
+        can_webp = 16384<pixel_count<max_webp
+        if can_webp:
             WITH_ALPHA.append("webp")
         options = []
         if current_encoding in WITH_ALPHA:
@@ -841,14 +841,16 @@ class WindowSource(object):
         if (speed>=75 and quality>=75) or pixel_count<=MAX_PIXELS_PREFER_RGB:
             #rgb is the fastest, and also worth using on small regions:
             options.append("rgb32")
-        if (not self.is_tray or quality>99) and pixel_count<1920*1080 and speed>30:
+        if not self.is_tray and can_webp:
             #see note above about webp
             options.append("webp")
         if speed<75:
             #png is a bit slow!
             options.append("png")
         #add fallback options:
-        return options+WITH_ALPHA
+        v = options+WITH_ALPHA
+        #log.info("transparent_encoding_options%s=%s", (current_encoding, pixel_count, speed, quality), v)
+        return v
 
     def get_encoding_options(self, batching, pixel_count, ww, wh, speed, quality, current_encoding):
         current_encoding = {"rgb" : "rgb24"}.get(current_encoding, current_encoding)
@@ -859,28 +861,29 @@ class WindowSource(object):
         #calculate the threshold for using rgb
         smult = max(1, (speed-75)/5.0)
         max_rgb = int(MAX_PIXELS_PREFER_RGB * smult * (1 + int(self.is_OR)*2))
-        #log("get_encoding_options%s lossless_q=%s, smult=%s, max_rgb=%s", (batching, pixel_count, ww, wh, speed, quality, current_encoding), lossless_q, smult, max_rgb)
+        #avoid large areas (too slow), especially at low speed and high quality:
+        max_webp = 1024*1024 * (200-quality)/100 * speed/100
+        #log.info("get_encoding_options%s lossless_q=%s, smult=%s, max_rgb=%s, max_webp=%s", (batching, pixel_count, ww, wh, speed, quality, current_encoding), lossless_q, smult, max_rgb, max_webp)
         if quality<lossless_q:
             #add lossy options
-            ALL_OPTIONS = ["jpeg", "webp", "png/P", "png/L"]
-            if speed>75 and (quality>90 or pixel_count<max_rgb):
+            ALL_OPTIONS = ["jpeg", "png/P", "png/L"]
+            if speed>75 and (quality>80 or pixel_count<max_rgb):
                 #high speed and high quality, rgb is still good
                 options.append("rgb24")
             if speed>50:
                 #at medium to high speed, jpeg is always good
                 options.append("jpeg")
-            if speed>30 and 16384<pixel_count<1920*1080:
+            if speed>30 and 16384<pixel_count<max_webp:
                 #medium speed: webp compresses well (just a bit slow)
                 options.append("webp")
         else:
             #lossless options:
-            ALL_OPTIONS = ["png", "webp", "rgb24"]
+            ALL_OPTIONS = ["png", "rgb24"]
             if speed>75 or pixel_count<max_rgb:
                 #high speed, rgb is very good:
                 options.append("rgb24")
-            if 16384<pixel_count<1920*1080 and ((quality>99 and speed>75) or speed>20):
-                #enable webp for medium speed (we normalize webp speed in webm_encode)
-                #but don't enable webp for "true" lossless (q>99) unless speed is high
+            if 16384<pixel_count<max_webp:
+                #don't enable webp for "true" lossless (q>99) unless speed is high
                 #because webp forces speed=100 for true lossless mode
                 #also avoid very small and very large areas (both slow)
                 options.append("webp")
@@ -959,16 +962,11 @@ class WindowSource(object):
         #because the code may rely on the client having received this frame
         if not packet:
             return
+        #queue packet for sending:
         self.queue_damage_packet(packet, damage_time, process_damage_time)
-        if coding.startswith("png") or coding.startswith("rgb") or self._mmap:
-            #primary encoding is lossless, no need for auto-refresh
-            return
-        #see if we need an auto-refresh:
-        if self._damage_delayed is not None:
-            #no: more updates coming
-            return
-        if self.auto_refresh_delay<=0 or self.is_cancelled(sequence) or len(self.auto_refresh_encodings)==0:
-            #no: auto-refresh is disabled
+        #now deal with auto refresh:
+        if self.auto_refresh_delay<=0 or self.is_cancelled(sequence) or len(self.auto_refresh_encodings)==0 or self._mmap:
+            #no: auto-refresh is disabled or not needed
             return
         #safe to call is_managed(), this is not an X11 function:
         if not window.is_managed():
@@ -977,24 +975,33 @@ class WindowSource(object):
         if options.get("auto_refresh", False):
             #no: this is from an auto-refresh already!
             return
-        #check quality:
+        #the actual encoding used may be different from the global one we specify
+        encoding = packet[6]
         client_options = packet[10]     #info about this packet from the encoder
         actual_quality = client_options.get("quality", 0)
+        if encoding.startswith("png") or encoding.startswith("rgb"):
+            actual_quality = 100
         lossy_csc = client_options.get("csc") in LOSSY_PIXEL_FORMATS
         scaled = client_options.get("scaled_size") is not None
+        ww, wh = window.get_dimensions()
         if actual_quality>=AUTO_REFRESH_THRESHOLD and not lossy_csc and not scaled:
-            refreshlog("auto refresh: was a lossless %s packet, ignoring", coding)
+            refreshlog("auto refresh: was a high quality %s screen update, ignoring", encoding)
             #lossless already: small region sent lossless or encoding is already lossless
-            #it is safe to call this method on window because they do not call down to X11:
-            ww, wh = window.get_dimensions()
+            #it is safe to call this method on window because it does not call down to X11:
             if self.refresh_timer and ww*wh>=w*h*9/10:
-                #discard pending auto-refresh since this is a fullscreen lossless update
+                #discard pending auto-refresh since this update covered more than 90% of the window
                 self.cancel_refresh_timer()
             #don't change anything: if we have a timer, keep it
             return
-        #if we're here: the window is still valid and this was a lossy update
+        if self._damage_delayed is not None:
+            #more updates coming already
+            return
+        if self.refresh_timer and w*h<ww*wh/20:
+            #a refresh is already due, and this update is small (20%), don't change anything
+            return
+        #if we're here: the window is still valid and this was a lossy update,
         #of some form (lossy encoding with low enough quality, or using CSC subsampling, or using scaling)
-        #so we need an auto-refresh:
+        #so we need an auto-refresh (re-schedule it if one was due already):
         self.idle_add(self.schedule_auto_refresh, window, options)
 
     def schedule_auto_refresh(self, window, damage_options):
@@ -1217,35 +1224,9 @@ class WindowSource(object):
 
 
     def webp_encode(self, coding, image, options):
-        stride = image.get_rowstride()
-        enc_webp = get_codec("enc_webp")
-        if enc_webp and stride%4==0 and image.get_pixel_format() in ("BGRA", "BGRX"):
-            #prefer Cython module:
-            alpha = self.supports_transparency and image.get_pixel_format()=="BGRA"
-            w = image.get_width()
-            h = image.get_height()
-            q = options.get("quality") or self.get_current_quality()
-            s = options.get("speed") or self.get_current_speed()
-            if q==100:
-                #webp lossless is unbearibly slow for only marginal compression improvements,
-                #so force max speed:
-                s = 100
-            else:
-                #normalize speed for webp: avoid low speeds!
-                s = int(sqrt(s) * 10)
-            cdata = enc_webp.compress(image.get_pixels(), w, h, stride=stride/4, quality=q, speed=s, has_alpha=alpha)
-            client_options = {"speed" : max(0, min(100, s))}
-            if q>=0 and q<100:
-                client_options["quality"] = q
-            if alpha:
-                client_options["has_alpha"] = True
-            return "webp", Compressed("webp", cdata), client_options, image.get_width(), image.get_height(), 0, 24
-        enc_webm = get_codec("enc_webm")
-        webp_handlers = get_codec("webm_bitmap_handlers")
-        if enc_webm and webp_handlers:
-            return webm_encode(image, self.get_current_quality())
-        #fallback to PIL
-        return self.PIL_encode(coding, image, options)
+        q = options.get("quality") or self.get_current_quality()
+        s = options.get("speed") or self.get_current_speed()
+        return webp_encode(coding, image, self.supports_transparency, q, s, options)
 
     def rgb_encode(self, coding, image, options):
         s = options.get("speed") or self.get_current_speed()

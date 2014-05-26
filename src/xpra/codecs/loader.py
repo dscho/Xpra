@@ -8,6 +8,10 @@ import os.path
 from xpra.log import Logger
 log = Logger("codec", "loader")
 
+#these codecs may well not load because we
+#do not require the libraries to be installed
+NOWARN = ["nvenc", "opencl"]
+
 codec_errors = {}
 codecs = {}
 def codec_import_check(name, description, top_module, class_module, *classnames):
@@ -31,7 +35,10 @@ def codec_import_check(name, description, top_module, class_module, *classnames)
                 return ic
         except ImportError, e:
             codec_errors[name] = e
-            log.warn(" cannot import %s (%s): %s", name, description, e)
+            l = log.warn
+            if name in NOWARN:
+                l = log.debug
+            l(" cannot import %s (%s): %s", name, description, e)
     except Exception, e:
         codec_errors[name] = e
         log.warn(" cannot load %s (%s): %s missing from %s: %s", name, description, classname, class_module, e)
@@ -110,7 +117,10 @@ def load_codecs():
 
     #webp via cython:
     codec_import_check("enc_webp", "webp encoder", "xpra.codecs.webp", "xpra.codecs.webp.encode", "compress")
-    add_codec_version("webp", "xpra.codecs.webp.encode")
+    add_codec_version("enc_webp", "xpra.codecs.webp.encode")
+
+    codec_import_check("dec_webp", "webp decoder", "xpra.codecs.webp", "xpra.codecs.webp.decode", "decompress")
+    add_codec_version("dec_webp", "xpra.codecs.webp.decode")
 
     #no bytearray (python 2.6 or later) or no bitmap handlers, no webm:
     from xpra.os_util import builtins
@@ -164,7 +174,8 @@ ALL_CODECS = "PIL", "enc_vpx", "dec_vpx", "enc_x264", "enc_x265", "nvenc", \
             "dec_avcodec", "dec_avcodec2", \
             "enc_webm", \
             "dec_webm", \
-            "enc_webp"
+            "enc_webp", \
+            "dec_webp"
 
 #note: this is just for defining the order of encodings,
 #so we have both core encodings (rgb24/rgb32) and regular encodings (rgb) in here:
