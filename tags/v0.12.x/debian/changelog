@@ -2,8 +2,9 @@ xpra (0.12.7-1) UNRELEASED; urgency=low
   * fix password mode in launcher
   * fix pam authentication module
   * fix proxy server launched without a display
+  * fix transparency with png/L mode
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 27 May 2014 10:26:03 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 27 May 2014 13:56:10 +0700
 
 xpra (0.12.6-1) UNRELEASED; urgency=low
   * fix invalid pixel buffer size causing encoding failures

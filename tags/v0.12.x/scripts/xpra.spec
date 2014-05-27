@@ -197,6 +197,7 @@ So basically it's screen for remote X apps.
 - fix password mode in launcher
 - fix pam authentication module
 - fix proxy server launched without a display
+- fix transparency with png/L mode
 
 * Fri May 16 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.6-1
 - fix invalid pixel buffer size causing encoding failures
