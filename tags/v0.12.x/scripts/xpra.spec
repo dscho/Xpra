@@ -193,8 +193,10 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Fri May 16 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.7-1
+* Tue May 27 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.7-1
 - fix password mode in launcher
+- fix pam authentication module
+- fix proxy server launched without a display
 
 * Fri May 16 2014 Antoine Martin <antoine@devloop.org.uk> 0.12.6-1
 - fix invalid pixel buffer size causing encoding failures
