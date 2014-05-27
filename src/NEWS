@@ -5,6 +5,7 @@ v0.13.1 (2014-05-27)
 	-- fix pam authentication module
 	-- fix proxy server launched without a display
 	-- fix xpra info data format (wrong prefix)
+	-- fix transparency with png/L mode
 
 
 v0.13.0 (2014-05-22)

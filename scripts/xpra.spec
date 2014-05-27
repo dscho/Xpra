@@ -191,6 +191,7 @@ So basically it's screen for remote X apps.
 - fix pam authentication module
 - fix proxy server launched without a display
 - fix xpra info data format (wrong prefix)
+- fix transparency with png/L mode
 
 * Thu May 22 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.0-1
 - Python3 / GTK3 client support
