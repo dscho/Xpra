@@ -1,3 +1,12 @@
+xpra (0.13.1-1) UNRELEASED; urgency=low
+  * honour lossless encodings
+  * fix avcodec2 build for Debian jessie and sid
+  * fix pam authentication module
+  * fix proxy server launched without a display
+  * fix xpra info data format (wrong prefix)
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 27 May 2014 10:12:07 +0700
+
 xpra (0.13.0-1) UNRELEASED; urgency=low
   * Python3 / GTK3 client support
   * NVENC module included in binary builds

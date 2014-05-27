@@ -1,3 +1,12 @@
+v0.13.1 (2014-05-27)
+======================
+	-- honour lossless encodings
+	-- fix avcodec2 build for Debian jessie and sid
+	-- fix pam authentication module
+	-- fix proxy server launched without a display
+	-- fix xpra info data format (wrong prefix)
+
+
 v0.13.0 (2014-05-22)
 ======================
 	-- Python3 / GTK3 client support
