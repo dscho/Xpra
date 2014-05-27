@@ -3,6 +3,7 @@ v0.12.7 (2014-05-27)
 	-- fix password mode in launcher
 	-- fix pam authentication module
 	-- fix proxy server launched without a display
+	-- fix transparency with png/L mode
 
 
 v0.12.6 (2014-05-16)
