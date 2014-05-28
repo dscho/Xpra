@@ -185,13 +185,16 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Tue May 27 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.1-1
+* Wed May 28 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.1-1
 - honour lossless encodings
 - fix avcodec2 build for Debian jessie and sid
 - fix pam authentication module
 - fix proxy server launched without a display
 - fix xpra info data format (wrong prefix)
 - fix transparency with png/L mode
+- fix loss of transparency when toggling OpenGL
+- fix re-stride code for compatibility with ancient clients
+- fix timer reference leak causing some warnings
 
 * Thu May 22 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.0-1
 - Python3 / GTK3 client support
