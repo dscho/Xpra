@@ -198,6 +198,7 @@ So basically it's screen for remote X apps.
 - fix pam authentication module
 - fix proxy server launched without a display
 - fix transparency with png/L mode
+- fix buffer size errors with RGB encoding
 - fix re-stride code for compatibility with ancient clients
 - fix timer reference leak causing some warnings
 
