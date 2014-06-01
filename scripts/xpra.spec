@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.13.1
+%define version 0.13.2
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -185,6 +185,13 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Sun Jun 01 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.2-1
+- fix initial window workspace
+- fix launcher with debug option in config file
+- fix compilation of x265 encoder
+- fix infinite recursion in cython csc module
+- don't include sound utilities when building without sound
+
 * Wed May 28 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.1-1
 - honour lossless encodings
 - fix avcodec2 build for Debian jessie and sid
