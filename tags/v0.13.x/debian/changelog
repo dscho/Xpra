@@ -1,3 +1,12 @@
+xpra (0.13.2-1) UNRELEASED; urgency=low
+  * fix initial window workspace
+  * fix launcher with debug option in config file
+  * fix compilation of x265 encoder
+  * fix infinite recursion in cython csc module
+  * don't include sound utilities when building without sound
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sun, 01 Jun 2014 14:05:07 +0700
+
 xpra (0.13.1-1) UNRELEASED; urgency=low
   * honour lossless encodings
   * fix avcodec2 build for Debian jessie and sid

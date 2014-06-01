@@ -1,3 +1,12 @@
+v0.13.2 (2014-06-01)
+======================
+	-- fix initial window workspace
+	-- fix launcher with debug option in config file
+	-- fix compilation of x265 encoder
+	-- fix infinite recursion in cython csc module
+	-- don't include sound utilities when building without sound
+
+
 v0.13.1 (2014-05-28)
 ======================
 	-- honour lossless encodings
