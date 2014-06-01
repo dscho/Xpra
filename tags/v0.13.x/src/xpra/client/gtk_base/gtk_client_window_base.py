@@ -66,7 +66,7 @@ class GTKClientWindowBase(ClientWindowBase, gtk.Window):
         self._fullscreen = None
         self._iconified = False
         self._resize_counter = 0
-        self._window_workspace = self._client_properties.get("workspace")
+        self._window_workspace = self._client_properties.get("workspace", -1)
         workspacelog("init_window(..) workspace=%s", self._window_workspace)
         self._desktop_workspace = -1
         ClientWindowBase.init_window(self, metadata)
@@ -229,12 +229,12 @@ class GTKClientWindowBase(ClientWindowBase, gtk.Window):
         return self.xget_u32_property(root, "_NET_NUMBER_OF_DESKTOPS")
 
     def set_workspace(self):
-        if not HAS_X11_BINDINGS:
+        if not self._can_set_workspace:
             return -1
         root = self.gdk_window().get_screen().get_root_window()
         ndesktops = self.get_workspace_count()
         workspacelog("%s.set_workspace() workspace=%s ndesktops=%s", self, self._window_workspace, ndesktops)
-        if ndesktops is None or ndesktops<=1:
+        if ndesktops is None or ndesktops<=1 or self._window_workspace<0:
             return  -1
         workspace = max(0, min(ndesktops-1, self._window_workspace))
         event_mask = SubstructureNotifyMask | SubstructureRedirectMask
