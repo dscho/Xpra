@@ -186,6 +186,7 @@ So basically it's screen for remote X apps.
 
 %changelog
 * Sun Jun 01 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.2-1
+- fix painting of forwarded tray
 - fix initial window workspace
 - fix launcher with debug option in config file
 - fix compilation of x265 encoder

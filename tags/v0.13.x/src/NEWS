@@ -1,5 +1,6 @@
 v0.13.2 (2014-06-01)
 ======================
+	-- fix painting of forwarded tray
 	-- fix initial window workspace
 	-- fix launcher with debug option in config file
 	-- fix compilation of x265 encoder
