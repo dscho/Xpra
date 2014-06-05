@@ -1,3 +1,12 @@
+xpra (0.13.3-1) UNRELEASED; urgency=low
+  * fix xpra upgrade
+  * fix xpra control error handling
+  * fix slow cursor updates
+  * fix error in rgb strict mode
+  * add missing x11 server type information
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 05 Jun 2014 12:48:55 +0700
+
 xpra (0.13.2-1) UNRELEASED; urgency=low
   * fix painting of forwarded tray
   * fix initial window workspace
