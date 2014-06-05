@@ -188,6 +188,7 @@ So basically it's screen for remote X apps.
 * Sun Jun 01 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.3-1
 - fix xpra upgrade
 - fix xpra control error handling
+- fix window refresh on inactive workspace
 - fix slow cursor updates
 - fix error in rgb strict mode
 - add missing x11 server type information
