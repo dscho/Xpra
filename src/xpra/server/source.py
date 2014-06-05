@@ -1161,7 +1161,7 @@ class ServerSource(object):
         self.cursor_sizes = sizes
         if not self.send_cursor_pending:
             self.send_cursor_pending = True
-            delay = max(10, int(self.global_batch_config.delay*4))
+            delay = max(10, int(self.global_batch_config.delay/4))
             self.timeout_add(delay, self.do_send_cursor)
 
     def do_send_cursor(self):
