@@ -1,3 +1,12 @@
+v0.13.3 (2014-06-05)
+======================
+	-- fix xpra upgrade
+	-- fix xpra control error handling
+	-- fix slow cursor updates
+	-- fix error in rgb strict mode
+	-- add missing x11 server type information
+
+
 v0.13.2 (2014-06-01)
 ======================
 	-- fix painting of forwarded tray
