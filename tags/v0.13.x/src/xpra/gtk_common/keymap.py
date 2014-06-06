@@ -40,6 +40,11 @@ def get_gtk_keymap(ignore_keys=[None, "VoidSymbol"]):
             for keyval, keycode, group, level in entries:
                 #assert keycode==i
                 name = gdk.keyval_name(keyval)
+                #ugly workaround for "period" key on win32 (see ticket 588)
+                #which is reported as "period" instead of "KP_Decimal",
+                #despite being on the numeric keypad just like all the other KP_* keys...
+                if name=="period" and keyval==46 and keycode==110:
+                    name = "KP_Decimal"
                 if name not in ignore_keys:
                     keycodes.append((nn(keyval), nn(name), nn(keycode), nn(group), nn(level)))
     log("get_gtk_keymap(%s)=%s (keymap=%s)", ignore_keys, keycodes, keymap)

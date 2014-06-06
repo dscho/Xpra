@@ -113,6 +113,7 @@ class Keyboard(KeyboardBase):
             So we just ignore those and rely on the list of "modifiers" passed
             with each keypress to let the server set them for us when needed.
         """
+        log("win32.process_key_event(%s, %s, %s)", send_key_action_cb, wid, key_event)
         if key_event.keyval==2**24-1 and key_event.keyname=="VoidSymbol":
             return
         #self.modifier_mappings = None       #{'control': [(37, 'Control_L'), (105, 'Control_R')], 'mod1':
@@ -135,5 +136,8 @@ class Keyboard(KeyboardBase):
                         undo[2] = False
                         send_key_action_cb(*undo)
                 self.AltGr_modifiers(key_event.modifiers, not key_event.pressed)
+        if key_event.keyname=="period" and key_event.keyval==46 and key_event.keycode==110:
+            log("patched 'period' keyname to 'KP_Decimal'")
+            key_event.keyname = "KP_Decimal"
         self.last_key_event_sent = key_event
         send_key_action_cb(wid, key_event)
