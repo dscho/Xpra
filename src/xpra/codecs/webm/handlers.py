@@ -127,7 +127,10 @@ class WebPHandler(object):
         :type filename: string
         :rtype: WebPHandler
         """
-        from xpra.codecs.webm import decode
+        try:
+            from . import decode                    #@UnusedImport
+        except:
+            import decode                           #@Reimport
 
         data = file(filename, "rb").read()
         width, height = decode.GetInfo(data)
