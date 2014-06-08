@@ -35,7 +35,7 @@ from ctypes import cdll as loader
 
 
 # Generic constants
-__VERSION__ = "0.2.4"
+__VERSION__ = "0.2.5"
 
 PIXEL_SZ = 3
 PIXEL_ALPHA_SZ = 4
