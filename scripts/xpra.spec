@@ -189,6 +189,7 @@ So basically it's screen for remote X apps.
 - fix numeric keypad period key mapping on some non-us keyboards
 - fix client launcher GUI on OSX
 - fix remote ssh start with clean user account
+- fix remote shadow start with automatic display selection
 - fix avoid scaling during resize
 - fix changes of speed and quality via xpra control (make it stick)
 - fix xpra info global batch statistics
