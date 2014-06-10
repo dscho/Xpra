@@ -2,13 +2,14 @@ xpra (0.13.4-1) UNRELEASED; urgency=low
   * fix numeric keypad period key mapping on some non-us keyboards
   * fix client launcher GUI on OSX
   * fix remote ssh start with clean user account
+  * fix remote shadow start with automatic display selection
   * fix avoid scaling during resize
   * fix changes of speed and quality via xpra control (make it stick)
   * fix xpra info global batch statistics
   * fix focus issue with some applications
   * fix batch delay use
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 10 Jun 2014 17:48:32 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 10 Jun 2014 21:40:12 +0700
 
 xpra (0.13.3-1) UNRELEASED; urgency=low
   * fix xpra upgrade
