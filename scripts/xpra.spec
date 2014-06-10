@@ -191,6 +191,9 @@ So basically it's screen for remote X apps.
 - fix remote ssh start with clean user account
 - fix avoid scaling during resize
 - fix changes of speed and quality via xpra control (make it stick)
+- fix xpra info global batch statistics
+- fix focus issue with some applications
+- fix batch delay use
 
 * Sun Jun 01 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.3-1
 - fix xpra upgrade
