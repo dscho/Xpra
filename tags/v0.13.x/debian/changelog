@@ -1,7 +1,11 @@
 xpra (0.13.4-1) UNRELEASED; urgency=low
   * fix numeric keypad period key mapping on some non-us keyboards
+  * fix client launcher GUI on OSX
+  * fix remote ssh start with clean user account
+  * fix avoid scaling during resize
+  * fix changes of speed and quality via xpra control (make it stick)
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 06 Jun 2014 18:12:58 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 10 Jun 2014 12:57:45 +0700
 
 xpra (0.13.3-1) UNRELEASED; urgency=low
   * fix xpra upgrade

@@ -185,8 +185,12 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Fri Jun 06 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.4-1
+* Tue Jun 10 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.4-1
 - fix numeric keypad period key mapping on some non-us keyboards
+- fix client launcher GUI on OSX
+- fix remote ssh start with clean user account
+- fix avoid scaling during resize
+- fix changes of speed and quality via xpra control (make it stick)
 
 * Sun Jun 01 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.3-1
 - fix xpra upgrade
