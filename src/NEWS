@@ -1,4 +1,11 @@
-v0.13.4 (2014-06-06)
+v0.13.5 (2014-06-11)
+======================
+	-- fix use correct dimensions when evaluating video
+	-- fix invalid latency statistics recording
+	-- fix auto-refresh wrongly cancelled
+
+
+v0.13.4 (2014-06-10)
 ======================
 	-- fix numeric keypad period key mapping on some non-us keyboards
 	-- fix client launcher GUI on OSX
