@@ -185,10 +185,12 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Wed Jun 11 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.5-1
+* Thu Jun 12 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.5-1
 - fix use correct dimensions when evaluating video
 - fix invalid latency statistics recording
 - fix auto-refresh wrongly cancelled
+- fix connection via nested ssh commands
+- fix statically linked builds of swscale codec
 
 * Tue Jun 10 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.4-1
 - fix numeric keypad period key mapping on some non-us keyboards
