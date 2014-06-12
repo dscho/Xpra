@@ -5,6 +5,8 @@ v0.13.5 (2014-06-12)
 	-- fix auto-refresh wrongly cancelled
 	-- fix connection via nested ssh commands
 	-- fix statically linked builds of swscale codec
+	-- fix system tray icons when upgrading server
+	-- fix opengl compatibility with older libraries
 
 
 v0.13.4 (2014-06-10)

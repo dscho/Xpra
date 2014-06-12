@@ -191,6 +191,8 @@ So basically it's screen for remote X apps.
 - fix auto-refresh wrongly cancelled
 - fix connection via nested ssh commands
 - fix statically linked builds of swscale codec
+- fix system tray icons when upgrading server
+- fix opengl compatibility with older libraries
 
 * Tue Jun 10 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.4-1
 - fix numeric keypad period key mapping on some non-us keyboards
