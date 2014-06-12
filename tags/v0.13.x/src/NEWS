@@ -1,8 +1,10 @@
-v0.13.5 (2014-06-11)
+v0.13.5 (2014-06-12)
 ======================
 	-- fix use correct dimensions when evaluating video
 	-- fix invalid latency statistics recording
 	-- fix auto-refresh wrongly cancelled
+	-- fix connection via nested ssh commands
+	-- fix statically linked builds of swscale codec
 
 
 v0.13.4 (2014-06-10)
