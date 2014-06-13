@@ -6,8 +6,10 @@ xpra (0.13.5-1) UNRELEASED; urgency=low
   * fix statically linked builds of swscale codec
   * fix system tray icons when upgrading server
   * fix opengl compatibility with older libraries
+  * fix ssh connection with shells not starting in home directory
+  * fix keyboard layout change forwarding
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 12 Jun 2014 22:19:51 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 13 Jun 2014 20:40:10 +0700
 
 xpra (0.13.4-1) UNRELEASED; urgency=low
   * fix numeric keypad period key mapping on some non-us keyboards
