@@ -1,4 +1,4 @@
-v0.13.5 (2014-06-12)
+v0.13.5 (2014-06-13)
 ======================
 	-- fix use correct dimensions when evaluating video
 	-- fix invalid latency statistics recording
@@ -7,6 +7,8 @@ v0.13.5 (2014-06-12)
 	-- fix statically linked builds of swscale codec
 	-- fix system tray icons when upgrading server
 	-- fix opengl compatibility with older libraries
+	-- fix ssh connection with shells not starting in home directory
+	-- fix keyboard layout change forwarding
 
 
 v0.13.4 (2014-06-10)
