@@ -1,4 +1,9 @@
 xpra (0.13.5-1) UNRELEASED; urgency=low
+  * re-fix opengl compatibility
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 14 Jun 2014 01:04:46 +0700
+
+xpra (0.13.5-1) UNRELEASED; urgency=low
   * fix use correct dimensions when evaluating video
   * fix invalid latency statistics recording
   * fix auto-refresh wrongly cancelled
