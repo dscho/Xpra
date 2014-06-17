@@ -138,5 +138,11 @@ class Keyboard(KeyboardBase):
         if key_event.keyname=="period" and key_event.keyval==46 and key_event.keycode==110:
             log("patched 'period' keyname to 'KP_Decimal'")
             key_event.keyname = "KP_Decimal"
+        elif key_event.keyname=="dead_tilde" and key_event.keyval==65107 and key_event.keycode==50:
+            log("patched 'dead_tilde' keyname to 'asciitilde'")
+            key_event.keyname = "asciitilde"
+        elif key_event.keyname=="dead_grave" and key_event.keyval==65104 and key_event.keycode==55:
+            log("patched 'dead_grave' keyname to 'grave'")
+            key_event.keyname = "grave"
         self.last_key_event_sent = (wid, key_event)
         send_key_action_cb(wid, key_event)
