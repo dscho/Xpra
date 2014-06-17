@@ -185,9 +185,13 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Sat Jun 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.6-3
+* Tue Jun 17 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.6-3
 - fix compatibility older versions of pygtk (centos5)
 - fix compatibility with python 2.4 (centos5)
+- fix AltGr workaround with win32 clients
+- fix some missing keys with 'fr' keyboard layout (win32)
+- fix installation on systems without python-glib (centos5)
+- fix Xorg version detection for Fedora rawhide
 
 * Sat Jun 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.5-3
 - re-fix opengl compatibility 

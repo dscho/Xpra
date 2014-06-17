@@ -1,8 +1,12 @@
 xpra (0.13.6-1) UNRELEASED; urgency=low
   * fix compatibility older versions of pygtk (centos5)
   * fix compatibility with python 2.4 (centos5)
+  * fix AltGr workaround with win32 clients
+  * fix some missing keys with 'fr' keyboard layout (win32)
+  * fix installation on systems without python-glib (centos5)
+  * fix Xorg version detection for Fedora rawhide
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Sat, 14 Jun 2014 17:43:43 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 17 Jun 2014 23:02:29 +0700
 
 xpra (0.13.5-3) UNRELEASED; urgency=low
   * re-fix opengl compatibility
