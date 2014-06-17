@@ -45,6 +45,10 @@ def get_gtk_keymap(ignore_keys=[None, "VoidSymbol"]):
                 #despite being on the numeric keypad just like all the other KP_* keys...
                 if name=="period" and keyval==46 and keycode==110:
                     name = "KP_Decimal"
+                elif name=="dead_tilde" and keyval==65107 and keycode==50:
+                    name = "asciitilde"
+                elif name=="dead_grave" and keyval==65104 and keycode==55:
+                    name = "grave"
                 if name not in ignore_keys:
                     keycodes.append((nn(keyval), nn(name), nn(keycode), nn(group), nn(level)))
     log("get_gtk_keymap(%s)=%s (keymap=%s)", ignore_keys, keycodes, keymap)
