@@ -663,7 +663,11 @@ def get_xorg_conf_and_script():
         print("failed to detect OS release using %s: %s" % (" ".join(cmd), e))
 
     #do live detection
-    cmd = ["Xorg", "-version"]
+    #fedora rawhide binary:
+    if os.path.exists("/usr/libexec/Xorg.bin"):
+        cmd = ["/usr/libexec/Xorg.bin", "-version"]
+    else:
+        cmd = ["Xorg", "-version"] 
     if verbose_ENABLED:
         print("detecting Xorg version using: %s" % str(cmd))
     try:
