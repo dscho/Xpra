@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.13.6
+%define version 0.13.7
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -185,6 +185,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Thu Jul 10 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.7-3
+- fix x11 server pixmap memory leak
+
 * Tue Jun 17 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.6-3
 - fix compatibility older versions of pygtk (centos5)
 - fix compatibility with python 2.4 (centos5)
