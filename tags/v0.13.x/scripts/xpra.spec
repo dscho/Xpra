@@ -190,6 +190,7 @@ So basically it's screen for remote X apps.
 - fix speed and quality values range (1 to 100)
 - fix nvenc device allocation errors
 - fix unnecessary refreshes with nvenc
+- fix "initenv" compatibility with older servers
 - don't start child when upgrading or shadowing
 
 * Tue Jun 17 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.6-3

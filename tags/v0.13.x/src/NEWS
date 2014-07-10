@@ -4,6 +4,7 @@ v0.13.7 (2014-07-10)
 	-- fix speed and quality values range (1 to 100)
 	-- fix nvenc device allocation errors
 	-- fix unnecessary refreshes with nvenc
+	-- fix "initenv" compatibility with older servers
 	-- don't start child when upgrading or shadowing
 
 
