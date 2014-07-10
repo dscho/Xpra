@@ -187,6 +187,10 @@ So basically it's screen for remote X apps.
 %changelog
 * Thu Jul 10 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.7-3
 - fix x11 server pixmap memory leak
+- fix speed and quality values range (1 to 100)
+- fix nvenc device allocation errors
+- fix unnecessary refreshes with nvenc
+- don't start child when upgrading or shadowing
 
 * Tue Jun 17 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.6-3
 - fix compatibility older versions of pygtk (centos5)

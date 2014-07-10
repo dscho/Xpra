@@ -1,5 +1,9 @@
 xpra (0.13.7-1) UNRELEASED; urgency=low
   * fix x11 server pixmap memory leak
+  * fix speed and quality values range (1 to 100)
+  * fix nvenc device allocation errors
+  * fix unnecessary refreshes with nvenc
+  * don't start child when upgrading or shadowing
 
  -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 10 Jul 2014 19:47:21 +0200
 
