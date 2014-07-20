@@ -1051,9 +1051,6 @@ class WindowSource(object):
         self.refresh_timer = self.timeout_add(delay, timer_full_refresh)
 
     def full_quality_refresh(self, window, damage_options):
-        if self._damage_delayed:
-            #there is already a new damage region pending
-            return
         if not window.is_managed():
             #this window is no longer managed
             return
