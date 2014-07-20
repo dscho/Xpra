@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.13.7
+%define version 0.13.8
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -185,6 +185,12 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Sun Jul 20 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.8-3
+- fix SELinux static codec library label (make it persistent)
+- fix missed auto-refresh when batching
+- fix png and jpeg painting via gdk pixbuf (when PIL is missing)
+- fix webp refresh loops
+
 * Thu Jul 10 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.7-3
 - fix x11 server pixmap memory leak
 - fix speed and quality values range (1 to 100)
