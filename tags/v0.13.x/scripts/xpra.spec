@@ -1230,13 +1230,18 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/xpra.desktop
 %if 0%{?static_ffmpeg}
 chcon -t texrel_shlib_t %{python_sitelib}/xpra/codecs/csc_swscale/colorspace_converter.so
 chcon -t texrel_shlib_t %{python_sitelib}/xpra/codecs/dec_avcodec*/decoder.so
+semanage fcontext -a -t texrel_shlib_t %{python_sitelib}/xpra/codecs/csc_swscale/colorspace_converter.so
+semanage fcontext -a -t texrel_shlib_t %{python_sitelib}/xpra/codecs/dec_avcodec*/decoder.so
 %endif
 %if 0%{?static_vpx}
 chcon -t texrel_shlib_t %{python_sitelib}/xpra/codecs/vpx/encoder.so
 chcon -t texrel_shlib_t %{python_sitelib}/xpra/codecs/vpx/decoder.so
+semanage fcontext -a -t texrel_shlib_t /xpra/codecs/vpx/encoder.so
+semanage fcontext -a -t texrel_shlib_t /xpra/codecs/vpx/decoder.so
 %endif
 %if 0%{?static_x264}
 chcon -t texrel_shlib_t %{python_sitelib}/xpra/codecs/enc_x264/encoder.so
+semanage fcontext -a -t texrel_shlib_t %{python_sitelib}/xpra/codecs/enc_x264/encoder.so
 %endif
 %if %{defined Fedora}
 update-desktop-database &> /dev/null || :
