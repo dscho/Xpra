@@ -1,3 +1,11 @@
+v0.13.8 (2014-07-20)
+======================
+	-- fix SELinux static codec library label (make it persistent)
+	-- fix missed auto-refresh when batching
+	-- fix png and jpeg painting via gdk pixbuf (when PIL is missing)
+	-- fix webp refresh loops
+
+
 v0.13.7 (2014-07-10)
 ======================
 	-- fix x11 server pixmap memory leak
