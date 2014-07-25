@@ -421,6 +421,17 @@ form.trac-comment-editor, div.ticketdraft  {
         box-shadow: none;
 }
 
+/* make the modify ticket box less annoying on a large screen: predictable location */
+form#propertyform div {
+        clear: left;
+}
+h3.foldable {
+        margin-top: 10px;
+}
+div#modify fieldset {
+        clear: both;
+}
+
 tt {
 	color: #5E2612;
 	border: 1px solid #953;
