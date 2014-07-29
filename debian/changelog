@@ -1,10 +1,14 @@
 xpra (0.13.8-1) UNRELEASED; urgency=low
+  * fix server early exit when pulseaudio terminates
   * fix SELinux static codec library label (make it persistent)
   * fix missed auto-refresh when batching
   * fix png and jpeg painting via gdk pixbuf (when PIL is missing)
   * fix webp refresh loops
+  * honour lz4-off environment variable
+  * fix proxy handling of raw RGB data for large screen sizes
+  * fix potential error from missing data in client packets
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Sun, 20 Jul 2014 21:09:30 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 29 Jul 2014 17:39:43 +0700
 
 xpra (0.13.7-1) UNRELEASED; urgency=low
   * fix x11 server pixmap memory leak
