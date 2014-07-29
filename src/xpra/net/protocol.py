@@ -829,7 +829,7 @@ class Protocol(object):
                 if compression_level>0:
                     try:
                         if compression_level & LZ4_FLAG:
-                            assert has_lz4
+                            assert use_lz4
                             data = LZ4_uncompress(data)
                         else:
                             data = decompress(data)
