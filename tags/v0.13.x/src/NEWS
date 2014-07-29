@@ -1,9 +1,13 @@
-v0.13.8 (2014-07-20)
+v0.13.8 (2014-07-29)
 ======================
+	-- fix server early exit when pulseaudio terminates
 	-- fix SELinux static codec library label (make it persistent)
 	-- fix missed auto-refresh when batching
 	-- fix png and jpeg painting via gdk pixbuf (when PIL is missing)
 	-- fix webp refresh loops
+	-- honour lz4-off environment variable
+	-- fix proxy handling of raw RGB data for large screen sizes
+	-- fix potential error from missing data in client packets
 
 
 v0.13.7 (2014-07-10)

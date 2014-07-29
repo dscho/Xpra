@@ -185,11 +185,15 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Sun Jul 20 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.8-3
+* Tue Jul 29 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.8-1
+- fix server early exit when pulseaudio terminates
 - fix SELinux static codec library label (make it persistent)
 - fix missed auto-refresh when batching
 - fix png and jpeg painting via gdk pixbuf (when PIL is missing)
 - fix webp refresh loops
+- honour lz4-off environment variable
+- fix proxy handling of raw RGB data for large screen sizes
+- fix potential error from missing data in client packets
 
 * Thu Jul 10 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.7-3
 - fix x11 server pixmap memory leak
