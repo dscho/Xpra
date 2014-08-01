@@ -434,6 +434,8 @@ class Protocol(object):
         chunks, proto_flags = self.encode(packet)
         try:
             self._write_lock.acquire()
+            if self._closed:
+                return
             self._add_chunks_to_queue(chunks, proto_flags, start_send_cb, end_send_cb)
         finally:
             self._write_lock.release()
@@ -902,6 +904,7 @@ class Protocol(object):
             then no matter what, we close the connection and stop the threads.
         """
         if self._closed:
+            log("flush_then_close: already closed")
             return
         def wait_for_queue(timeout=10):
             #IMPORTANT: if we are here, we have the write lock held!
@@ -917,11 +920,28 @@ class Protocol(object):
             else:
                 log("flush_then_close: queue is now empty, sending the last packet and closing")
                 chunks, proto_flags = self.encode(last_packet)
-                def close_cb(*args):
+                def close_and_release():
+                    log("flush_then_close: wait_for_packet_sent() close_and_release()")
                     self.close()
-                self._add_chunks_to_queue(chunks, proto_flags, start_send_cb=None, end_send_cb=close_cb)
-                self._write_lock.release()
-                self.timeout_add(5*1000, self.close)
+                    try:
+                        self._write_lock.release()
+                    except:
+                        pass
+                def wait_for_packet_sent():
+                    log("flush_then_close: wait_for_packet_sent() queue.empty()=%s, closed=%s", self._write_queue.empty(), self._closed)
+                    if self._write_queue.empty() or self._closed:
+                        #it got sent, we're done!
+                        close_and_release()
+                        return False
+                    return not self._closed     #run until we manage to close (here or via the timeout)
+                def packet_queued(*args):
+                    #if we're here, we have the lock and the packet is in the write queue
+                    log("flush_then_close: packet_queued() closed=%s", self._closed)
+                    #check every 100ms
+                    self.timeout_add(100, wait_for_packet_sent)
+                self._add_chunks_to_queue(chunks, proto_flags, start_send_cb=None, end_send_cb=packet_queued)
+                #just in case wait_for_packet_sent never fires:
+                self.timeout_add(5*1000, close_and_release)
 
         def wait_for_write_lock(timeout=100):
             if not self._write_lock.acquire(False):
@@ -939,7 +959,10 @@ class Protocol(object):
         # -> wait_for_write_lock
         # -> wait_for_queue
         # -> _add_chunks_to_queue
-        # -> close
+        # -> packet_queued
+        # -> wait_for_packet_sent
+        # -> close_and_release
+        log("flush_then_close: wait_for_write_lock()")
         wait_for_write_lock()
 
     def close(self):
