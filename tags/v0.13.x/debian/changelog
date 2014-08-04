@@ -4,13 +4,15 @@ xpra (0.13.8-1) UNRELEASED; urgency=low
   * fix missed auto-refresh when batching
   * fix disabled clipboard packets coming through
   * fix cleaner client connection shutdown sequence and exit code
+  * fix resource leak on connection error
+  * fix avahi double free on exit
   * fix png and jpeg painting via gdk pixbuf (when PIL is missing)
   * fix webp refresh loops
   * honour lz4-off environment variable
   * fix proxy handling of raw RGB data for large screen sizes
   * fix potential error from missing data in client packets
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Fri, 01 Aug 2014 10:11:16 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Mon, 04 Aug 2014 12:24:45 +0700
 
 xpra (0.13.7-1) UNRELEASED; urgency=low
   * fix x11 server pixmap memory leak
