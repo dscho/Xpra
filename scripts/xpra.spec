@@ -194,12 +194,14 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Fri Aug 01 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.8-1
+* Mon Aug 04 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.8-1
 - fix server early exit when pulseaudio terminates
 - fix SELinux static codec library label (make it persistent)
 - fix missed auto-refresh when batching
 - fix disabled clipboard packets coming through
 - fix cleaner client connection shutdown sequence and exit code
+- fix resource leak on connection error
+- fix avahi double free on exit
 - fix png and jpeg painting via gdk pixbuf (when PIL is missing)
 - fix webp refresh loops
 - honour lz4-off environment variable
