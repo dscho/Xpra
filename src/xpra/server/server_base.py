@@ -516,7 +516,15 @@ class ServerBase(ServerCore):
                           self.default_quality, self.default_min_quality,
                           self.default_speed, self.default_min_speed)
         log("process_hello serversource=%s", ss)
-        ss.parse_hello(c)
+        try:
+            ss.parse_hello(c)
+        except:
+            #close it already
+            ss.close()
+            raise
+        self._server_sources[proto] = ss
+
+        #process screen size (if needed)
         dw, dh = None, None
         if ss.desktop_size:
             try:
@@ -528,7 +536,7 @@ class ServerBase(ServerCore):
                     log_screen_sizes(dw, dh, ss.screen_sizes)
             except:
                 dw, dh = None, None
-        self._server_sources[proto] = ss
+
         root_w, root_h = self.set_best_screen_size()
         self.calculate_workarea()
         self.set_desktop_geometry(dw or root_w, dh or root_h)
