@@ -5,6 +5,9 @@ xpra (0.13.8-1) UNRELEASED; urgency=low
   * fix disabled clipboard packets coming through
   * fix cleaner client connection shutdown sequence and exit code
   * fix resource leak on connection error
+  * fix potential bug in fallback encoding selection
+  * fix deadlock on worker race it was meant to prevent
+  * fix remote ssh server start timeout
   * fix avahi double free on exit
   * fix png and jpeg painting via gdk pixbuf (when PIL is missing)
   * fix webp refresh loops
@@ -12,7 +15,7 @@ xpra (0.13.8-1) UNRELEASED; urgency=low
   * fix proxy handling of raw RGB data for large screen sizes
   * fix potential error from missing data in client packets
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Mon, 04 Aug 2014 12:24:45 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 06 Aug 2014 09:33:07 +0700
 
 xpra (0.13.7-1) UNRELEASED; urgency=low
   * fix x11 server pixmap memory leak
