@@ -1,4 +1,4 @@
-v0.13.8 (2014-08-04)
+v0.13.8 (2014-08-06)
 ======================
 	-- fix server early exit when pulseaudio terminates
 	-- fix SELinux static codec library label (make it persistent)
@@ -6,6 +6,9 @@ v0.13.8 (2014-08-04)
 	-- fix disabled clipboard packets coming through
 	-- fix cleaner client connection shutdown sequence and exit code
 	-- fix resource leak on connection error
+	-- fix potential bug in fallback encoding selection
+	-- fix deadlock on worker race it was meant to prevent
+	-- fix remote ssh server start timeout
 	-- fix avahi double free on exit
 	-- fix png and jpeg painting via gdk pixbuf (when PIL is missing)
 	-- fix webp refresh loops
