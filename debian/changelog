@@ -1,3 +1,9 @@
+xpra (0.13.9-1) UNRELEASED; urgency=low
+  * fix clipboard errors with no data
+  * fix opencl platform initialization errors
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 07 Aug 2014 09:16:56 +0700
+
 xpra (0.13.8-1) UNRELEASED; urgency=low
   * fix server early exit when pulseaudio terminates
   * fix SELinux static codec library label (make it persistent)
