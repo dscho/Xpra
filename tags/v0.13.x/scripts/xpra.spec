@@ -3,7 +3,7 @@
 # Xpra is released under the terms of the GNU GPL v2, or, at your option, any
 # later version. See the file COPYING for details.
 
-%define version 0.13.8
+%define version 0.13.9
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %if 0%{?build_no} == 0
 %define build_no 0
@@ -194,6 +194,10 @@ So basically it's screen for remote X apps.
 
 
 %changelog
+* Thu Aug 07 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.9-1
+- fix clipboard errors with no data
+- fix opencl platform initialization errors
+
 * Wed Aug 06 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.8-1
 - fix server early exit when pulseaudio terminates
 - fix SELinux static codec library label (make it persistent)

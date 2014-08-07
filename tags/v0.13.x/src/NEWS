@@ -1,3 +1,9 @@
+v0.13.9 (2014-08-07)
+======================
+	-- fix clipboard errors with no data
+	-- fix opencl platform initialization errors
+
+
 v0.13.8 (2014-08-06)
 ======================
 	-- fix server early exit when pulseaudio terminates
