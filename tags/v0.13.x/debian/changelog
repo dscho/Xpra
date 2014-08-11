@@ -1,8 +1,14 @@
 xpra (0.13.9-1) UNRELEASED; urgency=low
+  * use secure "compare_digest" if available
+  * fix crashes in codec cleanup
+  * fix video encoding fallback code
+  * fix fakeXinerama setup wrongly skipped in some cases
+  * fix connection failures with large screens and uncompressed RGB
+  * fix Ubuntu trustyi Xvfb configuration
   * fix clipboard errors with no data
   * fix opencl platform initialization errors
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Thu, 07 Aug 2014 09:16:56 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Mon, 11 Aug 2014 14:49:47 +0700
 
 xpra (0.13.8-1) UNRELEASED; urgency=low
   * fix server early exit when pulseaudio terminates
