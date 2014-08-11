@@ -1,5 +1,11 @@
-v0.13.9 (2014-08-07)
+v0.13.9 (2014-08-11)
 ======================
+	-- use secure "compare_digest" if available
+	-- fix crashes in codec cleanup
+	-- fix video encoding fallback code
+	-- fix fakeXinerama setup wrongly skipped in some cases
+	-- fix connection failures with large screens and uncompressed RGB
+	-- fix Ubuntu trustyi Xvfb configuration
 	-- fix clipboard errors with no data
 	-- fix opencl platform initialization errors
 
