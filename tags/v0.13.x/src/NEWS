@@ -1,5 +1,7 @@
-v0.13.9 (2014-08-11)
+v0.13.9 (2014-08-13)
 ======================
+	-- fix clipboard on OSX
+	-- fix remote ssh start with start-child issues
 	-- use secure "compare_digest" if available
 	-- fix crashes in codec cleanup
 	-- fix video encoding fallback code

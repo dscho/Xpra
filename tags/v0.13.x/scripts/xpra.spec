@@ -194,7 +194,9 @@ So basically it's screen for remote X apps.
 
 
 %changelog
-* Mon Aug 11 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.9-1
+* Wed Aug 13 2014 Antoine Martin <antoine@devloop.org.uk> 0.13.9-1
+- fix clipboard on OSX
+- fix remote ssh start with start-child issues
 - use secure "compare_digest" if available
 - fix crashes in codec cleanup
 - fix video encoding fallback code
