@@ -1,4 +1,6 @@
 xpra (0.13.9-1) UNRELEASED; urgency=low
+  * fix clipboard on OSX
+  * fix remote ssh start with start-child issues
   * use secure "compare_digest" if available
   * fix crashes in codec cleanup
   * fix video encoding fallback code
@@ -8,7 +10,7 @@ xpra (0.13.9-1) UNRELEASED; urgency=low
   * fix clipboard errors with no data
   * fix opencl platform initialization errors
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Mon, 11 Aug 2014 14:49:47 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 13 Aug 2014 21:56:26 +0700
 
 xpra (0.13.8-1) UNRELEASED; urgency=low
   * fix server early exit when pulseaudio terminates
