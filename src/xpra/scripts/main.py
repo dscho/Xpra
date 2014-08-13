@@ -64,12 +64,13 @@ def main(script_file, cmdline):
     try:
         platform_init("Xpra")
         try:
-            parser, options, args = parse_cmdline(cmdline)
+            defaults = make_defaults_struct()
+            parser, options, args = do_parse_cmdline(cmdline, defaults)
             if not args:
                 print("xpra: need a mode")
                 return -1
             mode = args.pop(0)
-            return run_mode(script_file, parser, options, args, mode)
+            return run_mode(script_file, parser, options, args, mode, defaults)
         except SystemExit:
             raise
         except:
@@ -94,6 +95,10 @@ def fixup_debug_option(value):
 
 
 def parse_cmdline(cmdline):
+    defaults = make_defaults_struct()
+    return do_parse_cmdline(cmdline, defaults)
+
+def do_parse_cmdline(cmdline, defaults):
     #################################################################
     ## NOTE NOTE NOTE
     ##
@@ -128,7 +133,6 @@ def parse_cmdline(cmdline):
 
     parser = OptionParser(version="xpra v%s" % XPRA_VERSION,
                           usage="\n" + "".join(command_options))
-    defaults = make_defaults_struct()
     hidden_options = {"display" : defaults.display}
     if len(server_modes):
         group = OptionGroup(parser, "Server Options",
@@ -611,7 +615,7 @@ def configure_logging(options, mode):
         signal.signal(signal.SIGUSR1, sigusr1)
 
 
-def run_mode(script_file, parser, options, args, mode):
+def run_mode(script_file, parser, options, args, mode, defaults):
     #configure default logging handler:
     if os.name=="posix" and os.getuid()==0 and mode!="proxy":
         warn("\nWarning: running as root")
@@ -622,7 +626,7 @@ def run_mode(script_file, parser, options, args, mode):
         ssh_display = len(args)>0 and (args[0].startswith("ssh/") or args[0].startswith("ssh:"))
         if mode in ("start", "shadow") and ssh_display:
             #ie: "xpra start ssh:HOST:DISPLAY --start-child=xterm"
-            return run_remote_server(parser, options, args, mode)
+            return run_remote_server(parser, options, args, mode, defaults)
         elif (mode in ("start", "upgrade", "proxy") and supports_server) or (mode=="shadow" and supports_shadow):
             nox()
             from xpra.scripts.server import run_server
@@ -636,7 +640,7 @@ def run_mode(script_file, parser, options, args, mode):
             return run_list(parser, options, args)
         elif mode in ("_proxy", "_proxy_start", "_shadow_start") and (supports_server or supports_shadow):
             nox()
-            return run_proxy(parser, options, script_file, args, mode)
+            return run_proxy(parser, options, script_file, args, mode, defaults)
         elif mode == "initenv":
             from xpra.scripts.server import xpra_runner_shell_script, write_runner_shell_script
             script = xpra_runner_shell_script(script_file, os.getcwd(), options.socket_dir)
@@ -1032,7 +1036,21 @@ def do_run_client(app):
     finally:
         app.cleanup()
 
-def run_remote_server(parser, opts, args, mode):
+def shellquote(s):
+    return "'" + s.replace("'", "'\\''") + "'"
+
+def strip_defaults_start_child(start_child, defaults_start_child):
+    if start_child and defaults_start_child:
+        #ensure we don't pass start-child commands
+        #which came from defaults (the configuration files)
+        #only the ones specified on the command line:
+        #(and only remove them once so the command line can re-add the same ones!)
+        for x in defaults_start_child:
+            if x in start_child:
+                start_child.remove(x)
+    return start_child
+
+def run_remote_server(parser, opts, args, mode, defaults):
     """ Uses the regular XpraClient with patched proxy arguments to tell run_proxy to start the server """
     params = parse_display_name(parser.error, opts, args[0])
     #add special flags to "display_as_args"
@@ -1040,8 +1058,9 @@ def run_remote_server(parser, opts, args, mode):
     if params["display"] is not None:
         proxy_args.append(params["display"])
     if opts.start_child:
-        for c in opts.start_child:
-            proxy_args.append("--start-child=%s" % c)
+        start_child = strip_defaults_start_child(opts.start_child, defaults.start_child)
+        for c in start_child:
+            proxy_args.append(shellquote("--start-child=%s" % c))
     #key=value options we forward:
     for x in ("session-name", "encoding", "socket-dir", "dpi"):
         v = getattr(opts, x.replace("-", "_"))
@@ -1098,7 +1117,7 @@ def guess_X11_display():
     assert len(displays)==1, "too many live X11 displays to choose from"
     return ":%s" % displays[0]
 
-def run_proxy(parser, opts, script_file, args, mode):
+def run_proxy(parser, opts, script_file, args, mode, defaults):
     from xpra.server.proxy import XpraProxy
     assert "gtk" not in sys.modules
     if mode in ("_proxy_start", "_shadow_start"):
@@ -1119,8 +1138,9 @@ def run_proxy(parser, opts, script_file, args, mode):
                 #we now know the display name, so add it:
                 args = [display_name]
         cmd += args
-        if opts.start_child and len(opts.start_child)>0:
-            for x in opts.start_child:
+        start_child = strip_defaults_start_child(opts.start_child, defaults.start_child)
+        if start_child:
+            for x in start_child:
                 cmd.append("--start-child=%s" % x)
         if opts.exit_with_children:
             cmd.append("--exit-with-children")
