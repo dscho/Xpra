@@ -1,0 +1,16 @@
+#!/bin/sh
+
+#call the "Python" wrapper:
+exe_name=$(basename $0)
+full_path=$(cd "$(dirname "$0")"; pwd -P)
+PYTHON="$full_path/PythonExecWrapper"
+
+#parse arguments into a string:
+args="[\"xpra\""
+while (($#)); do
+    args="$args,\"$1\""
+    shift
+done
+args="$args]"
+
+exec "$PYTHON" "Xpra" -c "import sys;sys.argv[0]=\"$full_path/$exe_name\";from xpra.scripts.main import main;main('xpra', $args)"
