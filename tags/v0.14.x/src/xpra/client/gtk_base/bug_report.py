@@ -19,7 +19,7 @@ pango = import_pango()
 
 
 from xpra.gtk_common.gtk_util import set_tooltip_text, add_close_accel, scaled_image, pixbuf_new_from_file, \
-                                    WIN_POS_CENTER, STATE_NORMAL, FILE_CHOOSER_ACTION_SAVE, choose_file, get_gtk_version_info
+                                    JUSTIFY_LEFT, WIN_POS_CENTER, STATE_NORMAL, FILE_CHOOSER_ACTION_SAVE, choose_file, get_gtk_version_info
 from xpra.client.gtk_base.about import about
 from xpra.client.client_base import SIGNAMES
 from xpra.platform.paths import get_icon_dir
@@ -80,7 +80,7 @@ class BugReport(object):
         #self.description.set_width_chars(40)
         self.description = gtk.TextView()
         self.description.set_accepts_tab(True)
-        self.description.set_justification(gtk.JUSTIFY_LEFT)
+        self.description.set_justification(JUSTIFY_LEFT)
         self.description.set_border_width(2)
         self.description.set_size_request(300, 80)
         ibox.pack_start(self.description, expand=False, fill=False)
@@ -288,7 +288,7 @@ class BugReport(object):
                 info = zipfile.ZipInfo(cfile, date_time=time.localtime(time.time()))
                 info.compress_type = zipfile.ZIP_DEFLATED
                 #very poorly documented:
-                info.external_attr = 0644 << 16
+                info.external_attr = 0o644 << 16
                 info.comment = tooltip
                 zf.writestr(info, s, compress_type=zipfile.ZIP_DEFLATED)
         finally:
