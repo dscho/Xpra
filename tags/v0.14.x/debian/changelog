@@ -1,3 +1,8 @@
+xpra (0.14.1-1) UNRELEASED; urgency=low
+  * fix GTK3 build
+
+ -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 19 Aug 2014 21:53:02 +0700
+
 xpra (0.14.0-1) UNRELEASED; urgency=low
   * support for lzo compression
   * support for choosing the compressors enabled (lz4, lzo, zlib)
