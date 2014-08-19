@@ -21,8 +21,14 @@ echo "Creating $PKG_NAME"
 
 rm -fr image/*pkg
 
+if [ ! -d xpra.pmdoc ]; then
+	echo extracting pmdoc
+	bunzip2 -k xpra.pmdoc.tar.bz2 && tar -xvf xpra.pmdoc.tar && rm xpra.pmdoc.tar
+fi
+
 echo "Creating PKG"
 /Developer/usr/bin/packagemaker --verbose --doc xpra.pmdoc --out image/Xpra.pkg -i org.xpra
+
 
 if [ ! -e image/Xpra.pkg ] ; then
   echo FAILED TO CREATE PKG
