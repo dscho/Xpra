@@ -235,8 +235,15 @@ fi
 
 
 %changelog
-* Tue Aug 19 2014 Antoine Martin <antoine@devloop.org.uk> 0.14.1-1
+* Wed Aug 20 2014 Antoine Martin <antoine@devloop.org.uk> 0.14.1-1
 - fix GTK3 build
+- fix start-child conflict with configuration files
+- fix loading of per-user configuration files on *nix
+- fix unnecessary warning if pulseaudio is missing
+- fix compatibility with clients without rencode support (ie: html5)
+- fix unlikely crash in nvenc encoder
+- fix error during window cleanup
+- fix OSX build script
 
 * Thu Aug 14 2014 Antoine Martin <antoine@devloop.org.uk> 0.14.0-1
 - support for lzo compression

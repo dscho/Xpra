@@ -1,7 +1,14 @@
 xpra (0.14.1-1) UNRELEASED; urgency=low
   * fix GTK3 build
+  * fix start-child conflict with configuration files
+  * fix loading of per-user configuration files on *nix
+  * fix unnecessary warning if pulseaudio is missing
+  * fix compatibility with clients without rencode support (ie: html5)
+  * fix unlikely crash in nvenc encoder
+  * fix error during window cleanup
+  * fix OSX build script
 
- -- Antoine Martin <antoine@nagafix.co.uk>  Tue, 19 Aug 2014 21:53:02 +0700
+ -- Antoine Martin <antoine@nagafix.co.uk>  Wed, 20 Aug 2014 20:38:53 +0700
 
 xpra (0.14.0-1) UNRELEASED; urgency=low
   * support for lzo compression
