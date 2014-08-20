@@ -236,6 +236,7 @@ fi
 
 %changelog
 * Wed Aug 20 2014 Antoine Martin <antoine@devloop.org.uk> 0.14.1-1
+- fix invalid encoding switch
 - fix GTK3 build
 - fix start-child conflict with configuration files
 - fix loading of per-user configuration files on *nix

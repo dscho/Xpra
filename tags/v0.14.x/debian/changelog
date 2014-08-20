@@ -1,4 +1,5 @@
 xpra (0.14.1-1) UNRELEASED; urgency=low
+  * fix invalid encoding switch
   * fix GTK3 build
   * fix start-child conflict with configuration files
   * fix loading of per-user configuration files on *nix
