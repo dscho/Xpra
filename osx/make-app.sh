@@ -133,7 +133,7 @@ done
 for x in `find $LIBDIR/python/xpra -name "*.py" -type f`; do
 	d="`dirname $x`"
 	f="`basename $x`"
-	if [ -r "$d/$fc" ]; then
+	if [ -r "$d/${f}c" ]; then
 		rm "$x"
 	fi
 done
