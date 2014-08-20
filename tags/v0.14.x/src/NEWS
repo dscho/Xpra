@@ -1,6 +1,13 @@
-v0.14.1 (2014-08-19)
+v0.14.1 (2014-08-20)
 ======================
 	-- fix GTK3 build
+	-- fix start-child conflict with configuration files
+	-- fix loading of per-user configuration files on *nix
+	-- fix unnecessary warning if pulseaudio is missing
+	-- fix compatibility with clients without rencode support (ie: html5)
+	-- fix unlikely crash in nvenc encoder
+	-- fix error during window cleanup
+	-- fix OSX build script
 
 
 v0.14.0 (2014-08-14)
