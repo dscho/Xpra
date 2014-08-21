@@ -386,7 +386,7 @@ class XpraClient(GTKXpraClient):
                 #use default:
                 cursor = gdk.Cursor(gtk.gdk.X_CURSOR)
         for gtkwindow in gtkwindows:
-            if gtk.gtk_version>=(2,14):
+            if hasattr(gtkwindow, "get_window"):
                 gdkwin = gtkwindow.get_window()
             else:
                 gdkwin = gtkwindow.window
